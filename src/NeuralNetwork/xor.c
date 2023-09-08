@@ -1,11 +1,14 @@
 #include <stdio.h>
-
+#include "NeuralNetwork.h"
 
 void train();
 
 
 void solve(char input[2]) {
-    printf("todo... %d %d\n", input[0], input[1]);
+    size_t layers_size[] = {2, 1};
+    Network test = newNetwork(layers_size, 2);
+    
+    printf("todo... %d %d  %ld\n", input[0], input[1], test.depth);
 }
 
 
