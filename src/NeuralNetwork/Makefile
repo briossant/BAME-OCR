@@ -1,7 +1,19 @@
+CC=gcc
+CFLAGS=-W -Wall -Wextra 
+LDFLAGS=
+EXEC=xor
+SRC= $(wildcard *.c)
+OBJ= $(SRC:.c=.o)
 
-all:
-	gcc -c -Wall -Wextra xor.c NeuralNetwork.c
-	gcc -o xor xor.o NeuralNetwork.o
+
+all: $(EXEC)
+
+xor: $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
 	rm -f xor *.o *.d
+

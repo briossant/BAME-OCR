@@ -17,6 +17,7 @@ Node newNode(size_t weight_size) {
     return nd;
 }
 
+
 Layer newLayer(size_t layer_size, size_t before_layer_size) {
     if (layer_size < 1) {
         errx(0, "a layer needs at least one node (layers_size < 1)");
@@ -35,9 +36,6 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
 
     return layer;
 }
-
-
-
 
 
 Network newNetwork(size_t *layers_size, size_t number_of_layers) {
