@@ -25,7 +25,7 @@ typedef struct Network {
 
 Network newNetwork(size_t *layers_size, size_t number_of_layers);
 
-Layer newLayer(size_t layer_size);
+Layer newLayer(size_t layer_size, size_t before_layer_size);
 
 Node newNode();
 
