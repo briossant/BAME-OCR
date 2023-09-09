@@ -5,7 +5,7 @@
 
 typedef struct Node {
     size_t weight_size; 
-    double value;
+    double bias;
     double *weights;  
 } Node;
 
@@ -27,7 +27,7 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers);
 
 Layer newLayer(size_t layer_size, size_t before_layer_size);
 
-Node newNode();
+Node newNode(size_t weight_size);
 
 
 #endif
