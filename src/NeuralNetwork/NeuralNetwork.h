@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
+//////////////////////////////////////
+// Struct
+
 typedef struct Node {
     size_t weight_size; 
     double bias;
@@ -23,11 +26,25 @@ typedef struct Network {
 } Network;
 
 
+
+////////////////////////////////////
+// NetworkInit
+
 Network newNetwork(size_t *layers_size, size_t number_of_layers);
 
 Layer newLayer(size_t layer_size, size_t before_layer_size);
 
 Node newNode(size_t weight_size);
 
+
+
+////////////////////////////////////
+// Propagation
+
+double* Propagate(double *inputs, Network network);
+
+double WeightedSum(double *activations, Node node);
+
+double Sigmoid(double x);
 
 #endif
