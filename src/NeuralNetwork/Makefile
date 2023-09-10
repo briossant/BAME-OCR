@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-W -Wall -Wextra 
-LDFLAGS=
+CFLAGS=-W -Wall -Wextra  
+LDFLAGS= -lm
 EXEC=xor
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)

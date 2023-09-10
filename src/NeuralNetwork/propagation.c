@@ -1,9 +1,11 @@
 #include "NeuralNetwork.h"
 #include <math.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 double WeightedSum(double *activations, Node node) {
     double sum = 0.0;
-    for (int i = 0; i <node.weight_size; i++) {
+    for (size_t i = 0; i <node.weight_size; i++) {
         sum += activations[i] * node.weights[i];
     }
     sum -= node.bias;
@@ -14,5 +16,21 @@ double Sigmoid(double x) {
     return 1/ (1-exp(-x));
 }
 
-double* Propagate(double *inputs, Network network);
+double *PropagateLayer(double *lastActivation, Layer layer) {
+    double *newActiv = malloc(sizeof(double) * layer.size);
+    for (size_t i = 0; i < layer.size; i++) {
+        newActiv[i] = Sigmoid(WeightedSum(lastActivation, layer.nodes[i]));
+    }
+    return newActiv;
+}
+
+double* Propagate(double *inputs, Network network) {
+    double *activations = inputs;
+    for (size_t i = 0; i < network.depth;i++) {
+        double *newActiv = PropagateLayer(activations, network.layers[i]);
+        free(activations);
+        activations = newActiv;
+    }
+    return activations;
+}
 

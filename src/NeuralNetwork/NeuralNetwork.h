@@ -43,6 +43,8 @@ Node newNode(size_t weight_size);
 
 double* Propagate(double *inputs, Network network);
 
+double *PropagateLayer(double *lastActivation, Layer layer);
+
 double WeightedSum(double *activations, Node node);
 
 double Sigmoid(double x);
