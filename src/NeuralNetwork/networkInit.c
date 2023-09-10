@@ -1,17 +1,18 @@
 #include "NeuralNetwork.h"
-#include <err.h>
-#include <stddef.h>
 
 
+double startingValue() {
+    return ((double)rand() / RAND_MAX * 2.0 - 1.0);
+}
 
 Node newNode(size_t weight_size) {
-    double weights[weight_size];
+    double *weights = malloc(weight_size * sizeof(double));
     for (size_t i = 0;i < weight_size;i++) {
-        weights[i] = 0.5; // replace later with a random value 
+        weights[i] = startingValue();
     }
     Node nd = {
         .weight_size = weight_size,
-        .bias = 0.0, // replace later with a random value
+        .bias = startingValue(),
         .weights = weights
     };
     return nd;
@@ -23,7 +24,7 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
         errx(0, "a layer needs at least one node (layers_size < 1)");
     }
 
-    Node nodes[layer_size];
+    Node *nodes = malloc(sizeof(Node) * layer_size);
 
     for (size_t i = 0; i < layer_size;++i) {
         nodes[i] = newNode(before_layer_size);
@@ -43,7 +44,8 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers) {
         errx(0, "a neural network has a least 2 layers : input and output. (number_of_layers < 2)");
     }
 
-    Layer layers[number_of_layers-1]; // -1 because the input layer isn't a proper layer
+    // -1 because the input layer isn't a proper layer
+    Layer *layers = malloc((number_of_layers-1) * sizeof(Layer)); 
 
     for (size_t i = 0; i < number_of_layers-1;++i) {
         layers[i] = newLayer(layers_size[i+1], layers_size[i]);    
@@ -57,5 +59,20 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers) {
 
     return network;
 }
+
+void printNetwork(Network network){
+    printf("///////////////////////////////\n");
+    printf("network -> depth: %ld  input_size: %ld \n", network.depth, network.input_size);
+    for (size_t i = 0; i < network.depth; i++) {
+        printf("layer -> size: %ld \n", network.layers[i].size);
+        for(size_t j=0; j< network.layers[i].size; j++) {
+            Node nd = network.layers[i].nodes[j];
+            printf("nd: %f %ld | ", nd.bias, nd.weight_size);
+        }
+        printf("\n");
+    }
+    printf("///////////////////////////////\n");
+}
+
 
 

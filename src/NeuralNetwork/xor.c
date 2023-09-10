@@ -5,10 +5,15 @@ void train();
 
 
 void solve(char input[2]) {
-    size_t layers_size[] = {2, 1};
-    Network test = newNetwork(layers_size, 2);
+    size_t layers_size[] = {2, 4, 2};
+    Network network = newNetwork(layers_size, 3);
     
-    printf("todo... %d %d  %ld\n", input[0], input[1], test.depth);
+    printNetwork(network);
+
+    double inputs[2] = {(double)input[0], (double)input[1]};
+    double *res = Propagate(inputs, network);
+
+    printf("Result of %d%d -> 0:%f 1:%f\n", input[0], input[1], res[0], res[1]);
 }
 
 

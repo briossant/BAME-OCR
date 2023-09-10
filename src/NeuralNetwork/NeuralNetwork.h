@@ -2,6 +2,10 @@
 #define NEURAL_NETWORK
 
 #include <stddef.h>
+#include <err.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 //////////////////////////////////////
 // Struct
@@ -36,7 +40,7 @@ Layer newLayer(size_t layer_size, size_t before_layer_size);
 
 Node newNode(size_t weight_size);
 
-
+void printNetwork(Network network);
 
 ////////////////////////////////////
 // Propagation
