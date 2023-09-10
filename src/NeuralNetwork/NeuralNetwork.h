@@ -51,6 +51,7 @@ double *PropagateLayer(double *lastActivation, Layer layer);
 
 double WeightedSum(double *activations, Node node);
 
+// may switch to ReLU function later on
 double Sigmoid(double x);
 
 #endif
