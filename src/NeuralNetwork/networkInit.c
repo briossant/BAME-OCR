@@ -2,7 +2,8 @@
 
 
 double startingValue() {
-    return ((double)rand() / RAND_MAX * 2.0 - 1.0);
+    return ((double)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
+                                                    // add it later
 }
 
 Node newNode(size_t weight_size) {

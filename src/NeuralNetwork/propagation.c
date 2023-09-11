@@ -1,5 +1,4 @@
 #include "NeuralNetwork.h"
-#include <stdio.h>
 
 double WeightedSum(double *activations, Node node) {
     double sum = 0.0;

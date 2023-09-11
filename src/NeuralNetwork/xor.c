@@ -26,6 +26,8 @@ int main(int argc, char **argv) {
         printHelp();
         return 1;
     }
+    srand(time(NULL));
+
 
     if(argv[1][0] == 's') {
         if (argc < 4) {

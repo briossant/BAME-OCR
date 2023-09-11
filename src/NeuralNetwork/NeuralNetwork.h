@@ -6,6 +6,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 
 //////////////////////////////////////
 // Struct
@@ -41,6 +43,8 @@ Layer newLayer(size_t layer_size, size_t before_layer_size);
 Node newNode(size_t weight_size);
 
 void printNetwork(Network network);
+
+double startingValue(); // don't forget to init rand() with srand(time(NULL));
 
 ////////////////////////////////////
 // Propagation
