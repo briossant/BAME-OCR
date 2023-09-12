@@ -1,10 +1,13 @@
 #include "NeuralNetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+
 void SaveNetwork(Network network, char* filepath)
 {
-   FILE * file= fopen( filepath, "w"); // this will clear the file so we can write on it, if we don't want the 
-                                       // file to be cleared do: fopen(filepath,"a" for appending
+   FILE * file= fopen( filepath, "w"); // this will clear the file so we can write on it, 
+                                       // if we don't want the 
+                                       // file to be cleared do: fopen(filepath,"a") for appending
 
    if (file == NULL)
    {
