@@ -1,8 +1,21 @@
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
-void train();
+void train() {
+    printf("training\n");
+}
 
+void save(char *filepath) {
+    printf("saving\n");
+    size_t layers_size[] = {2, 4, 2};
+    Network network = newNetwork(layers_size, 3);
+
+
+}
+
+void load(char *filepath){
+    printf("loading\n");
+}
 
 void solve(char input[2]) {
     size_t layers_size[] = {2, 4, 2};
@@ -18,7 +31,8 @@ void solve(char input[2]) {
 
 
 void printHelp() {
-    printf("Usage:\n./xor t : for training\n./xor s [0-1] [0-1]: solve inputs\n"); 
+    printf("Usage:\n./xor t : for training\n./xor p [0-1] [0-1] : propagate inputs");
+    printf("\n./xor s : save\n./xor l [filepath] : to load\n"); 
 }
 
 int main(int argc, char **argv) {
@@ -29,7 +43,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 
 
-    if(argv[1][0] == 's') {
+    if(argv[1][0] == 'p') {
         if (argc < 4) {
             printHelp();
             return 1;
@@ -38,7 +52,21 @@ int main(int argc, char **argv) {
         char input[] = {argv[2][0]-48, argv[3][0]-48};
 
         solve(input);
-    }
+    } else if(argv[1][0] == 't') { 
+        train();
+    } else if(argv[1][0] == 's') {
+        if (argc < 3) {
+            printHelp();
+            return 1;
+        }
+        save(argv[2]);
+    } else if(argv[1][0] == 'l') {
+        if (argc < 3) {
+            printHelp();
+            return 1;
+        }
+        load(argv[2]);
+    }else printHelp();
 
     return 0;
 }

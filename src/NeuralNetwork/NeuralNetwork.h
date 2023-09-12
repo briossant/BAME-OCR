@@ -58,4 +58,15 @@ double WeightedSum(double *activations, Node node);
 // may switch to ReLU function later on
 double Sigmoid(double x);
 
+
+
+////////////////////////////////////
+// Saving and loading
+
+void SaveNetwork(Network network, char *filepath);
+
+Network LoadNetwork(char *filepath);
+
+
+
 #endif
