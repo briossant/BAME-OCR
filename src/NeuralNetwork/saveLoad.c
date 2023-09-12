@@ -28,6 +28,7 @@ void SaveNetwork(Network network, char* filepath)
       }
       
    }
+   fflush(file);
    fclose(file);
 
 }
