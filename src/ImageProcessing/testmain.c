@@ -14,8 +14,10 @@ int main(int argc, char *argv[])
     {
         errx(1, "Unable to initialize SDL: %s\n", SDL_GetError());
     }
-    
+
+
     GreyScale(argv[1]);
 
     SDL_Quit();
+    return 0;
 }
