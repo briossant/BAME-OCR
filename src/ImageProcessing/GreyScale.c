@@ -6,13 +6,13 @@ void GreyScale(char *path)
 {
     if (IMG_Init(IMG_INIT_PNG) == 0) 
     {
-    printf("Error when initializing SDL2_image : %d\n", IMG_GetError());
+    printf("Error when initializing SDL2_image : %s\n", IMG_GetError());
     }
     
     struct SDL_Surface* image = IMG_Load(path);
     if (!image) 
     {
-    printf("Can't load image : %d\n", IMG_GetError());
+    printf("Can't load image : %s\n", IMG_GetError());
     }
 
     for (int y = 0; y < image->h; ++y) 
