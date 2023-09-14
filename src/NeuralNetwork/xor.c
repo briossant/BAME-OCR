@@ -32,7 +32,7 @@ void solve(char input[2]) {
 
 void printHelp() {
     printf("Usage:\n./xor t : for training\n./xor p [0-1] [0-1] : propagate inputs");
-    printf("\n./xor s : save\n./xor l [filepath] : to load\n"); 
+    printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n"); 
 }
 
 int main(int argc, char **argv) {
