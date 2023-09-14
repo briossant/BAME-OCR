@@ -1,11 +1,17 @@
 #include "ImageProcess.h"
-#include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-void BlacknWhite(SDL_Surface* image)
+
+Uint8 fb(Uint8 c, int n)
 {
-    Uint8 biais = 127;
+    return (Uint8) (255 * SDL_pow((double) c / 255, n));
+}
+
+
+void Bright(SDL_Surface* image)
+{
+    int brightness = 3;
 
     int height = image->h;
     int width = image->w;
@@ -22,19 +28,9 @@ void BlacknWhite(SDL_Surface* image)
             Uint8 r, g, b, a;
             SDL_GetRGBA(pixtab[y * width + x],format, &r, &g, &b, &a);
 
-            if ((r + g + b)/3 > biais)
-            {
-                r = 255;
-                g = 255;
-                b = 255;
-            }
-            else
-            {
-                r = 0;
-                g = 0;
-                b = 0;
-            }
-            
+            r = fb(r,brightness);
+            g = fb(g,brightness);
+            b = fb(b,brightness);
 
             // Mettre à jour le pixel
             pixtab[y * width + x] = SDL_MapRGBA(format, r, g, b,a);

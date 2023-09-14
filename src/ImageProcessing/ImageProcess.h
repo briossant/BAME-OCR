@@ -5,6 +5,10 @@ void BlacknWhite(SDL_Surface* image);
 
 void GreyScale(SDL_Surface* image);
 
-void Contrast (char* path);
+void Contrast (SDL_Surface* image);
 
-void GaussianBlur (char* path);
+void GaussianBlur (SDL_Surface* image);
+
+void Bright (SDL_Surface* image);
+
+void ArroundGaussianBlur (SDL_Surface* image);
