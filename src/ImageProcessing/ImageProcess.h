@@ -1,8 +1,9 @@
 #include <stdlib.h>
+#include <SDL2/SDL.h>
 
-void BlacknWhite (char* path);
+void BlacknWhite(SDL_Surface* image);
 
-void GreyScale (char* path);
+void GreyScale(SDL_Surface* image);
 
 void Contrast (char* path);
 
