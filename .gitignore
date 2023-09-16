@@ -1,5 +1,8 @@
 build
 main
+test 
+*.swp
+.*
 
 # Prerequisites
 *.d
