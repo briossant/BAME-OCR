@@ -9,17 +9,17 @@ double dSigmoid(double x) {
 }
 
 
-// cost function derivative
-double DCost(double result, double expected) {
+// cost function derivative over an output activation
+double GetDCost(double result, double expected) {
     return 2 * (result - expected);    
 }
 
 
-// cost dFunc for all outputs 
-double *firstDCost(double *outputActivations, double *expectedOutputs, size_t outputSize) {
+// cost function derivative over the output activations
+double *FirstDCost(double *outputActivations, double *expectedOutputs, size_t outputSize) {
     double *res = malloc(outputSize * sizeof(double));
     for(size_t i = 0; i < outputSize; i++){
-        res[i] = DCost(outputActivations[i], expectedOutputs[i]);
+        res[i] = GetDCost(outputActivations[i], expectedOutputs[i]);
     }
     return res;
 }
@@ -40,18 +40,18 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
         double **activationsLayers = PropagateAndKeep(input_batch[m], network);
         
         size_t outputLayerI = network.depth-1;
-        double *DCost = firstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
+        double *DCost = FirstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
         
         // update first weights and biases
         UpdateLayer(network.layers[outputLayerI], DCost);
 
-        for(size_t l = outputLayerI-1; l >= 0; l--) {
+        for(size_t l = outputLayerI; l > 0; l--) {
             
-            double *newDCost = malloc(network.layers[l].size * sizeof(double));
-            for (size_t i=0; i<network.layers[l].size;i++){
+            double *newDCost = malloc(network.layers[l-1].size * sizeof(double));
+            for (size_t i=0; i<network.layers[l-1].size;i++){
                 // calculate newDCost 
                 // start by calculating sig'(z[i])
-                for (size_t j=0; j<network.layers[l+1].size;j++){
+                for (size_t j=0; j<network.layers[l].size;j++){
                     // newDCost[i] += (layer[j] -> weight[i]) * sig'(z[i]) * DCost[j]
                 }
                 
@@ -61,7 +61,7 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
             DCost = newDCost;
 
             // update layer l weights & biases according to new DCost
-            UpdateLayer(network.layers[l], DCost);
+            UpdateLayer(network.layers[l-1], DCost);
         }
 
         free(DCost);
