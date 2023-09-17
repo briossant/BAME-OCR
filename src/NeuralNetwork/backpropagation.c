@@ -32,9 +32,19 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
         size_t outputLayerI = network.depth-1;
         double *lastDCost = firstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
         
-        for(size_t l = outputLayerI; l >= 0; l--) {
-            // update weight & bias according to lastDCost
-            // calculate new DCost
+        // update first weights and biases
+
+        for(size_t l = outputLayerI-1; l >= 0; l--) {
+            
+            for (size_t i=0; i<network.layers[l].size;i++){
+                // calculate new DCost 
+                // start by calculating sig'(z[i])
+                for (size_t j=0; j<network.layers[l+1].size;j++){
+                    // DCost[i] += (layer[j] -> weight[i]) * sig'(z[i]) * lastDCost[j]
+                }
+
+                // update layer l weights & biases according to new DCost
+            }
         }
 
     }         
