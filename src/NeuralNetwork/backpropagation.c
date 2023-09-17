@@ -48,12 +48,15 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
             
             double *newDCost = malloc(network.layers[l-1].size * sizeof(double));
             for (size_t i=0; i<network.layers[l-1].size;i++){
+                
                 // calculate newDCost 
+                
                 // start by calculating sig'(z[i])
                 double dSig = DSigmoid(activationsLayers[l][i]);
-
+                
+                newDCost[i] = 0;
                 for (size_t j=0; j<network.layers[l].size;j++){
-                    // newDCost[i] += (layer[j] -> weight[i]) * sig'(z[i]) * DCost[j]
+                    newDCost[i] += network.layers[l].nodes[j].weights[i] * dSig * dCost[j];
                 }
                 
             }
