@@ -2,10 +2,9 @@
 
 #define TRAINING_RATE 3.0
 
-// sigmoid derivative
-double dSigmoid(double x) {
-    double sig = Sigmoid(x);
-    return sig * (1 - sig);
+// sigmoid derivative with x = Sigmoid(...)
+double DSigmoid(double x) {
+    return x * (1 - x);
 }
 
 
@@ -40,10 +39,10 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
         double **activationsLayers = PropagateAndKeep(input_batch[m], network);
         
         size_t outputLayerI = network.depth-1;
-        double *DCost = FirstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
+        double *dCost = FirstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
         
         // update first weights and biases
-        UpdateLayer(network.layers[outputLayerI], DCost);
+        UpdateLayer(network.layers[outputLayerI], dCost);
 
         for(size_t l = outputLayerI; l > 0; l--) {
             
@@ -51,20 +50,22 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
             for (size_t i=0; i<network.layers[l-1].size;i++){
                 // calculate newDCost 
                 // start by calculating sig'(z[i])
+                double dSig = DSigmoid(activationsLayers[l][i]);
+
                 for (size_t j=0; j<network.layers[l].size;j++){
                     // newDCost[i] += (layer[j] -> weight[i]) * sig'(z[i]) * DCost[j]
                 }
                 
             }
 
-            free(DCost);
-            DCost = newDCost;
+            free(dCost);
+            dCost = newDCost;
 
             // update layer l weights & biases according to new DCost
-            UpdateLayer(network.layers[l-1], DCost);
+            UpdateLayer(network.layers[l-1], dCost);
         }
 
-        free(DCost);
+        free(dCost);
     }         
 }
 
