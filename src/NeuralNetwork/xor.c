@@ -1,20 +1,39 @@
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
+void shuffle(double *input[], double* output[], size_t n)
+{
+    if (n > 1) 
+    {
+        for (size_t i = 0; i < n - 1; i++) 
+        {
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            double* t = input[j];
+            input[j] = input[i];
+            input[i] = t;
+            t = output[j];
+            output[j] = output[i];
+            output[i] = t;
+        }
+    }
+}
 
-void train() {
+
+void train(size_t epoch, double trRate) {
     printf("~|~ Training ~|~\n\n");
     
-    size_t layers_size[] = {2, 4, 1};
+    size_t layers_size[] = {2, 16, 16, 1};
     Network network = newNetwork(layers_size, 3);
     
+    size_t trSetSize = 4;
     double *inputs[] =  {(double[]) {0,1}, (double[]){1,0}, 
         (double[]){0,0}, (double[]){1,1}};
     double *outputs[] = {(double[]){1},(double[]){1},
         (double[]){0},(double[]){0}};
     
-    for (size_t i = 0; i < 10; i++) {
-        double err = BackPropagation(network, inputs, outputs, 4);
+    for (size_t i = 0; i < epoch; i++) {
+        shuffle(inputs, outputs, trSetSize); 
+        double err = BackPropagation(network, trRate, inputs, outputs, trSetSize);
         printNetwork(network);
         printf("Training Epoch: %ld -> Accuracy: %f\n\n",i, err);
     }
@@ -50,7 +69,7 @@ void solve(char input[2]) {
 
 
 void printHelp() {
-    printf("Usage:\n./xor t : for training\n./xor p [0-1] [0-1] : propagate inputs");
+    printf("Usage:\n./xor t [Epoch] [TrainingRate]: for training\n./xor p [0-1] [0-1] : propagate inputs");
     printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n"); 
 }
 
@@ -72,7 +91,13 @@ int main(int argc, char **argv) {
 
         solve(input);
     } else if(argv[1][0] == 't') { 
-        train();
+        if (argc < 4) {
+            printHelp();
+            return 1;
+        }
+        size_t epoch;
+        sscanf(argv[2], "%zu", &epoch);
+        train(epoch, atof(argv[3]));
     } else if(argv[1][0] == 's') {
         if (argc < 3) {
             printHelp();

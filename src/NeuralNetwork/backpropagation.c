@@ -1,6 +1,5 @@
 #include "NeuralNetwork.h"
 
-#define TRAINING_RATE 3.0
 
 // sigmoid derivative with x = Sigmoid(...)
 double DSigmoid(double x) {
@@ -26,11 +25,11 @@ double *FirstDCost(double *outputActivations, double *expectedOutputs,
 }
 
 
-void UpdateLayer(Layer layer, double* DCost) {
+void UpdateLayer(Layer layer, double* DCost, double training_rate) {
     for(size_t i=0;i<layer.size;i++) {
-        layer.nodes[i].bias -= DCost[i] * TRAINING_RATE;
+        layer.nodes[i].bias -= DCost[i] * training_rate;
         for(size_t j=0;j<layer.nodes[i].weight_size;j++) {
-            layer.nodes[i].weights[j] -= DCost[i] * TRAINING_RATE;    
+            layer.nodes[i].weights[j] -= DCost[i] * training_rate;    
         }    
     }
 }
@@ -46,7 +45,7 @@ double CostFunction(double *outputActivations, double *expectedOutputs,
 }
 
 
-double BackPropagation(Network network,  double **input_batch, 
+double BackPropagation(Network network, double training_rate, double **input_batch, 
         double **output_batch, size_t batch_size) 
 {
     double accuracy = 0;
@@ -64,7 +63,7 @@ double BackPropagation(Network network,  double **input_batch,
 
         
         // update first weights and biases
-        UpdateLayer(network.layers[outputLayerI], dCost);
+        UpdateLayer(network.layers[outputLayerI], dCost, training_rate);
 
         for(size_t l = outputLayerI; l > 0; l--) 
         {    
@@ -89,7 +88,7 @@ double BackPropagation(Network network,  double **input_batch,
             dCost = newDCost;
 
             // update layer l weights & biases according to new DCost
-            UpdateLayer(network.layers[l-1], dCost);
+            UpdateLayer(network.layers[l-1], dCost, training_rate);
         }
 
         free(dCost);
