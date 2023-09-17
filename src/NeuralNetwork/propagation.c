@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include <stdlib.h>
 
 double WeightedSum(double *activations, Node node) {
     double sum = 0.0;
@@ -29,5 +30,16 @@ double* Propagate(double *inputs, Network network) {
         activations = newActiv;
     }
     return activations;
+}
+
+
+double **PropagateAndKeep(double *inputs, Network network) {
+    double **activationsLayers = malloc(sizeof(double *) * network.depth);
+    double *lastActivations = inputs;
+    for (size_t i = 0; i < network.depth;i++) {
+        lastActivations = PropagateLayer(lastActivations, network.layers[i]);
+        activationsLayers[i] = lastActivations;
+    }
+    return activationsLayers;
 }
 

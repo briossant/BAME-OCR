@@ -42,14 +42,23 @@ Layer newLayer(size_t layer_size, size_t before_layer_size);
 
 Node newNode(size_t weight_size);
 
+double startingValue(); // don't forget to init rand() with srand(time(NULL));
+
+
+
+////////////////////////////////////
+// Printers
+
 void printNetwork(Network network);
 
-double startingValue(); // don't forget to init rand() with srand(time(NULL));
+
 
 ////////////////////////////////////
 // Propagation
 
 double* Propagate(double *inputs, Network network);
+
+double** PropagateAndKeep(double* inputs, Network network);
 
 double *PropagateLayer(double *lastActivation, Layer layer);
 
@@ -57,6 +66,15 @@ double WeightedSum(double *activations, Node node);
 
 // may switch to ReLU function later on
 double Sigmoid(double x);
+
+
+
+////////////////////////////////////
+// Back Propagation
+
+void BackPropagation(Network network, double** input_batch, size_t batch_size);
+
+double dSigmoid(double x);
 
 
 
