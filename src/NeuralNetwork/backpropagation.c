@@ -25,11 +25,11 @@ double *FirstDCost(double *outputActivations, double *expectedOutputs,
 }
 
 
-void UpdateLayer(Layer layer, double* DCost, double training_rate) {
+void UpdateLayer(Layer layer, double* dCost, double training_rate) {
     for(size_t i=0;i<layer.size;i++) {
-        layer.nodes[i].bias -= DCost[i] * training_rate;
+        layer.nodes[i].bias -= dCost[i] * training_rate;
         for(size_t j=0;j<layer.nodes[i].weight_size;j++) {
-            layer.nodes[i].weights[j] -= DCost[i] * training_rate;    
+            layer.nodes[i].weights[j] -= dCost[i] * training_rate;    
         }    
     }
 }
@@ -47,7 +47,8 @@ double CostFunction(double *outputActivations, double *expectedOutputs,
 
 double BackPropagation(Network network, double training_rate, double **input_batch, 
         double **output_batch, size_t batch_size) 
-{
+{ /// missing a part of the calcule -> dCost should not be past alone to UpdateLayer (e.g da/dw)
+  // making the moy of dC/dw over the sample batch and only call UpdateLayer after 
     double accuracy = 0;
 
     for (size_t m = 0; m < batch_size;m++) 
