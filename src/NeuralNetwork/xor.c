@@ -1,15 +1,34 @@
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
+
 void train() {
-    printf("training\n");
+    printf("~|~ Training ~|~\n\n");
+    
+    size_t layers_size[] = {2, 4, 1};
+    Network network = newNetwork(layers_size, 3);
+    
+    double *inputs[] =  {(double[]) {0,1}, (double[]){1,0}, 
+        (double[]){0,0}, (double[]){1,1}};
+    double *outputs[] = {(double[]){1},(double[]){1},
+        (double[]){0},(double[]){0}};
+    
+    for (size_t i = 0; i < 10; i++) {
+        double err = BackPropagation(network, inputs, outputs, 4);
+        printNetwork(network);
+        printf("Training Epoch: %ld -> Accuracy: %f\n\n",i, err);
+    }
+
+
 }
+
+
 
 void save(char *filepath) {
     printf("saving\n");
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
-    SaveNetwork( network,filepath);
+    //SaveNetwork( network,filepath);
 
 }
 

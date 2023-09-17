@@ -72,10 +72,8 @@ double Sigmoid(double x);
 ////////////////////////////////////
 // Back Propagation
 
-void BackPropagation(Network network, double** input_batch, 
+double BackPropagation(Network network, double** input_batch, 
         double** output_batch, size_t batch_size);
-
-double dSigmoid(double x);
 
 
 

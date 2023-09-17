@@ -15,7 +15,9 @@ double GetDCost(double result, double expected) {
 
 
 // cost function derivative over the output activations
-double *FirstDCost(double *outputActivations, double *expectedOutputs, size_t outputSize) {
+double *FirstDCost(double *outputActivations, double *expectedOutputs, 
+        size_t outputSize) 
+{
     double *res = malloc(outputSize * sizeof(double));
     for(size_t i = 0; i < outputSize; i++){
         res[i] = GetDCost(outputActivations[i], expectedOutputs[i]);
@@ -33,19 +35,39 @@ void UpdateLayer(Layer layer, double* DCost) {
     }
 }
 
+double CostFunction(double *outputActivations, double *expectedOutputs, 
+        size_t outputSize)
+{
+    double res = 0;
+    for(size_t i = 0; i < outputSize; i++){
+        res += pow(outputActivations[i] - expectedOutputs[i], 2);
+    }
+    return res;
+}
 
-void BackPropagation(Network network,  double **input_batch, double **output_batch, size_t batch_size) {
-    for (size_t m = 0; m < batch_size;m++) {
+
+double BackPropagation(Network network,  double **input_batch, 
+        double **output_batch, size_t batch_size) 
+{
+    double accuracy = 0;
+
+    for (size_t m = 0; m < batch_size;m++) 
+    {
         double **activationsLayers = PropagateAndKeep(input_batch[m], network);
         
         size_t outputLayerI = network.depth-1;
-        double *dCost = FirstDCost(activationsLayers[outputLayerI], output_batch[m], network.layers[outputLayerI].size);
+        
+        accuracy += CostFunction(activationsLayers[outputLayerI], output_batch[m],
+                network.layers[outputLayerI].size);
+        double *dCost = FirstDCost(activationsLayers[outputLayerI], 
+                output_batch[m], network.layers[outputLayerI].size);
+
         
         // update first weights and biases
         UpdateLayer(network.layers[outputLayerI], dCost);
 
-        for(size_t l = outputLayerI; l > 0; l--) {
-            
+        for(size_t l = outputLayerI; l > 0; l--) 
+        {    
             double *newDCost = malloc(network.layers[l-1].size * sizeof(double));
             for (size_t i=0; i<network.layers[l-1].size;i++){
                 
@@ -55,8 +77,10 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
                 double dSig = DSigmoid(activationsLayers[l][i]);
                 
                 newDCost[i] = 0;
-                for (size_t j=0; j<network.layers[l].size;j++){
-                    newDCost[i] += network.layers[l].nodes[j].weights[i] * dSig * dCost[j];
+                for (size_t j=0; j<network.layers[l].size;j++)
+                {
+                    newDCost[i] += network.layers[l].nodes[j].weights[i] 
+                        * dSig * dCost[j];
                 }
                 
             }
@@ -69,6 +93,8 @@ void BackPropagation(Network network,  double **input_batch, double **output_bat
         }
 
         free(dCost);
-    }         
+    }
+
+    return accuracy/batch_size;
 }
 
