@@ -85,8 +85,8 @@ double* get_numbers(const char* input, int* count) { // I think *count isn't nee
 Network LoadNetwork(char *filepath)
 {
 
-    FILE * file= fopen( filepath, "r"); // this will clear the file so we can write on it, if we don't want the 
-                                       // file to be cleared do: fopen(filepath,"a" for appending
+    FILE * file= fopen( filepath, "r");  
+                                       
     //Initialize a Network
     //new Network net = Network(0,0)
     if (file == NULL)
@@ -98,12 +98,12 @@ Network LoadNetwork(char *filepath)
    
     char* line = fgets(line,0, file);
 
-    if (line != NULL) { // line is undeclared
+    if (line == NULL) { 
         printf("The file was empty\n");
-        exit(1); // what is the default network?? there's no default just throw an error 
+        exit(1); 
     }       
 
-    double* numbers = get_numbers(line);
+    double* numbers = get_numbers(line, 0);
     // input_size * depth layer 
     // D fois 
     // layer size L
@@ -111,9 +111,8 @@ Network LoadNetwork(char *filepath)
     //remember to free(numbers) every single time
     if ( sizeof(numbers) < 2)
     {
-        printf ("there was no size or depth for the network\n"); // don't forget \n at the end of printf
+        printf ("there was no size or depth for the network\n"); 
         exit(1);
-        //or do we take the usual values? there isn't usual values
     }
     
     // this is how you create a new struct : 
@@ -144,11 +143,11 @@ Network LoadNetwork(char *filepath)
 
         if (L!=0)
         {
-            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layeri\n", L, D);
+            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layer\n", L, D);
             exit(1);
         }
         D--;
-        l++;
+     l++;
     }
     if (D!=0)
     {
