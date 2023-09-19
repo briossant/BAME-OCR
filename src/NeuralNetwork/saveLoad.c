@@ -40,9 +40,9 @@ int isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-double* get_numbers(const char* input, int* count) { // I think *count isn't needed as an argument
+double* get_numbers(const char* input) { // I think *count isn't needed as an argument
     double* numbers = NULL;
-    *count = 0;
+    int count = 0;
     double currentNumber = 0.0;
     int isParsingNumber = 0;
     int isParsingDecimal = 0;
@@ -61,9 +61,9 @@ double* get_numbers(const char* input, int* count) { // I think *count isn't nee
             isParsingDecimal = 1;
         } else {
             if (isParsingNumber) {
-                (*count)++;
-                numbers = (double*)realloc(numbers, sizeof(double) * (*count));
-                numbers[(*count) - 1] = currentNumber;
+                (count)++;
+                numbers = (double*)realloc(numbers, sizeof(double) * (count));
+                numbers[(count) - 1] = currentNumber;
                 currentNumber = 0.0;
                 isParsingNumber = 0;
                 isParsingDecimal = 0;
@@ -88,14 +88,12 @@ Network LoadNetwork(char *filepath)
     FILE * file= fopen( filepath, "r");  
                                        
     //Initialize a Network
-    //new Network net = Network(0,0)
     if (file == NULL)
     {
         printf ("Error this file does not exist or can't be opened\n");
         exit(1);
     }
     int l=0;
-   
     char* line = fgets(line,0, file);
 
     if (line == NULL) { 
@@ -103,43 +101,55 @@ Network LoadNetwork(char *filepath)
         exit(1); 
     }       
 
-    double* numbers = get_numbers(line, 0);
-    // input_size * depth layer 
-    // D fois 
-    // layer size L
-    // node l fois
-    //remember to free(numbers) every single time
+    double* numbers = get_numbers(line);
     if ( sizeof(numbers) < 2)
     {
         printf ("there was no size or depth for the network\n"); 
         exit(1);
     }
     
+    double input_size = numbers[0];
+    double depth_layer= numbers[1]; 
+    // D fois 
+    // layer size L
+    // node l fois
+    //remember to free(numbers) every single time
     // this is how you create a new struct : 
-    Layer *layers = malloc(sizeof(Layer) * numbers[0]); // the array needs to be created before
-    Network network = { // this is the new Network declaration
-        .input_size = numbers[1], 
-        .depth = numbers[0],
-        .layers = layers
-    };  
+    Layer *layers = malloc(sizeof(Layer) * numbers[depth_layer]); // the array needs to be created before
     
-
-    l++;
     size_t D = numbers[1];
+    l++;
     while ( D>0 && fgets(line, l, file)!= NULL)
     {
-        char* line = fgets(line,l, file);
-        double* numbers = get_numbers(line);
-        // new layer put layer size 
+        numbers = get_numbers(line);
+        // new layer put layer size L 
         size_t L= numbers[0];
+        l++;
+        //create the new layer with layer size then put all the nods inside 
         while (L>0 && fgets(line, l, file)!= NULL)
         {
-            char* line = fgets(line,0, file);
-            double* numbers = get_numbers(line);
-            //create a node and put the weights
-            L--;
-            l++;
+            if (line != NULL)
+            {
+                numbers=get_numbers(line);
+                int node_weight= (int)numbers[0];
+                double node_bias= numbers[1];
+                l++;
+                double* weight = malloc(sizeof(double) * node_weight);
+                if ( fgets(line, l , file)!= NULL)
+                {
+                    numbers= get_numbers(line);
+                    for (int i=0; i<node_weight; i++)
+                    {
+                        weight[i]=numbers[i];
+                    }
+                }
+                Node new_node(node_weight, weight);// include node_bias
+                //put the node in the list of nods
+                L--;
+                l++;
+            }
         }
+        //put the layer on the list of layers and clear the list of nods
 
         if (L!=0)
         {
@@ -147,7 +157,7 @@ Network LoadNetwork(char *filepath)
             exit(1);
         }
         D--;
-     l++;
+        l++;
     }
     if (D!=0)
     {
@@ -155,6 +165,11 @@ Network LoadNetwork(char *filepath)
         exit(1);
     }
     
+    Network network = { // this is the new Network declaration
+        .input_size = input_size, 
+        .depth = depth,
+        .layers = layers
+    };  
     return network;
 }
 

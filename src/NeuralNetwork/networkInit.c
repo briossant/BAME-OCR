@@ -19,6 +19,16 @@ Node newNode(size_t weight_size) {
     return nd;
 }
 
+Node new_node(size_t weight_size, double* weights) {
+
+    Node nd = {
+        .weight_size = weight_size,
+        .bias = startingValue(),
+        .weights = weights
+    };
+    return nd;
+
+}
 
 Layer newLayer(size_t layer_size, size_t before_layer_size) {
     if (layer_size < 1) {
