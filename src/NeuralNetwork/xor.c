@@ -38,7 +38,12 @@ void train(size_t epoch, double trRate) {
         printf("Training Epoch: %ld -> Accuracy: %f\n\n",i, err);
     }
 
-
+    shuffle(inputs, outputs, trSetSize); 
+   
+    for(size_t i = 0; i < trSetSize; i++) {
+        double *res = Propagate(inputs[i], network);
+        printf("Result of %f ^ %f -> res:%f \n", inputs[i][0], inputs[i][1], res[0]);
+    }
 }
 
 
