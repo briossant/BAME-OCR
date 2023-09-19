@@ -7,19 +7,13 @@ double DSigmoid(double x) {
 }
 
 
-// cost function derivative over an output activation
-double GetDCost(double result, double expected) {
-    return 2 * (result - expected);    
-}
-
-
 // cost function derivative over the output activations
-double *FirstDCost(double *outputActivations, double *expectedOutputs, 
+double *FirstDCostDActv(double *outputActivations, double *expectedOutputs, 
         size_t outputSize) 
 {
     double *res = malloc(outputSize * sizeof(double));
     for(size_t i = 0; i < outputSize; i++){
-        res[i] = GetDCost(outputActivations[i], expectedOutputs[i]);
+        res[i] = 2 * (outputActivations[i] - expectedOutputs[i]);
     }
     return res;
 }
@@ -45,6 +39,16 @@ double CostFunction(double *outputActivations, double *expectedOutputs,
 }
 
 
+
+double *DCostDZ(double* dCost_dActv, double* activations, size_t size) {
+    double *dCost_dZ = malloc(sizeof(double) * size);
+    for(size_t i = 0; i < size; i++) {
+        dCost_dZ[i] = dCost_dActv[i] * DSigmoid(activations[i]);
+    }
+    return dCost_dZ;
+}
+
+
 double BackPropagation(Network network, double training_rate, double **input_batch, 
         double **output_batch, size_t batch_size) 
 { /// missing a part of the calcule -> dCost should not be past alone to UpdateLayer (e.g da/dw)
@@ -59,16 +63,19 @@ double BackPropagation(Network network, double training_rate, double **input_bat
         
         accuracy += CostFunction(activationsLayers[outputLayerI], output_batch[m],
                 network.layers[outputLayerI].size);
-        double *dCost = FirstDCost(activationsLayers[outputLayerI], 
+        double *dCost_dActv = FirstDCostDActv(activationsLayers[outputLayerI], 
                 output_batch[m], network.layers[outputLayerI].size);
 
         
         // update first weights and biases
-        UpdateLayer(network.layers[outputLayerI], dCost, training_rate);
+        UpdateLayer(network.layers[outputLayerI], 
+                DCostDZ(dCost_dActv, activationsLayers[outputLayerI], 
+                    network.layers[outputLayerI].size), 
+                training_rate);
 
         for(size_t l = outputLayerI; l > 0; l--) 
         {    
-            double *newDCost = malloc(network.layers[l-1].size * sizeof(double));
+            double *new_dCost_dActv = malloc(network.layers[l-1].size * sizeof(double));
             for (size_t i=0; i<network.layers[l-1].size;i++){
                 
                 // calculate newDCost 
@@ -76,23 +83,26 @@ double BackPropagation(Network network, double training_rate, double **input_bat
                 // start by calculating sig'(z[i])
                 double dSig = DSigmoid(activationsLayers[l][i]);
                 
-                newDCost[i] = 0;
+                new_dCost_dActv[i] = 0;
                 for (size_t j=0; j<network.layers[l].size;j++)
                 {
-                    newDCost[i] += network.layers[l].nodes[j].weights[i] 
-                        * dSig * dCost[j];
+                    new_dCost_dActv[i] += network.layers[l].nodes[j].weights[i] 
+                        * dSig * dCost_dActv[j];
                 }
                 
             }
 
-            free(dCost);
-            dCost = newDCost;
+            free(dCost_dActv);
+            dCost_dActv = new_dCost_dActv;
 
             // update layer l weights & biases according to new DCost
-            UpdateLayer(network.layers[l-1], dCost, training_rate);
+            UpdateLayer(network.layers[l-1], 
+                DCostDZ(dCost_dActv, activationsLayers[l-1], 
+                    network.layers[l-1].size), 
+                training_rate);
         }
 
-        free(dCost);
+        free(dCost_dActv);
     }
 
     return accuracy/batch_size;
