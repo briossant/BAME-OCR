@@ -10,6 +10,10 @@ int main(int argc, char *argv[])
         errx(1, "Usage: %s <file to open> <file to save>\n", argv[0]);
     }
 
+    if(0 != SDL_Init(SDL_INIT_VIDEO))
+    {
+        errx(1, "Unable to initialize SDL: %s\n", SDL_GetError());
+    }
 
     SDL_Surface* image = NULL;
     image = IMG_Load(argv[1]);
@@ -17,11 +21,6 @@ int main(int argc, char *argv[])
     {
         printf("Can't load image : %s\n", IMG_GetError());
         return 0;
-    }
-
-    if(0 != SDL_Init(SDL_INIT_VIDEO))
-    {
-        errx(1, "Unable to initialize SDL: %s\n", SDL_GetError());
     }
 
     SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
@@ -33,7 +32,8 @@ int main(int argc, char *argv[])
     //Contrast(image_converted);
     //GaussianBlur(image_converted);
     //Bright(image_converted);
-    ArroundGaussianBlur(image_converted);
+    //ArroundGaussianBlur(image_converted);
+    //image_converted = Rotate(image_converted, 35);
 
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 

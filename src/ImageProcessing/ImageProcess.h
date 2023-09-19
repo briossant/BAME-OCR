@@ -12,3 +12,5 @@ void GaussianBlur (SDL_Surface* image);
 void Bright (SDL_Surface* image);
 
 void ArroundGaussianBlur (SDL_Surface* image);
+
+SDL_Surface* Rotate (SDL_Surface* image, double angle);
