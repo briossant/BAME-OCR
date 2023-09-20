@@ -27,13 +27,14 @@ int main(int argc, char *argv[])
     SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
-    //GreyScale(image_converted);
+    GreyScale(image_converted);
     //BlacknWhite(image_converted);
     //Contrast(image_converted);
-    //GaussianBlur(image_converted);
+    GaussianBlur(image_converted);
     //Bright(image_converted);
     //ArroundGaussianBlur(image_converted);
     //image_converted = Rotate(image_converted, 35);
+    Canny(image_converted);
 
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 

@@ -12,18 +12,20 @@ void GreyScale(SDL_Surface* image)
     int width = image->w;
     const SDL_PixelFormat* format = image->format;
 
+    Uint32* pixtab = image->pixels;
+
+
     for (int y = 0; y < height; y++) 
     {
         for (int x = 0; x < width; x++) 
         {
             //printf("y=%d x=%d pixel=%d\n",y,x,y*image->w+x);
-            Uint32* pixtab = image->pixels;
+            //Uint32* pixtab = image->pixels;
             //Uint32 pixel = pixels[y * image->w + x];
             
             Uint8 r, g, b, a;
             SDL_GetRGBA(pixtab[y * width + x],format, &r, &g, &b, &a);
 
-            // Inverser les composantes RVB
             Uint8 gris = (r + g + b) / 3;
 
             // Mettre à jour le pixel
