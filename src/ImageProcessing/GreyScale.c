@@ -26,7 +26,8 @@ void GreyScale(SDL_Surface* image)
             Uint8 r, g, b, a;
             SDL_GetRGBA(pixtab[y * width + x],format, &r, &g, &b, &a);
 
-            Uint8 gris = (r + g + b) / 3;
+            //Uint8 gris = (r + g + b) / 3;
+            Uint8 gris = 0.3*r+0.59*g+0.11*b;
 
             // Mettre à jour le pixel
             pixtab[y * width + x] = SDL_MapRGBA(format, gris, gris, gris,a);

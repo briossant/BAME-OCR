@@ -15,4 +15,4 @@ void ArroundGaussianBlur (SDL_Surface* image);
 
 SDL_Surface* Rotate (SDL_Surface* image, double angle);
 
-void Canny (SDL_Surface* image);
+SDL_Surface* Canny (SDL_Surface* image);
