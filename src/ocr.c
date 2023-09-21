@@ -65,8 +65,9 @@ SDL_Surface* SDL_Start(char* filename, int option)
 
     // Output
 
-int SDL_Output(SDL_Surface *image_converted)
-    if (IMG_SavePNG(image_converted, argv[2]) != 0) 
+int SDL_Output(SDL_Surface *image_converted, char* file)
+{
+    if (IMG_SavePNG(image_converted, file) != 0) 
     {
         printf("Error when trying to save the image : %s\n", IMG_GetError());
     }
