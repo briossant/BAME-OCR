@@ -3,6 +3,7 @@ main
 test 
 *.swp
 .*
+dataset
 
 # Prerequisites
 *.d

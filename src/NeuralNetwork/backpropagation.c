@@ -49,7 +49,7 @@ double *DCostDZ(double* dCost_dActv, double* activations, size_t size) {
 }
 
 
-double * GetNewDCostDActv(Layer layer, size_t size, double* activations, double* dCost_dActv) {
+double *GetNewDCostDActv(Layer layer, size_t size, double* activations, double* dCost_dActv) {
     double *new_dCost_dActv = malloc(size * sizeof(double));
     for (size_t i=0; i<size;i++){
 
@@ -68,7 +68,7 @@ double * GetNewDCostDActv(Layer layer, size_t size, double* activations, double*
 
 double BackPropagation(Network network, double training_rate, double **input_batch, 
         double **output_batch, size_t batch_size) 
-{ /// missing a part of the calcule -> dCost should not be past alone to UpdateLayer (e.g da/dw)
+{ 
   // making the moy of dC/dw over the sample batch and only call UpdateLayer after 
     double accuracy = 0;
 
@@ -85,7 +85,6 @@ double BackPropagation(Network network, double training_rate, double **input_bat
                 output_batch[m], network.layers[outputLayerI].size);
 
         
-        // update first weights and biases
         all_dCost_dZ[outputLayerI] = DCostDZ(dCost_dActv, activationsLayers[outputLayerI], 
                     network.layers[outputLayerI].size);
 
@@ -105,10 +104,16 @@ double BackPropagation(Network network, double training_rate, double **input_bat
     
 
         UpdateLayer(network.layers[0], all_dCost_dZ[0], training_rate, input_batch[m]);
-        for(size_t i = 1; i <= outputLayerI; i++) {
+        for(size_t i = 1; i < network.depth; i++) {
             UpdateLayer(network.layers[i], all_dCost_dZ[i], training_rate, activationsLayers[i-1]);
         }
-
+        
+        for(size_t i = 0; i < network.depth; i++) {
+            free(all_dCost_dZ[i]);
+            free(activationsLayers[i]);
+        }
+        free(all_dCost_dZ);
+        free(activationsLayers);
     }
 
     return accuracy/batch_size;

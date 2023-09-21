@@ -78,6 +78,15 @@ double BackPropagation(Network network, double training_rate, double** input_bat
 
 
 ////////////////////////////////////
+// Training
+
+void trainNetwork(Network network, double **inputs, 
+        double** outputs, size_t n, double trainingRate, 
+        size_t epochs);
+
+
+
+////////////////////////////////////
 // Saving and loading
 
 void SaveNetwork(Network network, char *filepath);
