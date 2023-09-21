@@ -19,11 +19,11 @@ Node newNode(size_t weight_size) {
     return nd;
 }
 
-Node new_node(size_t weight_size, double* weights) {
+Node new_node(size_t weight_size, double* weights, double bias ) {
 
     Node nd = {
         .weight_size = weight_size,
-        .bias = startingValue(),
+        .bias = bias ,
         .weights = weights
     };
     return nd;
@@ -49,7 +49,15 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
     return layer;
 }
 
+Layer new_layer ( Node* node, size_t layer_size )
+{
+    Layer layer = {
+        .size=layer_size,
+        .nodes= node
+    };
+    return layer;
 
+}
 Network newNetwork(size_t *layers_size, size_t number_of_layers) {
     if (number_of_layers < 2) {
         errx(0, "a neural network has a least 2 layers : input and output. (number_of_layers < 2)");

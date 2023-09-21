@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -74,9 +75,9 @@ double* get_numbers(const char* input) { // I think *count isn't needed as an ar
 
     // Check for a number at the end of the string
     if (isParsingNumber) {
-        (*count)++;
-        numbers = (double*)realloc(numbers, sizeof(double) * (*count));
-        numbers[(*count) - 1] = currentNumber;
+        (count)++;
+        numbers = (double*)realloc(numbers, sizeof(double) * (count));
+        numbers[(count) - 1] = currentNumber;
     }
 
     return numbers;
@@ -108,13 +109,13 @@ Network LoadNetwork(char *filepath)
         exit(1);
     }
     
-    double input_size = numbers[0];
-    double depth_layer= numbers[1]; 
+    int input_size = numbers[0];
+    int depth_layer= numbers[1]; 
     // D fois 
     // layer size L
     // node l fois
     //remember to free(numbers) every single time
-    // this is how you create a new struct : 
+    // -1?? beacuse the input layer isn't a proper layer  
     Layer *layers = malloc(sizeof(Layer) * numbers[depth_layer]); // the array needs to be created before
     
     size_t D = numbers[1];
@@ -123,11 +124,14 @@ Network LoadNetwork(char *filepath)
     {
         numbers = get_numbers(line);
         // new layer put layer size L 
-        size_t L= numbers[0];
+        size_t layer_size = numbers[0];
+        int i=0;
         l++;
-        //create the new layer with layer size then put all the nods inside 
-        while (L>0 && fgets(line, l, file)!= NULL)
-        {
+        //create the new layer with layer size then put all the nods inside
+        Node* nods = malloc ( sizeof (Node) * layer_size);
+        while (layer_size>0 && fgets(line, l, file)!= NULL)
+        {   
+            int n=0;
             if (line != NULL)
             {
                 numbers=get_numbers(line);
@@ -143,17 +147,21 @@ Network LoadNetwork(char *filepath)
                         weight[i]=numbers[i];
                     }
                 }
-                Node new_node(node_weight, weight);// include node_bias
-                //put the node in the list of nods
-                L--;
+                nods[n]=new_node(node_weight, weight, node_bias);
+                n++;
+                layer_size--;
                 l++;
+                
             }
-        }
-        //put the layer on the list of layers and clear the list of nods
 
-        if (L!=0)
+            layers[i]=new_layer( nods, layer_size);
+            i++;
+        }
+        
+
+        if (layer_size!=0)
         {
-            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layer\n", L, D);
+            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layer\n", layer_size, D);
             exit(1);
         }
         D--;
@@ -167,7 +175,7 @@ Network LoadNetwork(char *filepath)
     
     Network network = { // this is the new Network declaration
         .input_size = input_size, 
-        .depth = depth,
+        .depth = depth_layer,
         .layers = layers
     };  
     return network;
