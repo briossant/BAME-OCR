@@ -22,3 +22,5 @@ SDL_Surface* Intensity_Gradian (SDL_Surface* image);
 SDL_Surface* Orientation_Gradian (SDL_Surface* image);
 
 Uint32 convolution(SDL_Surface* image, int x, int y, int* kernel, int kernelWidth);
+
+SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orientation_Gradian_Image);

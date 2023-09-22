@@ -50,29 +50,6 @@ static Uint32 Gradian2(SDL_Surface *surface, SDL_PixelFormat* format, int i, int
     return grad << 24 | grad << 16 | grad << 8 | 255;
 }
 
-int roundToNearestAngle(int angle) {
-    int roundedAngle;
-
-    if (angle >= -22.5 && angle < 22.5) {
-        roundedAngle = 0;
-    } else if (angle >= 22.5 && angle < 67.5) {
-        roundedAngle = 45;
-    } else if (angle >= 67.5 && angle < 112.5) {
-        roundedAngle = 90;
-    } else if (angle >= 112.5 && angle < 157.5) {
-        roundedAngle = 135;
-    } else if (angle >= 157.5 || angle < -157.5) {
-        roundedAngle = 0;
-    } else if (angle >= -157.5 && angle < -112.5) {
-        roundedAngle = 45;
-    } else if (angle >= -112.5 && angle < -67.5) {
-        roundedAngle = 90;
-    } else {
-        roundedAngle = 135;
-    }
-
-    return roundedAngle;
-}
 
 static Uint32 Gradian(SDL_Surface *image,SDL_PixelFormat* format, int i, int j, int height, int width)
 {

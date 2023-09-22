@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 
     SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
+    SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
 
@@ -37,6 +38,9 @@ int main(int argc, char *argv[])
     //image_converted = Rotate(image_converted, 35);
     //image_converted = Canny(image_converted);
     image_converted = Intensity_Gradian(image_converted);
+    image_converted1 = Orientation_Gradian(image_converted);
+    image_converted = Supp_Maxima(image_converted, image_converted1);
+
 
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
