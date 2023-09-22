@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
+
     GreyScale(image_converted);
     //BlacknWhite(image_converted);
     //Contrast(image_converted);
@@ -34,7 +35,8 @@ int main(int argc, char *argv[])
     //Bright(image_converted);
     //ArroundGaussianBlur(image_converted);
     //image_converted = Rotate(image_converted, 35);
-    image_converted = Canny(image_converted);
+    //image_converted = Canny(image_converted);
+    image_converted = Intensity_Gradian(image_converted);
 
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 

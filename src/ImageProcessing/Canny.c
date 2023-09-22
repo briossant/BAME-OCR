@@ -5,37 +5,49 @@
 
 
 static Uint32 Gradian2(SDL_Surface *surface, SDL_PixelFormat* format, int i, int j, int height, int width, int n)
-{
-    const int initial_h = SDL_max(i - n, 0);
-    const int initial_w = SDL_max(j - n, 0);
-    const int final_h = SDL_min(i + n, height - 1);
-    const int final_w = SDL_min(j + n, width - 1);
+{    
     Uint32 *p = surface->pixels;
     Uint8 r,g,b,a;
+    
     int sumx = 0;
     int sumy = 0;
+    int sum_coef_x = 0;
+    int sum_coef_y = 0;
 
-    int covox[] = {-1,0,1,-2,0,2,-1,0,1};
-    int covoy[] = {-1,-2,-1,0,0,0,1,2,1};
+    int covox[] = {
+        -1,0,1,
+        -2,0,2,
+        -1,0,1};
+    int covoy[] = {
+        1,2,1
+        ,0,0,0
+        ,-1,-2,-1};
     
     int ib=0, jb=0;
 
-    for (i = initial_h; i < final_h; i++)
+    for (int y = i-n; y < i+n; y++)
     {
-        for(j = initial_w; j < final_w; j++)
+        for(int x = j-n; x < j+n; x++)
         {
-            SDL_GetRGBA(p[i * width + j], format, &r, &g, &b,&a);
-            sumy += covoy[ib*3+jb] * r;
-            sumx += covox[ib*3+jb] * r;
+            sum_coef_y += covoy[ib*3+jb];
+            sum_coef_x += covox[ib*3+jb];
+            if (x >= 0 && x < width && y >= 0 && y < height){
+                SDL_GetRGBA(p[y * width + x], format, &r, &g, &b,&a);
+                sumy += covoy[ib*3+jb] * (int)r;
+                sumx += covox[ib*3+jb] * (int)r;
+            }
             jb++;
         }
         ib++;
         jb=0;
     }
 
-    int grad = sqrt(sumx * sumx + sumy * sumy);
+    if (sum_coef_x != 0) sumx = sumx / sum_coef_x;
+    if (sum_coef_y != 0) sumy = sumy / sum_coef_y;
+
+    Uint8 grad = (Uint8)sqrt(sumx * sumx + sumy * sumy);
     double direction = atan2(sumy,sumx);
-    return SDL_MapRGBA(format, (Uint8)grad, (Uint8)grad, (Uint8)grad,255);
+    return grad << 24 | grad << 16 | grad << 8 | 255;
 }
 
 int roundToNearestAngle(int angle) {
@@ -126,27 +138,24 @@ static Uint32 Gradian(SDL_Surface *image,SDL_PixelFormat* format, int i, int j, 
 
 SDL_Surface* Canny (SDL_Surface* image)
 {
-    //application filtre necessaire Canny
-    //GreyScale(image);
-    //GaussianBlur(image);
-    ////////////////////////////////////////////////////////////////
-
-
     int height = image->h;
     int width = image->w;
     SDL_PixelFormat* format = image->format;
     //Uint32* pixtab = image->pixels;
 
-    SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
-    Uint32* new_pixtab = image_converted->pixels;
+    SDL_Surface* surface_result = SDL_CreateRGBSurfaceWithFormat(0,width,height,32,SDL_PIXELFORMAT_RGBA8888);
+    Uint32* new_pixtab = surface_result->pixels;
 
     for (int y = 0; y < height; y++) 
     {
         for (int x = 0; x < width; x++) 
         {
-            new_pixtab[y * width + x] = Gradian2(image,format,y,x,height,width,1);
+            Uint32 res = Gradian2(image,format,y,x,height,width,1);
+            //printf("result = %x\n",res);
+            new_pixtab[y * width + x] = res;
             //new_pixtab[y * width + x] = Gradian(image,format,y,x,height,width);
         }
     }
-    return image_converted;
+
+    return surface_result;
 }

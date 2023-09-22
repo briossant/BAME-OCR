@@ -16,3 +16,9 @@ void ArroundGaussianBlur (SDL_Surface* image);
 SDL_Surface* Rotate (SDL_Surface* image, double angle);
 
 SDL_Surface* Canny (SDL_Surface* image);
+
+SDL_Surface* Intensity_Gradian (SDL_Surface* image);
+
+SDL_Surface* Orientation_Gradian (SDL_Surface* image);
+
+Uint32 convolution(SDL_Surface* image, int x, int y, int* kernel, int kernelWidth);
