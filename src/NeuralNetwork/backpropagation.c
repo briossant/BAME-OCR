@@ -19,11 +19,11 @@ double *FirstDCostDActv(double *outputActivations, double *expectedOutputs,
 }
 
 
-void UpdateLayer(Layer layer, double* dCost, double training_rate, double* lastActv) {
+void UpdateLayer(Layer layer, double* dCost, double* lastActv) {
     for(size_t i=0;i<layer.size;i++) {
-        layer.nodes[i].bias -= dCost[i] * training_rate;
+        layer.nodes[i].bias += dCost[i];
         for(size_t j=0;j<layer.nodes[i].weight_size;j++) {
-            layer.nodes[i].weights[j] -= dCost[i] * training_rate * lastActv[j];    
+            layer.nodes[i].weights[j] += dCost[i] * lastActv[j];    
         }    
     }
 }
@@ -97,12 +97,42 @@ double** BackPropagateInput(Network network, double** activationsLayers,
 
 
 
+void AddToSumNetwork(Network sumNetwork, double** all_dCost_dZ, 
+        double** activationsLayers, double* inputs) {
+
+    UpdateLayer(sumNetwork.layers[0], all_dCost_dZ[0], inputs);
+    for(size_t i = 1; i < sumNetwork.depth; i++) {
+        UpdateLayer(sumNetwork.layers[i], all_dCost_dZ[i],
+                activationsLayers[i-1]);
+    }
+        
+    for(size_t i = 0; i < sumNetwork.depth; i++) {
+        free(all_dCost_dZ[i]);
+        free(activationsLayers[i]);
+    }
+    free(all_dCost_dZ);
+    free(activationsLayers);
+}
+
+
+void UpdateNetwork(Network network, Network sumNetwork, double training_rate, size_t batch_size) {
+    for(size_t l=0; l<network.depth;l++) {
+        for(size_t i=0;i<network.layers[l].size;i++) {
+            network.layers[l].nodes[i].bias -= sumNetwork.layers[l].nodes[i].bias / batch_size * training_rate;
+            for(size_t j=0;j<network.layers[l].nodes[i].weight_size;j++) {
+                network.layers[l].nodes[i].weights[j] -= sumNetwork.layers[l].nodes[i].weights[j] 
+                    / batch_size * training_rate;
+            }    
+        }
+    }
+}
+
+
 double BackPropagation(Network network, double training_rate, InputBatch batch) 
 { 
-  // making the moy of dC/dw over the sample batch and only call UpdateLayer after 
     double accuracy = 0;
 
-    Network sumNetwork;
+    Network sumNetwork = copyAndResetNetwork(network);
 
     for (size_t m = 0; m < batch.size;m++) 
     {
@@ -114,20 +144,13 @@ double BackPropagation(Network network, double training_rate, InputBatch batch)
     
         double** all_dCost_dZ = BackPropagateInput(network, activationsLayers, 
                 batch.outputs[m]);
-
-        UpdateLayer(network.layers[0], all_dCost_dZ[0], training_rate, batch.inputs[m]);
-        for(size_t i = 1; i < network.depth; i++) {
-            UpdateLayer(network.layers[i], all_dCost_dZ[i], training_rate,
-                    activationsLayers[i-1]);
-        }
-        
-        for(size_t i = 0; i < network.depth; i++) {
-            free(all_dCost_dZ[i]);
-            free(activationsLayers[i]);
-        }
-        free(all_dCost_dZ);
-        free(activationsLayers);
+    
+        AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers, batch.inputs[m]);
     }
+    
+    UpdateNetwork(network, sumNetwork, training_rate, batch.size); 
+
+    //free sumNetwork
 
     return accuracy/batch.size;
 }
