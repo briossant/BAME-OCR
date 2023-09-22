@@ -52,6 +52,9 @@ double startingValue(); // don't forget to init rand() with srand(time(NULL));
 
 Network copyAndResetNetwork(Network network);
 
+void freeNetwork(Network network);
+
+
 ////////////////////////////////////
 // Printers
 

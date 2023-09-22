@@ -98,3 +98,14 @@ Network copyAndResetNetwork(Network network) {
     return newNetwork;
 }
 
+
+void freeNetwork(Network network) {
+    for(size_t l=0; l<network.depth;l++) {
+        for (size_t i = 0; i < network.layers[l].size;++i) {
+            free(network.layers[l].nodes[i].weights);
+        }
+        free(network.layers[l].nodes);
+    }
+    free(network.layers);
+}
+

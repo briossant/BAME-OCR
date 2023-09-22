@@ -150,7 +150,7 @@ double BackPropagation(Network network, double training_rate, InputBatch batch)
     
     UpdateNetwork(network, sumNetwork, training_rate, batch.size); 
 
-    //free sumNetwork
+    freeNetwork(sumNetwork); 
 
     return accuracy/batch.size;
 }
