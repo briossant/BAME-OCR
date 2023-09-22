@@ -55,10 +55,18 @@ Network copyAndResetNetwork(Network network);
 void freeNetwork(Network network);
 
 
+
 ////////////////////////////////////
 // Printers
 
 void printNetwork(Network network);
+
+
+
+////////////////////////////////////
+// Mnist Loading
+
+double **loadMnistImages(); 
 
 
 
