@@ -61,5 +61,40 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers) {
     return network;
 }
 
+Network copyAndResetNetwork(Network network) {
+    Layer* layers = malloc(sizeof(Layer) * network.depth);
+    Network newNetwork = {
+        .input_size = network.input_size,
+        .depth = network.depth,
+        .layers = layers
+    };
+    
+    size_t weights_size = network.input_size;
 
+    for(size_t l=0; l<network.depth;l++) {
+        size_t layer_size = network.layers[l].size;
+        Node *nodes = malloc(sizeof(Node) * layer_size);
+
+        for (size_t i = 0; i < layer_size;++i) {
+            double *weights = malloc(weights_size * sizeof(double));
+            for (size_t i = 0;i < weights_size;i++) {
+                weights[i] = 0.0;
+            }
+            Node nd = {
+                .weight_size = weights_size,
+                .bias = 0.0,
+                .weights = weights
+            };
+            nodes[i] = nd;
+        }
+        weights_size = layer_size;
+        Layer layer = {
+            .size = layer_size,
+            .nodes = nodes
+        };
+        layers[l] = layer;
+    }
+
+    return newNetwork;
+}
 

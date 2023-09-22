@@ -50,7 +50,7 @@ Node newNode(size_t weight_size);
 
 double startingValue(); // don't forget to init rand() with srand(time(NULL));
 
-
+Network copyAndResetNetwork(Network network);
 
 ////////////////////////////////////
 // Printers

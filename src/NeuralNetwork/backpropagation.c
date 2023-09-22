@@ -102,12 +102,13 @@ double BackPropagation(Network network, double training_rate, InputBatch batch)
   // making the moy of dC/dw over the sample batch and only call UpdateLayer after 
     double accuracy = 0;
 
+    Network sumNetwork;
+
     for (size_t m = 0; m < batch.size;m++) 
     {
         double **activationsLayers = PropagateAndKeep(batch.inputs[m], network);
         
-        size_t outputLayerI = network.depth-1;
-        
+        size_t outputLayerI = network.depth-1;        
         accuracy += CostFunction(activationsLayers[outputLayerI], batch.outputs[m],
                 network.layers[outputLayerI].size);
     
