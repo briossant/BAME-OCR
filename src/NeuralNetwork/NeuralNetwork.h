@@ -12,6 +12,12 @@
 //////////////////////////////////////
 // Struct
 
+typedef struct InputBatch {
+    size_t size; 
+    double **inputs;
+    double **outputs;
+} InputBatch;
+
 typedef struct Node {
     size_t weight_size; 
     double bias;
@@ -72,8 +78,7 @@ double Sigmoid(double x);
 ////////////////////////////////////
 // Back Propagation
 
-double BackPropagation(Network network, double training_rate, double** input_batch, 
-        double** output_batch, size_t batch_size);
+double BackPropagation(Network network, double training_rate, InputBatch batch);
 
 
 

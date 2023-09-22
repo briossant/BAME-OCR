@@ -18,6 +18,15 @@ void shuffle(double **input, double** output, size_t n)
 }
 
 
+InputBatch MakeInputBatch(double** inputs, double** outputs, size_t n) {
+    InputBatch res = {
+        .size = n,
+        .inputs = inputs,
+        .outputs = outputs
+    };
+    return res;
+}
+
 
 void trainNetwork(Network network, double **inputs, 
         double** outputs, size_t n, double trainingRate, 
@@ -26,8 +35,7 @@ void trainNetwork(Network network, double **inputs,
     for (size_t i = 0; i < epochs; i++) {
         shuffle(inputs, outputs, n); 
         double err = BackPropagation(network, 
-                trainingRate, inputs, 
-                outputs, n);
+                trainingRate, MakeInputBatch(inputs, outputs, n));
         if (i % (1 + epochs / 100) == 0) {
             //printNetwork(network);
             printf("~~{ [Training Epoch]: %ld -> [Accuracy]: %f }\n",i, err);
