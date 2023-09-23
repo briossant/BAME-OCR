@@ -35,8 +35,8 @@ void TrainNetwork(Network network, NNValue **inputs, NNValue** outputs,
 {   
     printf("~~[- Training -]~~\n");
     size_t nbr_of_batch = settings.nbr_of_inputs/settings.batch_size;
-    printf("nbr_of_batch: %ld | nbr_of_inputs: %ld | batch_size: %ld | training_rate: %f | epochs: %ld\n",
-            nbr_of_batch, settings.nbr_of_inputs, settings.batch_size, settings.training_rate, settings.epochs);
+    printf("nbr_of_batch: %ld | nbr_of_inputs: %ld | batch_size: %ld | training_rate: %f | epochs: %ld | inertia_strength: %f\n",
+            nbr_of_batch, settings.nbr_of_inputs, settings.batch_size, settings.training_rate, settings.epochs, settings.inertia_strength);
 
     InputBatch *batchs = MakeInputsBatch(inputs, outputs, 
             nbr_of_batch, settings.batch_size);
@@ -44,8 +44,11 @@ void TrainNetwork(Network network, NNValue **inputs, NNValue** outputs,
     for (size_t i = 0; i < settings.epochs; i++) {
         shuffle(inputs, outputs, settings.nbr_of_inputs);
         NNValue err = 0.0;
+        Network inertiaNetwork = copyAndResetNetwork(network);
+
         for(size_t j=0;j<nbr_of_batch;j++)
-            err += BackPropagation(network, settings.training_rate, batchs[j]);
+            err += BackPropagation(network, settings, batchs[j], inertiaNetwork);
+        printNetwork(inertiaNetwork);
         err /= nbr_of_batch;
         //if (i % (1 + epochs / 100) == 0);
         printf("~~{ [Training Epoch]: %ld -> [Accuracy]: %f }\n",i, err);

@@ -26,6 +26,7 @@ void train(size_t epoch, NNValue trRate) {
         .training_rate = trRate,
         .batch_size = 1,
         .epochs = epoch,
+        .inertia_strength = 0,
         .nbr_of_inputs = trSetSize
     };
 
@@ -68,15 +69,16 @@ void solve(char input[2]) {
 void printHelp() {
     printf("Usage:\n./xor t [Epoch] [TrainingRate]: for training\n./xor p [0-1] [0-1] : propagate inputs");
     printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n"); 
-    printf("./xor m [Epochs] [TrainingRate] [BatchSize] : train on mnist\n"); 
+    printf("./xor m [Epochs] [TrainingRate] [BatchSize] [InertiaStrength (0.0 to 1.0)] : train on mnist\n"); 
 }
 
 
-void mnist(size_t epoch, NNValue learning_rate, size_t batch_size) {
+void mnist(size_t epoch, NNValue learning_rate, size_t batch_size, NNValue inertia_strength) {
     TrainingSettings sett = {
         .training_rate = learning_rate,
         .batch_size = batch_size,
         .epochs = epoch,
+        .inertia_strength = inertia_strength,
         .nbr_of_inputs = 42 //dummy value
     };
     MnistTraining(sett);
@@ -100,7 +102,7 @@ int main(int argc, char **argv) {
 
         solve(input);
     } else if(argv[1][0] == 'm') { 
-        if (argc < 5) {
+        if (argc < 6) {
             printHelp();
             return 1;
         }
@@ -108,7 +110,7 @@ int main(int argc, char **argv) {
         size_t batch_size;
         sscanf(argv[2], "%zu", &epoch);
         sscanf(argv[4], "%zu", &batch_size);
-        mnist(epoch, (NNValue)atof(argv[3]), batch_size);
+        mnist(epoch, (NNValue)atof(argv[3]), batch_size, (NNValue)atof(argv[5]));
     } else if(argv[1][0] == 't') { 
         if (argc < 4) {
             printHelp();

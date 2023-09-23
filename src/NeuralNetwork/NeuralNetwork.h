@@ -23,6 +23,7 @@ typedef struct InputBatch {
 typedef struct TrainingSettings {
     size_t nbr_of_inputs;
     NNValue training_rate;
+    NNValue inertia_strength; // between 0.0 and 1.0
     size_t epochs;
     size_t batch_size;
 } TrainingSettings;
@@ -108,7 +109,7 @@ NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs,
 ////////////////////////////////////
 // Back Propagation
 
-NNValue BackPropagation(Network network, NNValue training_rate, InputBatch batch);
+NNValue BackPropagation(Network network, TrainingSettings settings, InputBatch batch, Network inertiaNetwork);
 
 
 

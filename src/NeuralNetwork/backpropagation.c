@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include <stdio.h>
 
 
 // sigmoid derivative with x = Sigmoid(...)
@@ -106,20 +107,40 @@ void AddToSumNetwork(Network sumNetwork, NNValue** all_dCost_dZ,
 }
 
 
-void UpdateNetwork(Network network, Network sumNetwork, NNValue training_rate, size_t batch_size) {
+NNValue ValueToRemove(NNValue sumValue, NNValue *inertiaValue, TrainingSettings settings, size_t batch_size) {
+    NNValue dif = (1.0 - settings.inertia_strength) 
+        * sumValue / batch_size * settings.training_rate
+        - settings.inertia_strength * *inertiaValue;
+    
+    *inertiaValue = -dif;
+
+    return dif;
+}
+
+
+void UpdateNetwork(Network network, Network sumNetwork, Network inertiaNetwork, TrainingSettings settings, size_t batch_size) {
     for(size_t l=0; l<network.depth;l++) {
         for(size_t i=0;i<network.layers[l].size;i++) {
-            network.layers[l].nodes[i].bias -= sumNetwork.layers[l].nodes[i].bias / batch_size * training_rate;
-            for(size_t j=0;j<network.layers[l].nodes[i].weight_size;j++) {
-                network.layers[l].nodes[i].weights[j] -= sumNetwork.layers[l].nodes[i].weights[j] 
-                    / batch_size * training_rate;
+            
+            Node node = network.layers[l].nodes[i];
+            Node sumNode = sumNetwork.layers[l].nodes[i];
+            Node inertiaNode = inertiaNetwork.layers[l].nodes[i];
+
+            // update biases
+            node.bias -= ValueToRemove(sumNode.bias, &inertiaNode.bias, settings, batch_size);
+            
+            for(size_t j=0;j<node.weight_size;j++) {
+                
+                // update weights
+                node.weights[j] -= ValueToRemove(sumNode.weights[j], &inertiaNode.weights[j], settings, batch_size);
+
             }    
         }
     }
 }
 
 
-NNValue BackPropagation(Network network, NNValue training_rate, InputBatch batch) 
+NNValue BackPropagation(Network network, TrainingSettings settings, InputBatch batch, Network inertiaNetwork) 
 { 
     NNValue accuracy = 0;
 
@@ -139,7 +160,7 @@ NNValue BackPropagation(Network network, NNValue training_rate, InputBatch batch
         AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers, batch.inputs[m]);
     }
     
-    UpdateNetwork(network, sumNetwork, training_rate, batch.size); 
+    UpdateNetwork(network, sumNetwork, inertiaNetwork, settings, batch.size); 
 
     freeNetwork(sumNetwork); 
 
