@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
@@ -67,6 +68,18 @@ void solve(char input[2]) {
 void printHelp() {
     printf("Usage:\n./xor t [Epoch] [TrainingRate]: for training\n./xor p [0-1] [0-1] : propagate inputs");
     printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n"); 
+    printf("./xor m [Epochs] [TrainingRate] [BatchSize] : train on mnist\n"); 
+}
+
+
+void mnist(size_t epoch, double learning_rate, size_t batch_size) {
+    TrainingSettings sett = {
+        .training_rate = learning_rate,
+        .batch_size = batch_size,
+        .epochs = epoch,
+        .nbr_of_inputs = 42 //dummy value
+    };
+    MnistTraining(sett);
 }
 
 int main(int argc, char **argv) {
@@ -86,6 +99,16 @@ int main(int argc, char **argv) {
         char input[] = {argv[2][0]-48, argv[3][0]-48};
 
         solve(input);
+    } else if(argv[1][0] == 'm') { 
+        if (argc < 5) {
+            printHelp();
+            return 1;
+        }
+        size_t epoch;
+        size_t batch_size;
+        sscanf(argv[2], "%zu", &epoch);
+        sscanf(argv[4], "%zu", &batch_size);
+        mnist(epoch, atof(argv[3]), batch_size);
     } else if(argv[1][0] == 't') { 
         if (argc < 4) {
             printHelp();

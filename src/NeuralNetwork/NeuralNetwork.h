@@ -77,6 +77,7 @@ void printNetwork(Network network);
 
 void LoadMnist(double*** images, double*** labels, Bool isForTraining);
 
+void MnistTraining(TrainingSettings settings);
 
 ////////////////////////////////////
 // Propagation

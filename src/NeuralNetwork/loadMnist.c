@@ -8,7 +8,7 @@
 
 #define TRAINING_IMAGES_PATH "dataset/train-images.idx3-ubyte"
 #define TESTING_IMAGES_PATH "dataset/t10k-images.idx3-ubyte"
-#define TRAINING_LABELS_PATH "dataset/train-labels.idx3-ubyte"
+#define TRAINING_LABELS_PATH "dataset/train-labels.idx1-ubyte"
 #define TESTING_LABELS_PATH "dataset/t10k-labels.idx1-ubyte"
 
 #define CHARS_IN_INT32 sizeof(int32_t)/sizeof(char)
