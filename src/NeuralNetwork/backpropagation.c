@@ -28,15 +28,6 @@ void UpdateLayer(Layer layer, NNValue* dCost, NNValue* lastActv) {
     }
 }
 
-NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
-        size_t outputSize)
-{
-    NNValue res = 0;
-    for(size_t i = 0; i < outputSize; i++){
-        res += pow(outputActivations[i] - expectedOutputs[i], 2);
-    }
-    return res;
-}
 
 
 

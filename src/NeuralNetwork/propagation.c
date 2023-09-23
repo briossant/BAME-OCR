@@ -10,6 +10,18 @@ NNValue WeightedSum(NNValue *activations, Node node) {
     return sum;
 }
 
+
+NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
+        size_t outputSize)
+{
+    NNValue res = 0;
+    for(size_t i = 0; i < outputSize; i++){
+        res += pow(outputActivations[i] - expectedOutputs[i], 2);
+    }
+    return res;
+}
+
+
 NNValue Sigmoid(NNValue x) {
     return 1/ (1+exp(-x));
 }
@@ -42,4 +54,18 @@ NNValue **PropagateAndKeep(NNValue *inputs, Network network) {
     }
     return activationsLayers;
 }
+
+
+NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
+        Network network) 
+{
+    NNValue accuracy = 0.0;
+    for(size_t i=0;i<nbr_of_inputs;i++)
+        accuracy += CostFunction(Propagate(inputs[i], network), outputs[i],
+                network.layers[network.depth-1].size);
+    return accuracy/nbr_of_inputs;
+}
+
+
+
 

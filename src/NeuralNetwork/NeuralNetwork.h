@@ -81,6 +81,8 @@ void LoadMnist(NNValue*** images, NNValue*** labels, Bool isForTraining);
 
 void MnistTraining(TrainingSettings settings);
 
+
+
 ////////////////////////////////////
 // Propagation
 
@@ -94,6 +96,12 @@ NNValue WeightedSum(NNValue *activations, Node node);
 
 // may switch to ReLU function later on
 NNValue Sigmoid(NNValue x);
+
+NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
+        Network network);
+
+NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
+        size_t outputSize);
 
 
 

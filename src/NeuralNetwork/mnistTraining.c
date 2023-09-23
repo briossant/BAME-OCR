@@ -25,7 +25,11 @@ void MnistTraining(TrainingSettings settings) {
 
     TrainNetwork(network, inputs, outputs, settings);
    
-    // todo: test the network with testing data
-    //LoadMnist(&inputs, &outputs, False);
+    LoadMnist(&inputs, &outputs, False);
+
+    NNValue final_value = TestPropagation(inputs, outputs, NBR_OF_TESTING_INPUTS, network);
+
+    printf("//////////////////////////////////////////////////////////////////\n\n");
+    printf("*** Final accuracy: %f ***\n\n", final_value);
 }
 
