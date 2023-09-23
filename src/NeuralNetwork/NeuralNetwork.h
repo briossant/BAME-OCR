@@ -18,6 +18,14 @@ typedef struct InputBatch {
     double **outputs;
 } InputBatch;
 
+typedef struct TrainingSettings {
+    size_t nbr_of_inputs;
+    double training_rate;
+    size_t epochs;
+    size_t batch_size;
+} TrainingSettings;
+
+
 typedef struct Node {
     size_t weight_size; 
     double bias;
@@ -96,9 +104,8 @@ double BackPropagation(Network network, double training_rate, InputBatch batch);
 ////////////////////////////////////
 // Training
 
-void trainNetwork(Network network, double **inputs, 
-        double** outputs, size_t n, double trainingRate, 
-        size_t epochs);
+void TrainNetwork(Network network, double **inputs, 
+        double** outputs, TrainingSettings settings);
 
 
 

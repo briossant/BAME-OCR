@@ -20,10 +20,15 @@ void train(size_t epoch, double trRate) {
         (double[]){1},
         (double[]){0},
         (double[]){0}};
-    
-    trainNetwork(network, inputs, outputs, 
-            trSetSize, trRate, 
-            epoch);
+   
+    TrainingSettings sett = {
+        .training_rate = trRate,
+        .batch_size = 1,
+        .epochs = epoch,
+        .nbr_of_inputs = trSetSize
+    };
+
+    TrainNetwork(network, inputs, outputs, sett);
    
     for(size_t i = 0; i < trSetSize; i++) {
         double *res = Propagate(inputs[i],
