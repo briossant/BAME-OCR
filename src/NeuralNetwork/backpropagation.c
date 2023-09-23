@@ -107,14 +107,10 @@ void AddToSumNetwork(Network sumNetwork, NNValue** all_dCost_dZ,
 }
 
 
-NNValue ValueToRemove(NNValue sumValue, NNValue *inertiaValue, TrainingSettings settings, size_t batch_size) {
-    NNValue dif = (1.0 - settings.inertia_strength) 
+NNValue ValueToRemove(NNValue sumValue, NNValue inertiaValue, TrainingSettings settings, size_t batch_size) {
+    return - (1.0 - settings.inertia_strength) 
         * sumValue / batch_size * settings.training_rate
-        - settings.inertia_strength * *inertiaValue;
-    
-    *inertiaValue = -dif;
-
-    return dif;
+        + settings.inertia_strength * inertiaValue;
 }
 
 
@@ -124,15 +120,19 @@ void UpdateNetwork(Network network, Network sumNetwork, Network inertiaNetwork, 
             
             Node node = network.layers[l].nodes[i];
             Node sumNode = sumNetwork.layers[l].nodes[i];
-            Node inertiaNode = inertiaNetwork.layers[l].nodes[i];
+            Node *inertiaNodes = inertiaNetwork.layers[l].nodes;
 
             // update biases
-            node.bias -= ValueToRemove(sumNode.bias, &inertiaNode.bias, settings, batch_size);
-            
+            NNValue bdif = ValueToRemove(sumNode.bias, inertiaNodes[i].bias, settings, batch_size);
+            node.bias += bdif;
+            inertiaNodes[i].bias = -bdif;
+ 
             for(size_t j=0;j<node.weight_size;j++) {
                 
                 // update weights
-                node.weights[j] -= ValueToRemove(sumNode.weights[j], &inertiaNode.weights[j], settings, batch_size);
+                NNValue wdif = ValueToRemove(sumNode.weights[j], inertiaNodes[i].weights[j], settings, batch_size);
+                node.weights[j] += wdif;
+                inertiaNodes[i].weights[j] = -wdif;
 
             }    
         }

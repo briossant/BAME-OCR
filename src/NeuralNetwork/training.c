@@ -47,8 +47,10 @@ void TrainNetwork(Network network, NNValue **inputs, NNValue** outputs,
         Network inertiaNetwork = copyAndResetNetwork(network);
 
         for(size_t j=0;j<nbr_of_batch;j++)
+        {
             err += BackPropagation(network, settings, batchs[j], inertiaNetwork);
-        printNetwork(inertiaNetwork);
+        }
+
         err /= nbr_of_batch;
         //if (i % (1 + epochs / 100) == 0);
         printf("~~{ [Training Epoch]: %ld -> [Accuracy]: %f }\n",i, err);
