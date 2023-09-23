@@ -2,16 +2,16 @@
 
 
 // sigmoid derivative with x = Sigmoid(...)
-double DSigmoid(double x) {
+NNValue DSigmoid(NNValue x) {
     return x * (1 - x);
 }
 
 
 // cost function derivative over the output activations
-double *FirstDCostDActv(double *outputActivations, double *expectedOutputs, 
+NNValue *FirstDCostDActv(NNValue *outputActivations, NNValue *expectedOutputs, 
         size_t outputSize) 
 {
-    double *res = malloc(outputSize * sizeof(double));
+    NNValue *res = malloc(outputSize * sizeof(NNValue));
     for(size_t i = 0; i < outputSize; i++){
         res[i] = 2 * (outputActivations[i] - expectedOutputs[i]);
     }
@@ -19,7 +19,7 @@ double *FirstDCostDActv(double *outputActivations, double *expectedOutputs,
 }
 
 
-void UpdateLayer(Layer layer, double* dCost, double* lastActv) {
+void UpdateLayer(Layer layer, NNValue* dCost, NNValue* lastActv) {
     for(size_t i=0;i<layer.size;i++) {
         layer.nodes[i].bias += dCost[i];
         for(size_t j=0;j<layer.nodes[i].weight_size;j++) {
@@ -28,10 +28,10 @@ void UpdateLayer(Layer layer, double* dCost, double* lastActv) {
     }
 }
 
-double CostFunction(double *outputActivations, double *expectedOutputs, 
+NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
         size_t outputSize)
 {
-    double res = 0;
+    NNValue res = 0;
     for(size_t i = 0; i < outputSize; i++){
         res += pow(outputActivations[i] - expectedOutputs[i], 2);
     }
@@ -40,8 +40,8 @@ double CostFunction(double *outputActivations, double *expectedOutputs,
 
 
 
-double *DCostDZ(double* dCost_dActv, double* activations, size_t size) {
-    double *dCost_dZ = malloc(sizeof(double) * size);
+NNValue *DCostDZ(NNValue* dCost_dActv, NNValue* activations, size_t size) {
+    NNValue *dCost_dZ = malloc(sizeof(NNValue) * size);
     for(size_t i = 0; i < size; i++) {
         dCost_dZ[i] = dCost_dActv[i] * DSigmoid(activations[i]);
     }
@@ -49,11 +49,11 @@ double *DCostDZ(double* dCost_dActv, double* activations, size_t size) {
 }
 
 
-double *GetNewDCostDActv(Layer layer, size_t size, double* activations, double* dCost_dActv) {
-    double *new_dCost_dActv = malloc(size * sizeof(double));
+NNValue *GetNewDCostDActv(Layer layer, size_t size, NNValue* activations, NNValue* dCost_dActv) {
+    NNValue *new_dCost_dActv = malloc(size * sizeof(NNValue));
     for (size_t i=0; i<size;i++){
 
-        double dSig = DSigmoid(activations[i]);        
+        NNValue dSig = DSigmoid(activations[i]);        
         new_dCost_dActv[i] = 0;
         for (size_t j=0; j<layer.size;j++)
         {
@@ -66,12 +66,12 @@ double *GetNewDCostDActv(Layer layer, size_t size, double* activations, double* 
 
 
 
-double** BackPropagateInput(Network network, double** activationsLayers, 
-        double* outputs) {
-    double **all_dCost_dZ = malloc(network.depth * sizeof(double*));
+NNValue** BackPropagateInput(Network network, NNValue** activationsLayers, 
+        NNValue* outputs) {
+    NNValue **all_dCost_dZ = malloc(network.depth * sizeof(NNValue*));
     size_t outputLayerI = network.depth-1;
 
-    double *dCost_dActv = FirstDCostDActv(activationsLayers[outputLayerI], 
+    NNValue *dCost_dActv = FirstDCostDActv(activationsLayers[outputLayerI], 
                 outputs, network.layers[outputLayerI].size);
 
         
@@ -80,7 +80,7 @@ double** BackPropagateInput(Network network, double** activationsLayers,
 
     for(size_t l = outputLayerI; l > 0; l--) 
     {    
-        double *new_dCost_dActv = GetNewDCostDActv(network.layers[l], 
+        NNValue *new_dCost_dActv = GetNewDCostDActv(network.layers[l], 
                 network.layers[l-1].size, activationsLayers[l], dCost_dActv);
 
         free(dCost_dActv);
@@ -97,8 +97,8 @@ double** BackPropagateInput(Network network, double** activationsLayers,
 
 
 
-void AddToSumNetwork(Network sumNetwork, double** all_dCost_dZ, 
-        double** activationsLayers, double* inputs) {
+void AddToSumNetwork(Network sumNetwork, NNValue** all_dCost_dZ, 
+        NNValue** activationsLayers, NNValue* inputs) {
 
     UpdateLayer(sumNetwork.layers[0], all_dCost_dZ[0], inputs);
     for(size_t i = 1; i < sumNetwork.depth; i++) {
@@ -115,7 +115,7 @@ void AddToSumNetwork(Network sumNetwork, double** all_dCost_dZ,
 }
 
 
-void UpdateNetwork(Network network, Network sumNetwork, double training_rate, size_t batch_size) {
+void UpdateNetwork(Network network, Network sumNetwork, NNValue training_rate, size_t batch_size) {
     for(size_t l=0; l<network.depth;l++) {
         for(size_t i=0;i<network.layers[l].size;i++) {
             network.layers[l].nodes[i].bias -= sumNetwork.layers[l].nodes[i].bias / batch_size * training_rate;
@@ -128,21 +128,21 @@ void UpdateNetwork(Network network, Network sumNetwork, double training_rate, si
 }
 
 
-double BackPropagation(Network network, double training_rate, InputBatch batch) 
+NNValue BackPropagation(Network network, NNValue training_rate, InputBatch batch) 
 { 
-    double accuracy = 0;
+    NNValue accuracy = 0;
 
     Network sumNetwork = copyAndResetNetwork(network);
 
     for (size_t m = 0; m < batch.size;m++) 
     {
-        double **activationsLayers = PropagateAndKeep(batch.inputs[m], network);
+        NNValue **activationsLayers = PropagateAndKeep(batch.inputs[m], network);
         
         size_t outputLayerI = network.depth-1;        
         accuracy += CostFunction(activationsLayers[outputLayerI], batch.outputs[m],
                 network.layers[outputLayerI].size);
     
-        double** all_dCost_dZ = BackPropagateInput(network, activationsLayers, 
+        NNValue** all_dCost_dZ = BackPropagateInput(network, activationsLayers, 
                 batch.outputs[m]);
     
         AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers, batch.inputs[m]);

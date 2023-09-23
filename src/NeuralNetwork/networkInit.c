@@ -1,13 +1,13 @@
 #include "NeuralNetwork.h"
 
 
-double startingValue() {
-    return ((double)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
+NNValue startingValue() {
+    return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
                                                     // add it later
 }
 
 Node newNode(size_t weight_size) {
-    double *weights = malloc(weight_size * sizeof(double));
+    NNValue *weights = malloc(weight_size * sizeof(NNValue));
     for (size_t i = 0;i < weight_size;i++) {
         weights[i] = startingValue();
     }
@@ -76,7 +76,7 @@ Network copyAndResetNetwork(Network network) {
         Node *nodes = malloc(sizeof(Node) * layer_size);
 
         for (size_t i = 0; i < layer_size;++i) {
-            double *weights = malloc(weights_size * sizeof(double));
+            NNValue *weights = malloc(weights_size * sizeof(NNValue));
             for (size_t i = 0;i < weights_size;i++) {
                 weights[i] = 0.0;
             }

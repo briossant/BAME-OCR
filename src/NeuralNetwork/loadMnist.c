@@ -36,19 +36,19 @@ int32_t *GetHeaders(FILE* file, size_t nbr) {
 }
 
 
-double* GetImage(FILE* file, size_t image_size) {
+NNValue* GetImage(FILE* file, size_t image_size) {
     unsigned char *buffer =malloc(image_size * sizeof(unsigned char));
     fread(buffer, sizeof(char), image_size, file); 
-    double* image = malloc(sizeof(double) * image_size);
+    NNValue* image = malloc(sizeof(NNValue) * image_size);
     for(size_t i=0;i<image_size;i++)
-        image[i] = (double)buffer[i] / 255;
+        image[i] = (NNValue)buffer[i] / 255;
 
     free(buffer);
 
     return image;
 }
 
-double **LoadMnistImages(char* path) 
+NNValue **LoadMnistImages(char* path) 
 {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
@@ -60,7 +60,7 @@ double **LoadMnistImages(char* path)
 
     printf("Loading images (magic: %d) -> nbr: %d  h: %d  w: %d\n", headers[0], headers[1], headers[2], headers[3]);
 
-    double **images = malloc(sizeof(double*) * headers[1]);
+    NNValue **images = malloc(sizeof(NNValue*) * headers[1]);
     size_t image_size = headers[2] * headers[3];
     for (int i = 0; i < headers[1];i++)
         images[i] = GetImage(file, image_size);
@@ -68,7 +68,7 @@ double **LoadMnistImages(char* path)
     return images;
 }
 
-double **LoadMnistLabels(char* path) {
+NNValue **LoadMnistLabels(char* path) {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
         errx(1, "loadMnistLabels: unable to open dataset file (%s)", path);
@@ -83,9 +83,9 @@ double **LoadMnistLabels(char* path) {
     unsigned char *buffer =malloc(headers[1] * sizeof(unsigned char));
     fread(buffer, sizeof(char), headers[1], file); 
     
-    double **labels = malloc(sizeof(double*) * headers[1]);
+    NNValue **labels = malloc(sizeof(NNValue*) * headers[1]);
     for (int i = 0; i < headers[1];i++){
-        labels[i] = malloc(sizeof(double) * NBR_OF_DIFFERENT_LABELS);
+        labels[i] = malloc(sizeof(NNValue) * NBR_OF_DIFFERENT_LABELS);
         for (unsigned char j = 0; j < NBR_OF_DIFFERENT_LABELS; j++){
             if (buffer[i] == j) 
                 labels[i][j] = IS_LABEL;
@@ -100,7 +100,7 @@ double **LoadMnistLabels(char* path) {
 }
 
 
-void LoadMnist(double*** images, double*** labels, Bool isForTraining) {
+void LoadMnist(NNValue*** images, NNValue*** labels, Bool isForTraining) {
     *images = LoadMnistImages(isForTraining ? TRAINING_IMAGES_PATH : TESTING_IMAGES_PATH);
     *labels = LoadMnistLabels(isForTraining ? TRAINING_LABELS_PATH : TESTING_LABELS_PATH);
 }

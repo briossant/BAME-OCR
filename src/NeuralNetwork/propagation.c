@@ -1,8 +1,8 @@
 #include "NeuralNetwork.h"
 #include <stdlib.h>
 
-double WeightedSum(double *activations, Node node) {
-    double sum = 0.0;
+NNValue WeightedSum(NNValue *activations, Node node) {
+    NNValue sum = 0.0;
     for (size_t i = 0; i <node.weight_size; i++) {
         sum += activations[i] * node.weights[i];
     }
@@ -10,22 +10,22 @@ double WeightedSum(double *activations, Node node) {
     return sum;
 }
 
-double Sigmoid(double x) {
+NNValue Sigmoid(NNValue x) {
     return 1/ (1+exp(-x));
 }
 
-double *PropagateLayer(double *lastActivation, Layer layer) {
-    double *newActiv = malloc(sizeof(double) * layer.size);
+NNValue *PropagateLayer(NNValue *lastActivation, Layer layer) {
+    NNValue *newActiv = malloc(sizeof(NNValue) * layer.size);
     for (size_t i = 0; i < layer.size; i++) {
         newActiv[i] = Sigmoid(WeightedSum(lastActivation, layer.nodes[i]));
     }
     return newActiv;
 }
 
-double* Propagate(double *inputs, Network network) {
-    double *activations = inputs;
+NNValue* Propagate(NNValue *inputs, Network network) {
+    NNValue *activations = inputs;
     for (size_t i = 0; i < network.depth;i++) {
-        double *newActiv = PropagateLayer(activations, network.layers[i]);
+        NNValue *newActiv = PropagateLayer(activations, network.layers[i]);
         if(i>0) free(activations);
         activations = newActiv;
     }
@@ -33,9 +33,9 @@ double* Propagate(double *inputs, Network network) {
 }
 
 
-double **PropagateAndKeep(double *inputs, Network network) {
-    double **activationsLayers = malloc(sizeof(double *) * network.depth);
-    double *lastActivations = inputs;
+NNValue **PropagateAndKeep(NNValue *inputs, Network network) {
+    NNValue **activationsLayers = malloc(sizeof(NNValue *) * network.depth);
+    NNValue *lastActivations = inputs;
     for (size_t i = 0; i < network.depth;i++) {
         lastActivations = PropagateLayer(lastActivations, network.layers[i]);
         activationsLayers[i] = lastActivations;

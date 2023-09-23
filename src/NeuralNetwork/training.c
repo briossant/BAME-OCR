@@ -2,12 +2,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-void shuffle(double **input, double** output, size_t n)
+void shuffle(NNValue **input, NNValue** output, size_t n)
 {
     for (size_t i = 0; i < n - 1; i++) 
     {
         size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-        double* t = input[j];
+        NNValue* t = input[j];
         input[j] = input[i];
         input[i] = t;
         t = output[j];
@@ -16,7 +16,7 @@ void shuffle(double **input, double** output, size_t n)
     }
 }
 
-InputBatch *MakeInputsBatch(double** inputs, double** outputs, 
+InputBatch *MakeInputsBatch(NNValue** inputs, NNValue** outputs, 
         size_t nbr_of_batch, size_t batch_size) {
     InputBatch *res = malloc(sizeof(InputBatch)*nbr_of_batch);
     for (size_t i = 0; i<nbr_of_batch; i++){
@@ -30,16 +30,20 @@ InputBatch *MakeInputsBatch(double** inputs, double** outputs,
     return res;
 }
 
-void TrainNetwork(Network network, double **inputs, double** outputs, 
+void TrainNetwork(Network network, NNValue **inputs, NNValue** outputs, 
         TrainingSettings settings)
 {   
+    printf("~~[- Training -]~~\n");
     size_t nbr_of_batch = settings.nbr_of_inputs/settings.batch_size;
+    printf("nbr_of_batch: %ld | nbr_of_inputs: %ld | batch_size: %ld | training_rate: %f | epochs: %ld\n",
+            nbr_of_batch, settings.nbr_of_inputs, settings.batch_size, settings.training_rate, settings.epochs);
+
     InputBatch *batchs = MakeInputsBatch(inputs, outputs, 
             nbr_of_batch, settings.batch_size);
 
     for (size_t i = 0; i < settings.epochs; i++) {
         shuffle(inputs, outputs, settings.nbr_of_inputs);
-        double err = 0.0;
+        NNValue err = 0.0;
         for(size_t j=0;j<nbr_of_batch;j++)
             err += BackPropagation(network, settings.training_rate, batchs[j]);
         err /= nbr_of_batch;

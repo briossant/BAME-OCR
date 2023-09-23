@@ -8,14 +8,19 @@
 #define NBR_OF_TESTING_INPUTS 10000
 
 void MnistTraining(TrainingSettings settings) {
+    printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
+
     settings.nbr_of_inputs = NBR_OF_TRAINING_INPUTS;
     
     size_t number_of_layers = 4;
-    size_t layers_size[] = {INPUT_SIZE, 16, 16, OUTPUT_SIZE};
+    size_t layers_size[] = {INPUT_SIZE, 42, 16, OUTPUT_SIZE};
     Network network = newNetwork(layers_size, number_of_layers);
+    
+    printNetwork(network);
+    printf("\n");
 
-    double **inputs;
-    double **outputs;
+    NNValue **inputs;
+    NNValue **outputs;
     LoadMnist(&inputs, &outputs, True);
 
     TrainNetwork(network, inputs, outputs, settings);

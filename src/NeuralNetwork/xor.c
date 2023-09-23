@@ -4,7 +4,7 @@
 
 
 
-void train(size_t epoch, double trRate) {
+void train(size_t epoch, NNValue trRate) {
     printf("~|~ Training ~|~\n\n");
     
     size_t layers_size[] = {2,  42, 42, 42, 1};
@@ -12,15 +12,15 @@ void train(size_t epoch, double trRate) {
     
     size_t trSetSize = 4;
     
-    double *inputs[] =  {(double[]) {0,1},
-        (double[]){1,0}, 
-        (double[]){0,0}, 
-        (double[]){1,1}};
+    NNValue *inputs[] =  {(NNValue[]) {0,1},
+        (NNValue[]){1,0}, 
+        (NNValue[]){0,0}, 
+        (NNValue[]){1,1}};
     
-    double *outputs[] = {(double[]){1},
-        (double[]){1},
-        (double[]){0},
-        (double[]){0}};
+    NNValue *outputs[] = {(NNValue[]){1},
+        (NNValue[]){1},
+        (NNValue[]){0},
+        (NNValue[]){0}};
    
     TrainingSettings sett = {
         .training_rate = trRate,
@@ -32,7 +32,7 @@ void train(size_t epoch, double trRate) {
     TrainNetwork(network, inputs, outputs, sett);
    
     for(size_t i = 0; i < trSetSize; i++) {
-        double *res = Propagate(inputs[i],
+        NNValue *res = Propagate(inputs[i],
                 network);
         printf("Result of %f ^ %f -> res:%f \n",
                 inputs[i][0], inputs[i][1], res[0]);
@@ -58,8 +58,8 @@ void solve(char input[2]) {
     
     printNetwork(network);
 
-    double inputs[2] = {(double)input[0], (double)input[1]};
-    double *res = Propagate(inputs, network);
+    NNValue inputs[2] = {(NNValue)input[0], (NNValue)input[1]};
+    NNValue *res = Propagate(inputs, network);
 
     printf("Result of %d%d -> 0:%f 1:%f\n", input[0], input[1], res[0], res[1]);
 }
@@ -72,7 +72,7 @@ void printHelp() {
 }
 
 
-void mnist(size_t epoch, double learning_rate, size_t batch_size) {
+void mnist(size_t epoch, NNValue learning_rate, size_t batch_size) {
     TrainingSettings sett = {
         .training_rate = learning_rate,
         .batch_size = batch_size,
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
         size_t batch_size;
         sscanf(argv[2], "%zu", &epoch);
         sscanf(argv[4], "%zu", &batch_size);
-        mnist(epoch, atof(argv[3]), batch_size);
+        mnist(epoch, (NNValue)atof(argv[3]), batch_size);
     } else if(argv[1][0] == 't') { 
         if (argc < 4) {
             printHelp();
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
         }
         size_t epoch;
         sscanf(argv[2], "%zu", &epoch);
-        train(epoch, atof(argv[3]));
+        train(epoch, (NNValue)atof(argv[3]));
     } else if(argv[1][0] == 's') {
         if (argc < 3) {
             printHelp();
