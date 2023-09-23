@@ -37,6 +37,7 @@ typedef struct Network {
     Layer *layers;
 } Network;
 
+typedef enum { False = 0, True = 1 } Bool;
 
 
 ////////////////////////////////////
@@ -66,8 +67,7 @@ void printNetwork(Network network);
 ////////////////////////////////////
 // Mnist Loading
 
-double **loadMnistImages(); 
-
+void LoadMnist(double*** images, double*** labels, Bool isForTraining);
 
 
 ////////////////////////////////////

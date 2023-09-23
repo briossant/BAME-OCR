@@ -40,7 +40,6 @@ void save(char *filepath) {
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
     //SaveNetwork( network,filepath);
-    loadMnistImages();
 }
 
 void load(char *filepath){
