@@ -30,6 +30,6 @@ void MnistTraining(TrainingSettings settings) {
     NNValue final_value = TestPropagation(inputs, outputs, NBR_OF_TESTING_INPUTS, network);
 
     printf("//////////////////////////////////////////////////////////////////\n\n");
-    printf("*** Final accuracy: %f ***\n\n", final_value);
+    printf("*** Final accuracy: %f %% ***\n\n", final_value);
 }
 

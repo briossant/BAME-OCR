@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include <stddef.h>
 #include <stdlib.h>
 
 NNValue WeightedSum(NNValue *activations, Node node) {
@@ -56,14 +57,32 @@ NNValue **PropagateAndKeep(NNValue *inputs, Network network) {
 }
 
 
+size_t MaxIndex(NNValue *list, size_t n) {
+    size_t m = 0;
+    NNValue max = list[0];
+    for (size_t i=0;i<n;++i){
+        if (list[i] > max) {
+            m=i;
+            max=list[i];
+        }
+    }
+    return m;
+}
+
+NNValue IsRight(NNValue * activations, size_t size, NNValue* outputs){
+    return MaxIndex(activations,  size) == MaxIndex(outputs, size);
+}
+
+
 NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
         Network network) 
 {
     NNValue accuracy = 0.0;
     for(size_t i=0;i<nbr_of_inputs;i++)
-        accuracy += CostFunction(Propagate(inputs[i], network), outputs[i],
-                network.layers[network.depth-1].size);
-    return accuracy/nbr_of_inputs;
+        if (IsRight(Propagate(inputs[i], network),
+                network.layers[network.depth-1].size, outputs[i])) 
+            ++accuracy;
+    return accuracy/nbr_of_inputs * 100;
 }
 
 
