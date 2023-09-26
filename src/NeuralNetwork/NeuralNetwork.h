@@ -44,7 +44,7 @@ Layer new_layer (Node* node,  size_t layer_size);
 
 Node newNode(size_t weight_size);
 
-Node new_node( size_t weight_size, double* weights , double bias;
+Node new_node( size_t weight_size, double* weights , double bias);
 
 void printNetwork(Network network);
 

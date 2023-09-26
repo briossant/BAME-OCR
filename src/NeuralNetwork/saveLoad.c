@@ -87,15 +87,16 @@ Network LoadNetwork(char *filepath)
 {
 
     FILE * file= fopen( filepath, "r");  
-                                       
-    //Initialize a Network
+   
     if (file == NULL)
     {
         printf ("Error this file does not exist or can't be opened\n");
         exit(1);
     }
     int l=0;
-    char* line = fgets(line,0, file);
+    char* line;
+
+    fgets(line,l, file);
 
     if (line == NULL) { 
         printf("The file was empty\n");
