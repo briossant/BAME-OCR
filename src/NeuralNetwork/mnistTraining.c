@@ -4,8 +4,8 @@
 #define INPUT_SIZE 28*28
 #define OUTPUT_SIZE 10
 
-#define NBR_OF_TRAINING_INPUTS 60000
-#define NBR_OF_TESTING_INPUTS 10000
+#define NBR_OF_TRAINING_INPUTS 240000
+#define NBR_OF_TESTING_INPUTS 40000
 
 void MnistTraining(TrainingSettings settings) {
     printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
