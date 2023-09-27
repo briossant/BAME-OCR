@@ -86,9 +86,11 @@ void GaussianBlur(SDL_Surface* image)
     int height = image->h;
     int width = image->w;
 
-    int kernel[] = {1,2,1,
-                    2,4,2,
-                    1,2,1};
+    int kernel[] = {2,4,5,4,2,
+                    4,9,12,9,4,
+                    5,12,15,12,5,
+                    4,9,12,9,4,
+                    2,4,5,4,2};
 
     SDL_Surface *image_converted = SDL_ConvertSurface(image, image->format, 0);
 
@@ -100,7 +102,7 @@ void GaussianBlur(SDL_Surface* image)
             Uint32* pixtab = image->pixels;
 
             //pixtab[y * width + x] = blur(image,y,x,blur_radius);
-            pixtab[y * width + x] = convolution(image_converted,x,y,kernel,3);
+            pixtab[y * width + x] = convolution(image_converted,x,y,kernel,5);
         }
     }
     return;

@@ -63,8 +63,8 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image)
     {
         for (int x = 0; x < width; x++) 
         {
-            grad_x = convolution_grayscale(image, x, y, grad_x_kernel, 3);
-            grad_y = convolution_grayscale(image, x, y, grad_y_kernel, 3);
+            grad_x = convolution_grayscale(image, x, y, grad_x_kernel, 3)/4;
+            grad_y = convolution_grayscale(image, x, y, grad_y_kernel, 3)/4;
 
             grad = sqrt(grad_x*grad_x + grad_y*grad_y);
 
@@ -143,55 +143,47 @@ static Uint32 Sup_max_calculus(Uint8 Intensity_Gradian,Uint8 Orientation_Gradian
     Uint32* pixtab = surface->pixels;
     int height = surface->h;
     int width = surface->w;
-    const SDL_PixelFormat* format = surface->format;
+    SDL_PixelFormat* format = surface->format;
 
     int angle = roundToNearestAngle((int)Orientation_Gradian);
 
-    Uint8 bin, b ,g;
+    Uint8 bin, intensity1=0 ,intensity2=0;
 
     switch (angle)
     {
     case 0:
-        if (j+1<width)
-            SDL_GetRGBA(pixtab[i * width + j+1],format,&g,&bin,&g,&bin);
-        else {g = 0;}
-        if (j-1>=0)
-            SDL_GetRGBA(pixtab[i * width + j-1],format,&b,&bin,&b,&bin);
-        else {b = 0;}
-        break;
-
-    case 45:
-        if (j+1<width && i+1<height)
-            SDL_GetRGBA(pixtab[i+1 * width + j+1],format,&g,&bin,&g,&bin);
-        else {g = 0;}
-        if (j-1>=0 && i-1>=0)
-            SDL_GetRGBA(pixtab[i-1 * width + j-1],format,&b,&bin,&b,&bin);
-        else {b = 0;}
-        break;
-
-    case 90:
-        if (i+1<height)
-            SDL_GetRGBA(pixtab[i+1 * width + j],format,&g,&bin,&g,&bin);
-        else {g = 0;}
+        if (i+1<width)
+            SDL_GetRGBA(pixtab[j * width + i+1],format,&intensity1,&bin,&bin,&bin);
         if (i-1>=0)
-            SDL_GetRGBA(pixtab[i-1 * width + j],format,&b,&bin,&b,&bin);
-        else {b = 0;}
+            SDL_GetRGBA(pixtab[j * width + i-1],format,&intensity2,&bin,&bin,&bin);
         break;
 
     case 135:
-        if (i+1<height && j-1>=0)
-            SDL_GetRGBA(pixtab[i+1 * width + j-1],format,&g,&bin,&g,&bin);
-        else {g = 0;}
-        if (j+1<width && i-1>=0)
-            SDL_GetRGBA(pixtab[i-1 * width + j+1],format,&b,&bin,&b,&bin);
-        else {b = 0;}
+        if (j+1<height && i+1<height)
+            SDL_GetRGBA(pixtab[(j+1) * width + i+1],format,&intensity1,&bin,&bin,&bin);
+        if (j-1>=0 && i-1>=0)
+            SDL_GetRGBA(pixtab[(j-1) * width + i-1],format,&intensity2,&bin,&bin,&bin);
+        break;
+
+    case 90:
+        if (j+1<height)
+            SDL_GetRGBA(pixtab[(j+1) * width + i],format,&intensity1,&bin,&bin,&bin);
+        if (j-1>=0)
+            SDL_GetRGBA(pixtab[(j-1) * width + i],format,&intensity2,&bin,&bin,&bin);
+        break;
+
+    case 45:
+        if (i+1<width && j-1>=0)
+            SDL_GetRGBA(pixtab[(j+1) * width + i-1],format,&intensity1,&bin,&bin,&bin);
+        if (j+1<height && i-1>=0)
+            SDL_GetRGBA(pixtab[(j-1) * width + i+1],format,&intensity2,&bin,&bin,&bin);
         break;
 
     default:
         break;  
     }
 
-    if (Intensity_Gradian<b || Intensity_Gradian<g)
+    if (Intensity_Gradian<intensity1 || Intensity_Gradian<intensity2)
     {
         Intensity_Gradian=0;
     }
@@ -200,12 +192,11 @@ static Uint32 Sup_max_calculus(Uint8 Intensity_Gradian,Uint8 Orientation_Gradian
     return SDL_MapRGBA(format, (Uint8)Intensity_Gradian, (Uint8)Intensity_Gradian, (Uint8)Intensity_Gradian, (Uint8)255);
 }
 
-
 SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orientation_Gradian_Image)
 {
     int height = Intensity_Gradian_Image->h;
     int width = Intensity_Gradian_Image->w;
-    const SDL_PixelFormat* format = Intensity_Gradian_Image->format;
+    SDL_PixelFormat* format = Intensity_Gradian_Image->format;
 
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, format->format);
     Uint32* new_pixtab = image_converted->pixels;
