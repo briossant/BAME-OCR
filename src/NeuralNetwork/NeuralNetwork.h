@@ -14,6 +14,7 @@
 
 typedef double NNValue;
 
+
 typedef struct InputBatch {
     size_t size; 
     NNValue **inputs;
@@ -35,9 +36,24 @@ typedef struct Node {
     NNValue *weights;  
 } Node;
 
+// ActivationFunction(X) = SquishingFunction(ZFunction(X))
+// exple: WeightedSum
+typedef NNValue (*ZFunction) 
+    (NNValue *activations, Node node);
+
+// exple: Sigmoid
+typedef NNValue (*SquishingFunction) (NNValue z);
+
+typedef struct ActivationFunctions {
+    ZFunction zFct;  
+    SquishingFunction squishFct;   
+    SquishingFunction dSquishFct;   
+} ActivationFunctions;
+
 
 typedef struct Layer {
     size_t size; // number of nodes
+    ActivationFunctions activFcts;
     Node *nodes;
 } Layer;
 
@@ -92,11 +108,6 @@ NNValue* Propagate(NNValue *inputs, Network network);
 NNValue** PropagateAndKeep(NNValue* inputs, Network network);
 
 NNValue *PropagateLayer(NNValue *lastActivation, Layer layer);
-
-NNValue WeightedSum(NNValue *activations, Node node);
-
-// may switch to ReLU function later on
-NNValue Sigmoid(NNValue x);
 
 NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
         Network network);
