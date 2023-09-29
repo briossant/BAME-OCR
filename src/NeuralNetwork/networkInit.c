@@ -1,5 +1,5 @@
 #include "NeuralNetwork.h"
-
+#include "activationFunctions.h"
 
 NNValue startingValue() {
     return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
@@ -31,9 +31,16 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
         nodes[i] = newNode(before_layer_size);
     }
 
+    ActivationFunctions activFcts = {
+        .zFct = WeightedSum,
+        .squishFct = Sigmoid,
+        .dSquishFct = DSigmoid
+    };
+
     Layer layer = {
         .size = layer_size,
-        .nodes = nodes
+        .nodes = nodes,
+        .activFcts = activFcts
     };
 
     return layer;

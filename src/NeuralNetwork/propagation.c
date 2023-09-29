@@ -1,15 +1,8 @@
 #include "NeuralNetwork.h"
+#include "activationFunctions.h"
 #include <stddef.h>
 #include <stdlib.h>
 
-NNValue WeightedSum(NNValue *activations, Node node) {
-    NNValue sum = 0.0;
-    for (size_t i = 0; i <node.weight_size; i++) {
-        sum += activations[i] * node.weights[i];
-    }
-    sum -= node.bias;
-    return sum;
-}
 
 
 NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
@@ -23,9 +16,6 @@ NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs,
 }
 
 
-NNValue Sigmoid(NNValue x) {
-    return 1/ (1+exp(-x));
-}
 
 NNValue *PropagateLayer(NNValue *lastActivation, Layer layer) {
     NNValue *newActiv = malloc(sizeof(NNValue) * layer.size);

@@ -1,11 +1,8 @@
 #include "NeuralNetwork.h"
+#include "activationFunctions.h"
 #include <stdio.h>
 
 
-// sigmoid derivative with x = Sigmoid(...)
-NNValue DSigmoid(NNValue x) {
-    return x * (1 - x);
-}
 
 
 // cost function derivative over the output activations

@@ -15,5 +15,6 @@ NNValue WeightedSum(NNValue *activations, Node node);
 
 // may switch to ReLU function later on
 NNValue Sigmoid(NNValue x);
+NNValue DSigmoid(NNValue x);
 
 #endif 
