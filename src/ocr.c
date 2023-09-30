@@ -21,17 +21,17 @@ void print_usage(char* argv0) { // TODO: improve
     // printf("Usage : %s [-h] [-v] [-d] [-a ALGO] [-H HEUR] FILE\n", argv0);
 }
 
+void print_logo()
+{
+    printf("\n\n\n\n\n\n\n\n\n");
+}
+
 void print_help() // TODO: improve
 {
     printf("Usage: ocr [options] file...");
 }
 
-void loader()
-{
-    // TODO
-}
-
-SDL_Surface* SDL_Start(char* filename, int option)
+SDL_Surface* SDL_Start(char* filename)
 {
     // SDL Init
 
@@ -45,7 +45,7 @@ SDL_Surface* SDL_Start(char* filename, int option)
     if (image == NULL) 
     {
         printf("Can't load image : %s\n", IMG_GetError());
-        return;
+        return NULL;
     }
 
     SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
@@ -54,14 +54,7 @@ SDL_Surface* SDL_Start(char* filename, int option)
     return image_converted;
 }
 
-    // GreyScale(image_converted);
-    // BlacknWhite(image_converted);
-    // Contrast(image_converted);
-    // GaussianBlur(image_converted);
-    // Bright(image_converted);
-    // ArroundGaussianBlur(image_converted);
-    // image_converted = Rotate(image_converted, 35);
-    // Canny(image_converted);
+    
 
     // Output
 
@@ -90,8 +83,12 @@ int parse(int argc, char** argv)
         printf("OCR: error: the following argument is requied: PATH\n");
         return 1;
     }
+    
+    int k = 1;
 
-    for (int k = 1 ; k < argc ; k++) 
+    SDL_Surface* image_converted = SDL_Start(argv[k]);
+
+    while (k < argc)
     {
         if (strcmp(argv[k], "-h") == 0 || strcmp(argv[k], "--help") == 0) //Help
         { 
@@ -103,19 +100,51 @@ int parse(int argc, char** argv)
             printf("OCR version : %s\n", version);
             return 0;
         }
-        // else if (strcmp(argv[k], "-l") == 0 || strcmp(argv[k], "--loader") == 0) //Loader
-        // {
-        //     loader(argv[2]);
-        //     return 0;c 
-        // }
+        else if (strcmp(argv[k], "-g") == 0 || strcmp(argv[k], "--greyscale") == 0) //GreyScale
+        {
+            GreyScale(image_converted);
+        }
+        else if (strcmp(argv[k], "-bw") == 0 || strcmp(argv[k], "--blackwhite") == 0) //BlacknWhite
+        {
+            BlacknWhite(image_converted);
+        }
+        else if (strcmp(argv[k], "-c") == 0 || strcmp(argv[k], "--contrast") == 0) //Contrast
+        {
+            Contrast(image_converted);
+        }
+        else if (strcmp(argv[k], "-g") == 0 || strcmp(argv[k], "--gaussianblur") == 0) //GaussianBlur
+        {
+            GaussianBlur(image_converted);
+        }
+        else if (strcmp(argv[k], "-b") == 0 || strcmp(argv[k], "--bright") == 0) //Bright
+        {
+            Bright(image_converted);
+        }
+        else if (strcmp(argv[k], "-a") == 0 || strcmp(argv[k], "--arroundgaussianblur") == 0) //ArroundGaussianBlur
+        {
+            ArroundGaussianBlur(image_converted);
+        }
+        else if (strcmp(argv[k], "-r") == 0 || strcmp(argv[k], "--rotate") == 0) //Rotate
+        { 
+            image_converted = Rotate(image_converted, 35);
+        }
+        else if (strcmp(argv[k], "-c") == 0 || strcmp(argv[k], "--canny") == 0) //Canny
+        {
+            Canny(image_converted);
+        }
+        
+        
+
 
         else
         {
             printf("sdl: error: unrecognized command-line option '%s'\n", argv[k]);
             return 0;
         }
+        k++;
     }
 
+    SDL_Output(image_converted, argv[k]);
     return 0;
 }
 
