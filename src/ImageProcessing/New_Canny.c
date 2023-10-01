@@ -223,12 +223,95 @@ SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orie
     return image_converted;
 }
 
-SDL_Surface* Thresholdhysteresis(SDL_Surface* image)
+int Max_val_Neighbor(SDL_Surface* image, int x, int y)
 {
+    Uint8 max =0;
 
+    int height = image->h;
+    int width = image->w;
+    const SDL_PixelFormat* format = image->format;
+    Uint32* pixtab = image->pixels;
+    Uint8 r,g,b,a;
+
+    for (int j = y-1; j <= y+1; j++)
+    {
+        for (int i = x-1; i <= x+1; i++)
+        {
+            if (j>=0 && j<height && i>=0 && i<width)
+            {
+                SDL_GetRGBA(pixtab[j*width+i], format, &r, &g, &b, &a);
+                if(r>max)
+                    max = r;
+            }
+        }
+    }
+
+    return max;
 }
 
-int Histogram_Seuil(SDL_Surface* image)
+void Thresholdhysteresis(SDL_Surface* image)
+{
+    int seuil_sup = Histogram_Seuil(image)/3;
+    int seuil_min = seuil_sup * 1/2;
+
+    int height = image->h;
+    int width = image->w;
+    const SDL_PixelFormat* format = image->format;
+    Uint32* pixtab = image->pixels;
+
+    Uint8 col;
+    Uint8 trash;
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < width; x++) 
+        {
+            SDL_GetRGBA(pixtab[y * width + x], format, &col, &trash, &trash, &trash);
+
+            if (col > seuil_sup)
+                col = 255;
+            else if (col < seuil_min)
+                col = 0;
+            else
+                col = 127;
+
+            pixtab[y * width + x] = SDL_MapRGBA(format, (Uint8)col, (Uint8)col, (Uint8)col, 255);
+        }
+    }
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < width; x++) 
+        {
+            SDL_GetRGBA(pixtab[y * width + x], format, &col, &trash, &trash, &trash);
+
+            if (col == 127)
+            {
+                Uint8 max = Max_val_Neighbor(image, x, y);
+                if (max == 255)
+                    col = 255;
+                else
+                    col =0;
+                pixtab[y * width + x] = SDL_MapRGBA(format, (Uint8)col, (Uint8)col, (Uint8)col, 255);
+            }
+            else
+                continue;
+        }
+    }
+}
+
+//Calcul la somme des éléments d'un tableau de iind a indf
+int SumTab(int tab[], int indd, int indf)
+{
+    int res = 0;
+    for (int i = indd; i < indf; i++)
+    {
+        res += tab[i];
+    }
+    return res;
+}
+
+Uint8 Histogram_Seuil(SDL_Surface* image)
 {
     int histo[255] = {0};
 
@@ -249,7 +332,7 @@ int Histogram_Seuil(SDL_Surface* image)
         }
     }
     
-    int med = 1;
+    Uint8 med = 1;
 
     while (SumTab(histo, 0 , med) != SumTab(histo, med+1, 255))
     {
@@ -257,15 +340,4 @@ int Histogram_Seuil(SDL_Surface* image)
     }
     
     return med;
-}
-
-//Calcul la somme des éléments d'un tableau de iind a indf
-int SumTab(int tab[], int indd, int indf)
-{
-    int res = 0;
-    for (int i = indd; i < indf; i++)
-    {
-        res += tab[i];
-    }
-    return res;
 }

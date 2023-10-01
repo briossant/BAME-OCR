@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     image_converted = Intensity_Gradian(image_converted);
     image_converted1 = Orientation_Gradian(image_converted);
     image_converted = Supp_Maxima(image_converted, image_converted1);
+    Thresholdhysteresis(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
     {

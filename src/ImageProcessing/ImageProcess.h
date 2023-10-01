@@ -25,6 +25,6 @@ Uint32 convolution(SDL_Surface* image, int x, int y, int* kernel, int kernelWidt
 
 SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orientation_Gradian_Image);
 
-SDL_Surface* Thresholdhysteresis(SDL_Surface* image);
+void Thresholdhysteresis(SDL_Surface* image);
 
-int Histogram_Seuil(SDL_Surface* image);
+Uint8 Histogram_Seuil(SDL_Surface* image);
