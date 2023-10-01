@@ -236,7 +236,7 @@ int Histogram_Seuil(SDL_Surface* image)
     int width = image->w;
     const SDL_PixelFormat* format = image->format;
 
-     Uint32* pixtab = image->pixels;
+    Uint32* pixtab = image->pixels;
 
     Uint8 val;
     Uint8 trash;
@@ -249,13 +249,18 @@ int Histogram_Seuil(SDL_Surface* image)
         }
     }
     
-    
+    int med = 1;
 
-    return 0;
+    while (SumTab(histo, 0 , med) != SumTab(histo, med+1, 255))
+    {
+        med ++;
+    }
+    
+    return med;
 }
 
 //Calcul la somme des éléments d'un tableau de iind a indf
-int SumTab(int tab[255], int indd, int indf)
+int SumTab(int tab[], int indd, int indf)
 {
     int res = 0;
     for (int i = indd; i < indf; i++)

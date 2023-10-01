@@ -41,8 +41,6 @@ int main(int argc, char *argv[])
     image_converted1 = Orientation_Gradian(image_converted);
     image_converted = Supp_Maxima(image_converted, image_converted1);
 
-
-
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
     {
         printf("Error when trying to save the image : %s\n", IMG_GetError());
