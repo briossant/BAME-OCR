@@ -2,6 +2,7 @@
 #include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 void SaveNetwork(Network network, char* filepath)
@@ -16,14 +17,14 @@ void SaveNetwork(Network network, char* filepath)
        exit(1);
    }
    
-   fprintf(file, "NN-- %ld %ld \n", network.input_size,network.depth);
+   fprintf(file, "NN** %ld %ld \n", network.input_size,network.depth);
    for ( size_t i =0; i< network.depth; i++)
    {
-      fprintf(file, "L--%ld \n", network.layers[i].size );
+      fprintf(file, "L** %ld \n", network.layers[i].size );
       for(size_t j=0; j< network.layers[i].size; j++)
       {
          Node nd = network.layers[i].nodes[j];
-         fprintf(file,"N-- %ld %f \n", nd.weight_size, nd.bias);
+         fprintf(file,"N** %ld %f \n", nd.weight_size, nd.bias);
          for (size_t w=0; w<nd.weight_size; w++)
          {
              fprintf(file, "%f ", nd.weights[w]);
@@ -36,50 +37,32 @@ void SaveNetwork(Network network, char* filepath)
    fclose(file);
 
 }
-
-int isDigit(char c) {
-    return c >= '0' && c <= '9';
+int isDigit(const char* str) {
+    char* endptr;
+    strtod(str, &endptr);
+    if (*endptr != '\0' && *endptr != '\n') {
+        return 0; // Not a valid double
+    }
+    return 1; // Valid double
+   
 }
-
-double* get_numbers(const char* input) { // I think *count isn't needed as an argument
+   
+double* get_numbers ( char* str)
+{
+    char* token = strtok(str, " ");
     double* numbers = NULL;
     int count = 0;
-    double currentNumber = 0.0;
-    int isParsingNumber = 0;
-    int isParsingDecimal = 0;
-    double decimalMultiplier = 0.1;
-
-    for (int i = 0; input[i] != '\0'; i++) { 
-        if (isDigit(input[i])) { // isDigit done  
-            if (isParsingDecimal) {
-                currentNumber = currentNumber + (input[i] - '0') * decimalMultiplier;
-                decimalMultiplier /= 10.0;
-            } else {
-                currentNumber = currentNumber * 10 + (input[i] - '0');
-            }
-            isParsingNumber = 1;
-        } else if (input[i] == '.' && isParsingNumber) {
-            isParsingDecimal = 1;
-        } else {
-            if (isParsingNumber) {
-                (count)++;
-                numbers = (double*)realloc(numbers, sizeof(double) * (count));
-                numbers[(count) - 1] = currentNumber;
-                currentNumber = 0.0;
-                isParsingNumber = 0;
-                isParsingDecimal = 0;
-                decimalMultiplier = 0.1;
-            }
+   
+    while (token != NULL) {
+        if (isDigit(token)) {
+                // Convert the token to a double and store it in the            +++numbers array
+            double value = atof(token);
+            numbers = (double*)realloc(numbers, sizeof(double) *  (count + 1));
+            numbers[count] = value;
+            count++;
         }
+        token = strtok(NULL, " ");
     }
-
-    // Check for a number at the end of the string
-    if (isParsingNumber) {
-        (count)++;
-        numbers = (double*)realloc(numbers, sizeof(double) * (count));
-        numbers[(count) - 1] = currentNumber;
-    }
-
     return numbers;
 }
 
