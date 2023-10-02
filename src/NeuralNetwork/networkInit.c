@@ -1,13 +1,13 @@
 #include "NeuralNetwork.h"
 
 
-double startingValue() {
-    return ((double)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
+NNValue startingValue() {
+    return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
                                                     // add it later
 }
 
 Node newNode(size_t weight_size) {
-    double *weights = malloc(weight_size * sizeof(double));
+    NNValue *weights = malloc(weight_size * sizeof(NNValue));
     for (size_t i = 0;i < weight_size;i++) {
         weights[i] = startingValue();
     }
@@ -79,19 +79,51 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers) {
     return network;
 }
 
-void printNetwork(Network network){
-    printf("///////////////////////////////\n");
-    printf("network -> depth: %ld  input_size: %ld \n", network.depth, network.input_size);
-    for (size_t i = 0; i < network.depth; i++) {
-        printf("layer -> size: %ld \n", network.layers[i].size);
-        for(size_t j=0; j< network.layers[i].size; j++) {
-            Node nd = network.layers[i].nodes[j];
-            printf("nd: %f %ld | ", nd.bias, nd.weight_size);
+Network copyAndResetNetwork(Network network) {
+    Layer* layers = malloc(sizeof(Layer) * network.depth);
+    Network newNetwork = {
+        .input_size = network.input_size,
+        .depth = network.depth,
+        .layers = layers
+    };
+    
+    size_t weights_size = network.input_size;
+
+    for(size_t l=0; l<network.depth;l++) {
+        size_t layer_size = network.layers[l].size;
+        Node *nodes = malloc(sizeof(Node) * layer_size);
+
+        for (size_t i = 0; i < layer_size;++i) {
+            NNValue *weights = malloc(weights_size * sizeof(NNValue));
+            for (size_t i = 0;i < weights_size;i++) {
+                weights[i] = 0.0;
+            }
+            Node nd = {
+                .weight_size = weights_size,
+                .bias = 0.0,
+                .weights = weights
+            };
+            nodes[i] = nd;
         }
-        printf("\n");
+        weights_size = layer_size;
+        Layer layer = {
+            .size = layer_size,
+            .nodes = nodes
+        };
+        layers[l] = layer;
     }
-    printf("///////////////////////////////\n");
+
+    return newNetwork;
 }
 
 
+void freeNetwork(Network network) {
+    for(size_t l=0; l<network.depth;l++) {
+        for (size_t i = 0; i < network.layers[l].size;++i) {
+            free(network.layers[l].nodes[i].weights);
+        }
+        free(network.layers[l].nodes);
+    }
+    free(network.layers);
+}
 

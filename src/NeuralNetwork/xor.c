@@ -1,16 +1,52 @@
+#include <stddef.h>
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
-void train() {
-    printf("training\n");
+
+
+void train(size_t epoch, NNValue trRate) {
+    printf("~|~ Training ~|~\n\n");
+    
+    size_t layers_size[] = {2,  42, 42, 42, 1};
+    Network network = newNetwork(layers_size, 5);
+    
+    size_t trSetSize = 4;
+    
+    NNValue *inputs[] =  {(NNValue[]) {0,1},
+        (NNValue[]){1,0}, 
+        (NNValue[]){0,0}, 
+        (NNValue[]){1,1}};
+    
+    NNValue *outputs[] = {(NNValue[]){1},
+        (NNValue[]){1},
+        (NNValue[]){0},
+        (NNValue[]){0}};
+   
+    TrainingSettings sett = {
+        .training_rate = trRate,
+        .batch_size = 1,
+        .epochs = epoch,
+        .inertia_strength = 0,
+        .nbr_of_inputs = trSetSize
+    };
+
+    TrainNetwork(network, inputs, outputs, sett);
+   
+    for(size_t i = 0; i < trSetSize; i++) {
+        NNValue *res = Propagate(inputs[i],
+                network);
+        printf("Result of %f ^ %f -> res:%f \n",
+                inputs[i][0], inputs[i][1], res[0]);
+    }
 }
+
+
 
 void save(char *filepath) {
     printf("saving\n");
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
-    SaveNetwork( network,filepath);
-
+    //SaveNetwork( network,filepath);
 }
 
 void load(char *filepath){
@@ -24,16 +60,29 @@ void solve(char input[2]) {
     
     printNetwork(network);
 
-    double inputs[2] = {(double)input[0], (double)input[1]};
-    double *res = Propagate(inputs, network);
+    NNValue inputs[2] = {(NNValue)input[0], (NNValue)input[1]};
+    NNValue *res = Propagate(inputs, network);
 
     printf("Result of %d%d -> 0:%f 1:%f\n", input[0], input[1], res[0], res[1]);
 }
 
 
 void printHelp() {
-    printf("Usage:\n./xor t : for training\n./xor p [0-1] [0-1] : propagate inputs");
+    printf("Usage:\n./xor t [Epoch] [TrainingRate]: for training\n./xor p [0-1] [0-1] : propagate inputs");
     printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n"); 
+    printf("./xor m [Epochs] [TrainingRate] [BatchSize] [InertiaStrength (0.0 to 1.0)] : train on mnist\n"); 
+}
+
+
+void mnist(size_t epoch, NNValue learning_rate, size_t batch_size, NNValue inertia_strength) {
+    TrainingSettings sett = {
+        .training_rate = learning_rate,
+        .batch_size = batch_size,
+        .epochs = epoch,
+        .inertia_strength = inertia_strength,
+        .nbr_of_inputs = 42 //dummy value
+    };
+    MnistTraining(sett);
 }
 
 int main(int argc, char **argv) {
@@ -53,8 +102,24 @@ int main(int argc, char **argv) {
         char input[] = {argv[2][0]-48, argv[3][0]-48};
 
         solve(input);
+    } else if(argv[1][0] == 'm') { 
+        if (argc < 6) {
+            printHelp();
+            return 1;
+        }
+        size_t epoch;
+        size_t batch_size;
+        sscanf(argv[2], "%zu", &epoch);
+        sscanf(argv[4], "%zu", &batch_size);
+        mnist(epoch, (NNValue)atof(argv[3]), batch_size, (NNValue)atof(argv[5]));
     } else if(argv[1][0] == 't') { 
-        train();
+        if (argc < 4) {
+            printHelp();
+            return 1;
+        }
+        size_t epoch;
+        sscanf(argv[2], "%zu", &epoch);
+        train(epoch, (NNValue)atof(argv[3]));
     } else if(argv[1][0] == 's') {
         if (argc < 3) {
             printHelp();

@@ -12,10 +12,27 @@
 //////////////////////////////////////
 // Struct
 
+typedef double NNValue;
+
+typedef struct InputBatch {
+    size_t size; 
+    NNValue **inputs;
+    NNValue **outputs;
+} InputBatch;
+
+typedef struct TrainingSettings {
+    size_t nbr_of_inputs;
+    NNValue training_rate;
+    NNValue inertia_strength; // between 0.0 and 1.0
+    size_t epochs;
+    size_t batch_size;
+} TrainingSettings;
+
+
 typedef struct Node {
     size_t weight_size; 
-    double bias;
-    double *weights;  
+    NNValue bias;
+    NNValue *weights;  
 } Node;
 
 
@@ -31,6 +48,7 @@ typedef struct Network {
     Layer *layers;
 } Network;
 
+typedef enum { False = 0, True = 1 } Bool;
 
 
 ////////////////////////////////////
@@ -46,21 +64,64 @@ Node newNode(size_t weight_size);
 
 Node new_node( size_t weight_size, double* weights , double bias);
 
+NNValue startingValue(); // don't forget to init rand() with srand(time(NULL));
+
+Network copyAndResetNetwork(Network network);
+
+void freeNetwork(Network network);
+
+
+
+////////////////////////////////////
+// Printers
+
 void printNetwork(Network network);
 
-double startingValue(); // don't forget to init rand() with srand(time(NULL));
+
+
+////////////////////////////////////
+// Mnist Loading
+
+void LoadMnist(NNValue*** images, NNValue*** labels, Bool isForTraining);
+
+void MnistTraining(TrainingSettings settings);
+
+
 
 ////////////////////////////////////
 // Propagation
 
-double* Propagate(double *inputs, Network network);
+NNValue* Propagate(NNValue *inputs, Network network);
 
-double *PropagateLayer(double *lastActivation, Layer layer);
+NNValue** PropagateAndKeep(NNValue* inputs, Network network);
 
-double WeightedSum(double *activations, Node node);
+NNValue *PropagateLayer(NNValue *lastActivation, Layer layer);
+
+NNValue WeightedSum(NNValue *activations, Node node);
 
 // may switch to ReLU function later on
-double Sigmoid(double x);
+NNValue Sigmoid(NNValue x);
+
+NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
+        Network network);
+
+NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
+        size_t outputSize);
+
+
+
+////////////////////////////////////
+// Back Propagation
+
+NNValue BackPropagation(Network network, TrainingSettings settings, InputBatch batch, Network inertiaNetwork);
+
+
+
+////////////////////////////////////
+// Training
+
+void TrainNetwork(Network network, NNValue **inputs, 
+        NNValue** outputs, TrainingSettings settings);
 
 
 
