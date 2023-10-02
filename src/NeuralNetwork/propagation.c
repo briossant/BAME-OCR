@@ -1,25 +1,22 @@
 #include "NeuralNetwork.h"
+#include "matrices/matrices.h"
 #include <stddef.h>
 #include <stdlib.h>
 
-NNValue WeightedSum(NNValue *activations, Node node) {
-    NNValue sum = 0.0;
-    for (size_t i = 0; i <node.weight_size; i++) {
-        sum += activations[i] * node.weights[i];
-    }
-    sum -= node.bias;
-    return sum;
+Matrix WeightedSum(Matrix activations, Layer layer) {
+    return MatMult(layer.weights, activations);
 }
 
 
-NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
-        size_t outputSize)
+NNValue Pow2(NNValue x){
+    return pow(x, 2);
+}
+
+NNValue CostFunction(Matrix outputActivations,
+        Matrix expectedOutputs)
 {
-    NNValue res = 0;
-    for(size_t i = 0; i < outputSize; i++){
-        res += pow(outputActivations[i] - expectedOutputs[i], 2);
-    }
-    return res;
+    return MatSum(MatApplyFct(MatSub(expectedOutputs,
+                outputActivations),* Pow2));
 }
 
 

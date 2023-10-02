@@ -30,16 +30,10 @@ typedef struct TrainingSettings {
 } TrainingSettings;
 
 
-typedef struct Node {
-    size_t weight_size; 
-    NNValue bias;
-    NNValue *weights;  
-} Node;
-
-
 typedef struct Layer {
     size_t size; // number of nodes
-    Node *nodes;
+    Matrix biases;
+    Matrix weights;
 } Layer;
 
 
@@ -59,11 +53,9 @@ Network newNetwork(size_t *layers_size, size_t number_of_layers);
 
 Layer newLayer(size_t layer_size, size_t before_layer_size);
 
-Layer new_layer (Node* node,  size_t layer_size);
+//Layer new_layer (Node* node,  size_t layer_size);
 
-Node newNode(size_t weight_size);
-
-Node new_node( size_t weight_size, double* weights , double bias);
+//Node new_node( size_t weight_size, double* weights , double bias);
 
 NNValue startingValue(); // don't forget to init rand() with srand(time(NULL));
 
@@ -83,7 +75,7 @@ void printNetwork(Network network);
 ////////////////////////////////////
 // Mnist Loading
 
-void LoadMnist(NNValue*** images, NNValue*** labels, Bool isForTraining);
+void LoadMnist(Matrix* images, Matrix* labels, Bool isForTraining);
 
 void MnistTraining(TrainingSettings settings);
 
@@ -92,22 +84,20 @@ void MnistTraining(TrainingSettings settings);
 ////////////////////////////////////
 // Propagation
 
-NNValue* Propagate(NNValue *inputs, Network network);
+Matrix Propagate(Matrix inputs, Network network);
 
-NNValue** PropagateAndKeep(NNValue* inputs, Network network);
+Matrix PropagateAndKeep(Matrix inputs, Network network);
 
-NNValue *PropagateLayer(NNValue *lastActivation, Layer layer);
+Matrix PropagateLayer(Matrix lastActivation, Layer layer);
 
-NNValue WeightedSum(NNValue *activations, Node node);
+Matrix WeightedSum(Matrix activations, Layer layer);
 
 // may switch to ReLU function later on
 NNValue Sigmoid(NNValue x);
 
-NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
-        Network network);
+NNValue TestPropagation(Matrix inputs, Matrix outputs, Network network);
 
-NNValue CostFunction(NNValue *outputActivations, NNValue *expectedOutputs, 
-        size_t outputSize);
+NNValue CostFunction(Matrix outputActivations,Matrix  expectedOutputs);
 
 
 
@@ -121,8 +111,7 @@ NNValue BackPropagation(Network network, TrainingSettings settings, InputBatch b
 ////////////////////////////////////
 // Training
 
-void TrainNetwork(Network network, NNValue **inputs, 
-        NNValue** outputs, TrainingSettings settings);
+void TrainNetwork(Network network, Matrix inputs, Matrix outputs, TrainingSettings settings);
 
 
 
