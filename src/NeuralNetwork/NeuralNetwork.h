@@ -8,11 +8,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "precision.h"
+#include "matrices/matrices.h"
 
 //////////////////////////////////////
 // Struct
 
-typedef double NNValue;
 
 typedef struct InputBatch {
     size_t size; 
