@@ -4,25 +4,17 @@
 #include <stdlib.h>
 
 Matrix WeightedSum(Matrix activations, Layer layer) {
-    return MatMult(layer.weights, activations);
+    return MatDot(layer.weights, activations);
 }
 
+NNValue Pow2(NNValue x) { return pow(x, 2); }
 
-NNValue Pow2(NNValue x){
-    return pow(x, 2);
+NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs) {
+    return MatSum(
+        MatApplyFct(MatSub(expectedOutputs, outputActivations), *Pow2));
 }
 
-NNValue CostFunction(Matrix outputActivations,
-        Matrix expectedOutputs)
-{
-    return MatSum(MatApplyFct(MatSub(expectedOutputs,
-                outputActivations),* Pow2));
-}
-
-
-NNValue Sigmoid(NNValue x) {
-    return 1/ (1+exp(-x));
-}
+NNValue Sigmoid(NNValue x) { return 1 / (1 + exp(-x)); }
 
 NNValue *PropagateLayer(NNValue *lastActivation, Layer layer) {
     NNValue *newActiv = malloc(sizeof(NNValue) * layer.size);
@@ -32,56 +24,49 @@ NNValue *PropagateLayer(NNValue *lastActivation, Layer layer) {
     return newActiv;
 }
 
-NNValue* Propagate(NNValue *inputs, Network network) {
+NNValue *Propagate(NNValue *inputs, Network network) {
     NNValue *activations = inputs;
-    for (size_t i = 0; i < network.depth;i++) {
+    for (size_t i = 0; i < network.depth; i++) {
         NNValue *newActiv = PropagateLayer(activations, network.layers[i]);
-        if(i>0) free(activations);
+        if (i > 0)
+            free(activations);
         activations = newActiv;
     }
     return activations;
 }
 
-
 NNValue **PropagateAndKeep(NNValue *inputs, Network network) {
     NNValue **activationsLayers = malloc(sizeof(NNValue *) * network.depth);
     NNValue *lastActivations = inputs;
-    for (size_t i = 0; i < network.depth;i++) {
+    for (size_t i = 0; i < network.depth; i++) {
         lastActivations = PropagateLayer(lastActivations, network.layers[i]);
         activationsLayers[i] = lastActivations;
     }
     return activationsLayers;
 }
 
-
 size_t MaxIndex(NNValue *list, size_t n) {
     size_t m = 0;
     NNValue max = list[0];
-    for (size_t i=0;i<n;++i){
+    for (size_t i = 0; i < n; ++i) {
         if (list[i] > max) {
-            m=i;
-            max=list[i];
+            m = i;
+            max = list[i];
         }
     }
     return m;
 }
 
-NNValue IsRight(NNValue * activations, size_t size, NNValue* outputs){
-    return MaxIndex(activations,  size) == MaxIndex(outputs, size);
+NNValue IsRight(NNValue *activations, size_t size, NNValue *outputs) {
+    return MaxIndex(activations, size) == MaxIndex(outputs, size);
 }
 
-
-NNValue TestPropagation(NNValue **inputs, NNValue **outputs, size_t nbr_of_inputs,
-        Network network) 
-{
+NNValue TestPropagation(NNValue **inputs, NNValue **outputs,
+                        size_t nbr_of_inputs, Network network) {
     NNValue accuracy = 0.0;
-    for(size_t i=0;i<nbr_of_inputs;i++)
+    for (size_t i = 0; i < nbr_of_inputs; i++)
         if (IsRight(Propagate(inputs[i], network),
-                network.layers[network.depth-1].size, outputs[i])) 
+                    network.layers[network.depth - 1].size, outputs[i]))
             ++accuracy;
-    return accuracy/nbr_of_inputs * 100;
+    return accuracy / nbr_of_inputs * 100;
 }
-
-
-
-

@@ -5,11 +5,10 @@
 
 #include "../precision.h"
 
-
 typedef struct Matrix {
     size_t w;
     size_t h;
-    NNValue** mat;
+    NNValue **mat;
 } Matrix;
 
 typedef NNValue (*MatFct)(NNValue x);
@@ -18,11 +17,18 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue);
 
 Matrix MatCopy(Matrix mat);
 
-// don't perform calculus in place, the matrix should remained unchanged.
+// don't perform calculus in place, the matrices should remained unchanged.
+
+// add term by term, matrices should have the same size
 Matrix MatAdd(Matrix matA, Matrix matB);
 
+// substract term by term, matrices should have the same size
 Matrix MatSub(Matrix matA, Matrix matB);
 
+// matrix dot product
+Matrix MatDot(Matrix matA, Matrix matB);
+
+// multiply term by term, matrices should have the same size
 Matrix MatMult(Matrix matA, Matrix matB);
 
 Matrix MatAddScalar(Matrix mat, NNValue scalar);
@@ -31,8 +37,7 @@ Matrix MatMultScalar(Matrix mat, NNValue scalar);
 
 Matrix MatApplyFct(Matrix mat, MatFct matFct);
 
-// only for vectors a.k.a matrix with w==1
+// sum of all the terms
 NNValue MatSum(Matrix mat);
-
 
 #endif
