@@ -17,6 +17,16 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue);
 
 Matrix MatCopy(Matrix mat);
 
+Matrix MatCreateSimilar(Matrix mat);
+
+void MatFree(Matrix mat);
+
+Matrix MatGetVector(Matrix mat, size_t index);
+
+Matrix MatSetVector(Matrix mat, Matrix vect, size_t index);
+
+Bool MatIsVector(Matrix mat);
+
 // don't perform calculus in place, the matrices should remained unchanged.
 
 // add term by term, matrices should have the same size

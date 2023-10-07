@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include "err.h"
 #include "matrices/matrices.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -16,57 +17,54 @@ NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs) {
 
 NNValue Sigmoid(NNValue x) { return 1 / (1 + exp(-x)); }
 
-NNValue *PropagateLayer(NNValue *lastActivation, Layer layer) {
-    NNValue *newActiv = malloc(sizeof(NNValue) * layer.size);
-    for (size_t i = 0; i < layer.size; i++) {
-        newActiv[i] = Sigmoid(WeightedSum(lastActivation, layer.nodes[i]));
-    }
-    return newActiv;
+Matrix PropagateLayer(Matrix lastActivation, Layer layer) {
+    return MatApplyFct(WeightedSum(lastActivation, layer), Sigmoid);
 }
 
-NNValue *Propagate(NNValue *inputs, Network network) {
-    NNValue *activations = inputs;
+Matrix Propagate(Matrix inputs, Network network) {
+    Matrix activations = inputs;
     for (size_t i = 0; i < network.depth; i++) {
-        NNValue *newActiv = PropagateLayer(activations, network.layers[i]);
+        Matrix newActiv = PropagateLayer(activations, network.layers[i]);
         if (i > 0)
-            free(activations);
+            MatFree(activations);
         activations = newActiv;
     }
     return activations;
 }
 
-NNValue **PropagateAndKeep(NNValue *inputs, Network network) {
-    NNValue **activationsLayers = malloc(sizeof(NNValue *) * network.depth);
-    NNValue *lastActivations = inputs;
-    for (size_t i = 0; i < network.depth; i++) {
+Matrix PropagateAndKeep(Matrix inputs, Network network) {
+    Matrix activationsLayers = MatInit(network.depth, inputs.h, 0.0);
+    Matrix lastActivations = inputs;
+    for (size_t i = 0; i < activationsLayers.w; i++) {
         lastActivations = PropagateLayer(lastActivations, network.layers[i]);
-        activationsLayers[i] = lastActivations;
+        MatSetVector(activationsLayers, lastActivations, i);
     }
     return activationsLayers;
 }
 
-size_t MaxIndex(NNValue *list, size_t n) {
+size_t VectorMaxIndex(Matrix mat) {
+    if (!MatIsVector(mat))
+        errx(1, "VectorMaxIndex: matrix is not a vector");
     size_t m = 0;
-    NNValue max = list[0];
-    for (size_t i = 0; i < n; ++i) {
-        if (list[i] > max) {
+    NNValue max = mat.mat[0][0];
+    for (size_t i = 0; i < mat.h; ++i) {
+        if (mat.mat[0][i] > max) {
             m = i;
-            max = list[i];
+            max = mat.mat[0][i];
         }
     }
     return m;
 }
 
-NNValue IsRight(NNValue *activations, size_t size, NNValue *outputs) {
-    return MaxIndex(activations, size) == MaxIndex(outputs, size);
+NNValue IsRight(Matrix activations, Matrix outputs) {
+    return VectorMaxIndex(activations) == VectorMaxIndex(outputs);
 }
 
-NNValue TestPropagation(NNValue **inputs, NNValue **outputs,
-                        size_t nbr_of_inputs, Network network) {
+NNValue TestPropagation(Matrix inputs, Matrix outputs, Network network) {
     NNValue accuracy = 0.0;
-    for (size_t i = 0; i < nbr_of_inputs; i++)
-        if (IsRight(Propagate(inputs[i], network),
-                    network.layers[network.depth - 1].size, outputs[i]))
+    for (size_t i = 0; i < inputs.w; i++)
+        if (IsRight(Propagate(MatGetVector(inputs, i), network),
+                    MatGetVector(outputs, i)))
             ++accuracy;
-    return accuracy / nbr_of_inputs * 100;
+    return accuracy / inputs.w * 100;
 }
