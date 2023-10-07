@@ -27,7 +27,7 @@ Matrix MatSetVector(Matrix mat, Matrix vect, size_t index);
 
 Bool MatIsVector(Matrix mat);
 
-// don't perform calculus in place, the matrices should remained unchanged.
+// perform calculus in place for matA, the matB should remained unchanged.
 
 // add term by term, matrices should have the same size
 Matrix MatAdd(Matrix matA, Matrix matB);
