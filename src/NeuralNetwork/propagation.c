@@ -12,7 +12,7 @@ NNValue Pow2(NNValue x) { return pow(x, 2); }
 
 NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs) {
     return MatSum(
-        MatApplyFct(MatSub(expectedOutputs, outputActivations), *Pow2));
+        MatApplyFct(MatSub(expectedOutputs, outputActivations), Pow2));
 }
 
 NNValue Sigmoid(NNValue x) { return 1 / (1 + exp(-x)); }
