@@ -75,7 +75,7 @@ void MnistTraining(TrainingSettings settings);
 
 Matrix Propagate(Matrix inputs, Network network);
 
-Matrix PropagateAndKeep(Matrix inputs, Network network);
+Matrix *PropagateAndKeep(Matrix inputs, Network network);
 
 Matrix PropagateLayer(Matrix lastActivation, Layer layer);
 

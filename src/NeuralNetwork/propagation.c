@@ -32,12 +32,12 @@ Matrix Propagate(Matrix inputs, Network network) {
     return activations;
 }
 
-Matrix PropagateAndKeep(Matrix inputs, Network network) {
-    Matrix activationsLayers = MatInit(network.depth, inputs.h, 0.0);
+Matrix *PropagateAndKeep(Matrix inputs, Network network) {
+    Matrix *activationsLayers = malloc(network.depth * sizeof(Matrix));
     Matrix lastActivations = inputs;
-    for (size_t i = 0; i < activationsLayers.w; i++) {
+    for (size_t i = 0; i < network.depth; i++) {
         lastActivations = PropagateLayer(lastActivations, network.layers[i]);
-        MatSetVector(activationsLayers, lastActivations, i);
+        activationsLayers[i] = lastActivations;
     }
     return activationsLayers;
 }
