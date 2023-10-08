@@ -5,41 +5,23 @@
 NNValue DSigmoid(NNValue x) { return x * (1 - x); }
 
 // cost function derivative over the output activations
-NNValue *FirstDCostDActv(NNValue *outputActivations, NNValue *expectedOutputs,
-                         size_t outputSize) {
-    NNValue *res = malloc(outputSize * sizeof(NNValue));
-    for (size_t i = 0; i < outputSize; i++) {
-        res[i] = 2 * (outputActivations[i] - expectedOutputs[i]);
-    }
-    return res;
+Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
+    return MatMultScalar(MatSub(MatCopy(outputActivations), expectedOutputs),
+                         2);
 }
 
 void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
-    MatAdd(layer.biases, dCost);
-    MatAdd(layer.weights, MatMult(dCost, lastActv));
+    MatAdd(MatCopy(layer.biases), dCost);
+    MatAdd(MatCopy(layer.weights), MatMult(dCost, lastActv));
 }
 
-NNValue *DCostDZ(NNValue *dCost_dActv, NNValue *activations, size_t size) {
-    NNValue *dCost_dZ = malloc(sizeof(NNValue) * size);
-    for (size_t i = 0; i < size; i++) {
-        dCost_dZ[i] = dCost_dActv[i] * DSigmoid(activations[i]);
-    }
-    return dCost_dZ;
+Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
+    return MatMult(MatApplyFct(MatCopy(activations), DSigmoid), dCost_dActv);
 }
 
-NNValue *GetNewDCostDActv(Layer layer, size_t size, NNValue *activations,
-                          NNValue *dCost_dActv) {
-    NNValue *new_dCost_dActv = malloc(size * sizeof(NNValue));
-    for (size_t i = 0; i < size; i++) {
-
-        NNValue dSig = DSigmoid(activations[i]);
-        new_dCost_dActv[i] = 0;
-        for (size_t j = 0; j < layer.size; j++) {
-            new_dCost_dActv[i] +=
-                layer.nodes[j].weights[i] * dSig * dCost_dActv[j];
-        }
-    }
-    return new_dCost_dActv;
+Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
+    return MatMult(MatDot(layer.weights, dCost_dActv),
+                   MatApplyFct(MatCopy(activations), DSigmoid));
 }
 
 NNValue **BackPropagateInput(Network network, NNValue **activationsLayers,
@@ -72,21 +54,16 @@ NNValue **BackPropagateInput(Network network, NNValue **activationsLayers,
     return all_dCost_dZ;
 }
 
-void AddToSumNetwork(Network sumNetwork, NNValue **all_dCost_dZ,
-                     NNValue **activationsLayers, NNValue *inputs) {
+void AddToSumNetwork(Network sumNetwork, Matrix all_dCost_dZ,
+                     Matrix activationsLayers, Matrix inputs) {
 
-    UpdateLayer(sumNetwork.layers[0], all_dCost_dZ[0], inputs);
+    UpdateLayer(sumNetwork.layers[0], MatGetVector(all_dCost_dZ, 0), inputs);
     for (size_t i = 1; i < sumNetwork.depth; i++) {
-        UpdateLayer(sumNetwork.layers[i], all_dCost_dZ[i],
-                    activationsLayers[i - 1]);
+        UpdateLayer(sumNetwork.layers[i], MatGetVector(all_dCost_dZ, i),
+                    MatGetVector(activationsLayers, i - 1));
     }
-
-    for (size_t i = 0; i < sumNetwork.depth; i++) {
-        free(all_dCost_dZ[i]);
-        free(activationsLayers[i]);
-    }
-    free(all_dCost_dZ);
-    free(activationsLayers);
+    MatFree(all_dCost_dZ);
+    MatFree(activationsLayers);
 }
 
 NNValue ValueToRemove(NNValue sumValue, NNValue inertiaValue,
@@ -131,19 +108,20 @@ NNValue BackPropagation(Network network, TrainingSettings settings,
     Network sumNetwork = copyAndResetNetwork(network);
 
     for (size_t m = 0; m < batch.size; m++) {
-        NNValue **activationsLayers =
-            PropagateAndKeep(batch.inputs[m], network);
+
+        Matrix inputs = MatGetVector(batch.inputs, m);
+        Matrix outputs = MatGetVector(batch.outputs, m);
+
+        Matrix activationsLayers = PropagateAndKeep(inputs, network);
 
         size_t outputLayerI = network.depth - 1;
-        accuracy +=
-            CostFunction(activationsLayers[outputLayerI], batch.outputs[m],
-                         network.layers[outputLayerI].size);
+        accuracy += CostFunction(MatGetVector(activationsLayers, outputLayerI),
+                                 outputs);
 
-        NNValue **all_dCost_dZ =
-            BackPropagateInput(network, activationsLayers, batch.outputs[m]);
+        Matrix all_dCost_dZ =
+            BackPropagateInput(network, activationsLayers, outputs);
 
-        AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers,
-                        batch.inputs[m]);
+        AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers, inputs);
     }
 
     UpdateNetwork(network, sumNetwork, inertiaNetwork, settings, batch.size);
