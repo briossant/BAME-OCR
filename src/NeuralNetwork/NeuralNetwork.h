@@ -16,8 +16,8 @@
 
 typedef struct InputBatch {
     size_t size;
-    NNValue **inputs;
-    NNValue **outputs;
+    Matrix inputs;
+    Matrix outputs;
 } InputBatch;
 
 typedef struct TrainingSettings {
