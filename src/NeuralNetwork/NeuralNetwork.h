@@ -44,6 +44,10 @@ typedef struct Network {
 ////////////////////////////////////
 // NetworkInit
 
+// Create a new Network
+// size_t *layers_size : list containing the size of each layers (from input to
+// output layer)
+// size_t number_of_layers : size of layers_size list
 Network newNetwork(size_t *layers_size, size_t number_of_layers);
 
 Layer newLayer(size_t layer_size, size_t before_layer_size);
@@ -52,8 +56,12 @@ Layer newLayer(size_t layer_size, size_t before_layer_size);
 
 // Node new_node( size_t weight_size, double* weights , double bias);
 
-NNValue startingValue(); // don't forget to init rand() with srand(time(NULL));
+// function returning the init value of a weight or bias
+// don't forget to init rand() with srand(time(NULL));
+NNValue startingValue();
 
+// create a new network with the same size of Network network
+// and put each weights and biases to 0.0
 Network copyAndResetNetwork(Network network);
 
 void freeNetwork(Network network);
@@ -66,8 +74,11 @@ void printNetwork(Network network);
 ////////////////////////////////////
 // Mnist Loading
 
+// load mnist data into Matrix *images and Matrix *labels
+// Bool isForTraining select between the 2 2 differents path define in
+// loadMnist.c
 void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining);
-
+// don't forget to init rand() with srand(time(NULL));
 void MnistTraining(TrainingSettings settings);
 
 ////////////////////////////////////
@@ -84,6 +95,8 @@ Matrix WeightedSum(Matrix activations, Layer layer);
 // may switch to ReLU function later on
 NNValue Sigmoid(NNValue x);
 
+// propagate on all of the input layer of the Matrix inputs and compare it with
+// the Matrix outputs to return a success rate (in %)
 NNValue TestPropagation(Matrix inputs, Matrix outputs, Network network);
 
 NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs);
