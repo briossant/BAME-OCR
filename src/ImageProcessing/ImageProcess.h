@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <SDL2/SDL.h>
 
 void BlacknWhite(SDL_Surface* image);
@@ -27,4 +28,5 @@ SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orie
 
 void Thresholdhysteresis(SDL_Surface* image);
 
-Uint8 Histogram_Seuil(SDL_Surface* image);
+
+Uint8 ComputeSeuil(SDL_Surface* image);
