@@ -42,7 +42,7 @@ void save(char *filepath) {
 
 void load(char *filepath) {
     printf("loading\n");
-    Network network = LoadNetwork(filepath);
+    // Network network = LoadNetwork(filepath);
 }
 
 void solve(char input[2]) {
