@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-W -Wall -Wextra -Wpedantic -Wformat=2 -O3  
 LDFLAGS= -lm -O3
 EXEC=xor
-SRC= $(wildcard *.c) 
+SRC= $(wildcard *.c) $(wildcard matrices/*.c) 
 OBJ= $(SRC:.c=.o)
 
 
