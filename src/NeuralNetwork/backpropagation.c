@@ -6,22 +6,22 @@ NNValue DSigmoid(NNValue x) { return x * (1 - x); }
 
 // cost function derivative over the output activations
 Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
-    return MatMultScalar(MatSub(MatCopy(outputActivations), expectedOutputs),
+    return MatMultScalar(MatSub(MatCopy(outputActivations, "FirstDCostDActv"), expectedOutputs),
                          2);
 }
 
 void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
-    MatAdd(MatCopy(layer.biases), dCost);
-    MatAdd(MatCopy(layer.weights), MatMult(dCost, lastActv));
+    MatAdd(MatCopy(layer.biases, "Biases"), dCost);
+    MatAdd(MatCopy(layer.weights, "Weights"), MatMult(dCost, lastActv));
 }
 
 Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
-    return MatMult(MatApplyFct(MatCopy(activations), DSigmoid), dCost_dActv);
+    return MatMult(MatApplyFct(MatCopy(activations, "DCostDZ"), DSigmoid), dCost_dActv);
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
     return MatMult(MatDot(layer.weights, dCost_dActv),
-                   MatApplyFct(MatCopy(activations), DSigmoid));
+                   MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid));
 }
 
 Matrix *BackPropagateInput(Network network, Matrix *activationsLayers,

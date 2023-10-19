@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <err.h>
 
-Matrix MatInit(size_t w, size_t h, NNValue defaultValue) {
+Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label) {
     NNValue **list = malloc(sizeof(NNValue) * w);
     for (size_t i = 0; i < w; i++) {
         list[i] = malloc(sizeof(NNValue) * h);
@@ -11,12 +11,12 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue) {
             list[i][j] = defaultValue;
     }
 
-    Matrix mat = {.w = w, .h = h, .mat = list};
+    Matrix mat = {.w = w, .h = h, .mat = list, .label = label};
     return mat;
 }
 
 void MatPrint(Matrix mat) {
-    printf("~~ MATRIX (width: %zu | height: %zu) ~~ \n", mat.w, mat.h);
+    printf("~~ [%s] MATRIX (width: %zu | height: %zu) ~~ \n", mat.label, mat.w, mat.h);
     for (size_t i = 0; i < mat.w; ++i) {
         printf("[%2zu]|", i);
         for (size_t j = 0; j < mat.h; j++) {
@@ -24,10 +24,10 @@ void MatPrint(Matrix mat) {
         }
         printf("|\n");
     }
-    printf("~~ MATRIX END ~~ \n");
+    printf("~~ [%s] MATRIX END ~~ \n", mat.label);
 }
 
-Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)()) {
+Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label) {
     NNValue **list = malloc(sizeof(NNValue) * w);
     for (size_t i = 0; i < w; i++) {
         list[i] = malloc(sizeof(NNValue) * h);
@@ -35,11 +35,11 @@ Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)()) {
             list[i][j] = fct();
     }
 
-    Matrix mat = {.w = w, .h = h, .mat = list};
+    Matrix mat = {.w = w, .h = h, .mat = list, .label = label};
     return mat;
 }
 
-Matrix MatCopy(Matrix mat) {
+Matrix MatCopy(Matrix mat, char* label) {
     NNValue **copy = malloc(sizeof(NNValue) * mat.w);
     for (size_t i = 0; i < mat.w; i++) {
         copy[i] = malloc(sizeof(NNValue) * mat.h);
@@ -47,7 +47,7 @@ Matrix MatCopy(Matrix mat) {
             copy[i][j] = mat.mat[i][j];
     }
 
-    Matrix mat_copy = {.w = mat.w, .h = mat.h, .mat = copy};
+    Matrix mat_copy = {.w = mat.w, .h = mat.h, .mat = copy, .label = label};
     return mat_copy;
 }
 
@@ -66,7 +66,9 @@ Matrix MatGetVector(Matrix mat, size_t index) {
     for (size_t i = 0; i < mat.h; i++) {
         Vector[0][i] = mat.mat[index][i];
     }
-    Matrix vector = {.w = mat.w, .h = 1, .mat = Vector};
+    char* label;
+    asprintf(&label, "Vector of %s", mat.label);
+    Matrix vector = {.w = mat.w, .h = 1, .mat = Vector, .label = label};
     return vector;
 }
 

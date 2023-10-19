@@ -12,9 +12,9 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
     }
 
     Layer layer = {.size = layer_size,
-                   .biases = MatInitWithFct(1, layer_size, startingValue),
+                   .biases = MatInitWithFct(1, layer_size, startingValue, "Biases"),
                    .weights = MatInitWithFct(before_layer_size, layer_size,
-                                             startingValue)};
+                                             startingValue, "Weights")};
 
     return layer;
 }
@@ -56,8 +56,8 @@ Network copyAndResetNetwork(Network network) {
         size_t layer_size = network.layers[l].size;
 
         Layer layer = {.size = layer_size,
-                       .biases = MatInit(1, layer_size, 0.0),
-                       .weights = MatInit(weights_size, layer_size, 0.0)};
+                       .biases = MatInit(1, layer_size, 0.0, "Biases"),
+                       .weights = MatInit(weights_size, layer_size, 0.0, "Weights")};
         weights_size = layer_size;
         layers[l] = layer;
     }

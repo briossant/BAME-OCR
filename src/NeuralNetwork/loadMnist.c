@@ -36,7 +36,7 @@ int32_t *GetHeaders(FILE *file, size_t nbr) {
 Matrix GetImage(FILE *file, size_t image_size) {
     unsigned char *buffer = malloc(image_size * sizeof(unsigned char));
     fread(buffer, sizeof(char), image_size, file);
-    Matrix image = MatInit(1, image_size, 0);
+    Matrix image = MatInit(1, image_size, 0, "Mnist image");
     for (size_t i = 0; i < image_size; i++)
         image.mat[0][i] = (NNValue)buffer[i] / 255;
 
@@ -57,7 +57,7 @@ Matrix LoadMnistImages(char *path) {
     printf("Loading images (magic: %d) -> nbr: %d  h: %d  w: %d\n", headers[0],
            headers[1], headers[2], headers[3]);
 
-    Matrix images = MatInit(headers[1], headers[2] * headers[3], 0);
+    Matrix images = MatInit(headers[1], headers[2] * headers[3], 0, "Mnist images");
     size_t image_size = headers[2] * headers[3];
     for (int i = 0; i < headers[1]; i++) {
         Matrix img = GetImage(file, image_size);
@@ -83,7 +83,7 @@ Matrix LoadMnistLabels(char *path) {
     unsigned char *buffer = malloc(headers[1] * sizeof(unsigned char));
     fread(buffer, sizeof(char), headers[1], file);
 
-    Matrix labels = MatInit(headers[1], NBR_OF_DIFFERENT_LABELS, IS_NOT_LABEL);
+    Matrix labels = MatInit(headers[1], NBR_OF_DIFFERENT_LABELS, IS_NOT_LABEL, "Mnist labels");
     for (int i = 0; i < headers[1]; i++) {
         labels.mat[i][buffer[i]] = IS_LABEL;
     }

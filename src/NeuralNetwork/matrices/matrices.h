@@ -6,6 +6,7 @@
 #include "../precision.h"
 
 typedef struct Matrix {
+    char* label;
     size_t w;
     size_t h;
     NNValue **mat;
@@ -13,13 +14,13 @@ typedef struct Matrix {
 
 typedef NNValue (*MatFct)(NNValue x);
 
-Matrix MatInit(size_t w, size_t h, NNValue defaultValue);
+Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label);
 
 void MatPrint(Matrix mat);
 
-Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)());
+Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label);
 
-Matrix MatCopy(Matrix mat);
+Matrix MatCopy(Matrix mat, char* label);
 
 void MatFree(Matrix mat);
 
