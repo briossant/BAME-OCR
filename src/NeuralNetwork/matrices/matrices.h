@@ -1,7 +1,11 @@
 #ifndef MATRICES_H
 #define MATRICES_H
+#define _GNU_SOURCE 
 
+#include <err.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "../precision.h"
 

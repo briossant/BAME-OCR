@@ -1,11 +1,12 @@
-#include "err.h"
 #include "matrices.h"
 
 void CheckIfSameMatDim(Matrix matA, Matrix matB) {
-    if (matA.h != matB.h || matA.w != matB.w)
-        errx(0, 
-                "Matrix A and B must have the same dimensions A(%s: w=%ld h=%ld) B(%s: w=%ld h=%ld)",
-                matA.label, matA.w, matA.h, matB.label, matB.w, matB.h);
+    if (matA.h != matB.h || matA.w != matB.w){
+        printf("EEEEEEEEEERRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR\n");
+        MatPrint(matA);
+        MatPrint(matB);
+        errx(0, "Matrix A and B must have the same dimensions");
+    }
 }
 
 // add term by term, matrices should have the same size
@@ -28,13 +29,15 @@ Matrix MatSub(Matrix matA, Matrix matB) {
 
 // matrix dot product
 Matrix MatDot(Matrix matA, Matrix matB){
-    if (matA.w != matB.h)
-        errx(0, 
-                "MatDot: matrix size aren't right -> A:(%s ; w=%ld) B:(%s ; h=%ld)", 
-                matA.label, matA.w, matB.label, matB.h);
+    if (matA.w != matB.h) {
+        printf("EEEEEEEEEERRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR\n");
+        MatPrint(matA);
+        MatPrint(matB);
+        errx(0, "MatDot: matrix size aren't right");
+    }
     char* label;
     asprintf(&label, "Dot of [%s] * [%s]", matA.label, matB.label);
-    Matrix res = MatInit(matA.w, matB.h, 0, label);
+    Matrix res = MatInit(matB.w, matA.h, 0, label);
     for (size_t i = 0; i < matB.w; i++)
         for (size_t j = 0; j < matA.h; j++)
             for (size_t h = 0; h < matB.h; h++) 

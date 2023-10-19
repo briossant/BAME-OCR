@@ -20,10 +20,10 @@ InputBatch *MakeInputsBatch(Matrix inputs, Matrix outputs, size_t nbr_of_batch,
     InputBatch *res = malloc(sizeof(InputBatch) * nbr_of_batch);
     for (size_t i = 0; i < nbr_of_batch; i++) {
         Matrix input = {
-            .w = batch_size, .h = inputs.h, .mat = inputs.mat + i * batch_size};
+            .w = batch_size, .h = inputs.h, .mat = inputs.mat + i * batch_size, .label = "inputs"};
         Matrix output = {.w = batch_size,
                          .h = outputs.h,
-                         .mat = outputs.mat + i * batch_size};
+                         .mat = outputs.mat + i * batch_size, .label="outputs"};
 
         InputBatch batch = {
             .size = batch_size, .inputs = input, .outputs = output};

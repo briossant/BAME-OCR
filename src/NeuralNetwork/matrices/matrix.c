@@ -1,7 +1,4 @@
 #include "matrices.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <err.h>
 
 Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label) {
     NNValue **list = malloc(sizeof(NNValue) * w);
@@ -58,6 +55,7 @@ void MatFree(Matrix mat) {
     free(mat.mat);
     mat.w = 0;
     mat.h = 0;
+    free(mat.label);
 }
 
 Matrix MatGetVector(Matrix mat, size_t index) {
@@ -68,7 +66,7 @@ Matrix MatGetVector(Matrix mat, size_t index) {
     }
     char* label;
     asprintf(&label, "Vector of %s", mat.label);
-    Matrix vector = {.w = mat.w, .h = 1, .mat = Vector, .label = label};
+    Matrix vector = {.w = 1, .h = mat.h, .mat = Vector, .label = label};
     return vector;
 }
 

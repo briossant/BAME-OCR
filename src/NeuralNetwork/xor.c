@@ -16,8 +16,8 @@ void train(size_t epoch, NNValue trRate) {
     NNValue *outputsl[] = {(NNValue[]){1}, (NNValue[]){1}, (NNValue[]){0},
                            (NNValue[]){0}};
 
-    Matrix outputsm = {.w = trSetSize, .h = 2, .mat = outputsl};
-    Matrix inputsm = {.w = trSetSize, .h = 2, .mat = inputsl};
+    Matrix inputsm = {.w = trSetSize, .h = 2, .mat = outputsl, .label = "inputs"};
+    Matrix outputsm = {.w = trSetSize, .h = 1, .mat = inputsl, .label = "outputs"};
 
     TrainingSettings sett = {.training_rate = trRate,
                              .batch_size = 1,

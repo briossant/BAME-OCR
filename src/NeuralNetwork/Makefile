@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-W -Wall -Wextra -Wpedantic -Wformat=2 -g
+CFLAGS=-W -Wall -Wextra -Wformat=2 -g
 LDFLAGS= -lm -g
 EXEC=xor
 SRC= $(wildcard *.c) $(wildcard matrices/*.c) 
