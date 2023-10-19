@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include "matrices/matrices.h"
 #include <stdio.h>
 
 // sigmoid derivative with x = Sigmoid(...)
@@ -11,8 +12,10 @@ Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
 }
 
 void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
-    MatAdd(MatCopy(layer.biases, "Biases"), dCost);
-    MatAdd(MatCopy(layer.weights, "Weights"), MatMult(dCost, lastActv));
+    MatPrint(lastActv);
+    MatPrint(dCost);
+    MatAdd(layer.biases, dCost);
+    MatAdd(layer.weights, MatDot(dCost, MatTranspose(lastActv)));
 }
 
 Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
@@ -20,8 +23,8 @@ Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
-    return MatMult(MatDot(dCost_dActv, MatTranspose(layer.weights)),
-                   MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid));
+    return MatDot(MatTranspose(layer.weights), MatMult( 
+                   MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid), dCost_dActv));
 }
 
 Matrix *BackPropagateInput(Network network, Matrix *activationsLayers,

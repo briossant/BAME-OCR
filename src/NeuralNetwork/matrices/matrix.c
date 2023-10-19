@@ -13,7 +13,7 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label) {
 }
 
 void MatPrint(Matrix mat) {
-    printf("~~ [%s] MATRIX (width: %zu | height: %zu) ~~ \n", mat.label, mat.w, mat.h);
+    printf("\n~~ [%s] MATRIX (width: %zu | height: %zu) ~~ \n", mat.label, mat.w, mat.h);
     for (size_t i = 0; i < mat.w; ++i) {
         printf("[%2zu]|", i);
         for (size_t j = 0; j < mat.h; j++) {
@@ -21,7 +21,7 @@ void MatPrint(Matrix mat) {
         }
         printf("|\n");
     }
-    printf("~~ [%s] MATRIX END ~~ \n", mat.label);
+    printf("~~ [%s] MATRIX END ~~ \n\n", mat.label);
 }
 
 Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label) {
@@ -55,7 +55,6 @@ void MatFree(Matrix mat) {
     free(mat.mat);
     mat.w = 0;
     mat.h = 0;
-    free(mat.label);
 }
 
 Matrix MatGetVector(Matrix mat, size_t index) {
