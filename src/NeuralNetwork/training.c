@@ -53,7 +53,7 @@ void TrainNetwork(Network network, Matrix inputs, Matrix outputs,
             err +=
                 BackPropagation(network, settings, batchs[j], inertiaNetwork);
         }
-
+        freeNetwork(inertiaNetwork);
         err /= nbr_of_batch;
         // if (i % (1 + epochs / 100) == 0);
         printf("~~{ [Training Epoch]: %ld -> [Accuracy]: %f }\n", i, err);

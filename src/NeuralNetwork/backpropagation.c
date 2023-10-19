@@ -12,10 +12,10 @@ Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
 }
 
 void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
-    MatPrint(lastActv);
-    MatPrint(dCost);
     MatAdd(layer.biases, dCost);
-    MatAdd(layer.weights, MatDot(dCost, MatTranspose(lastActv)));
+    Matrix dW = MatDot(dCost, MatTranspose(lastActv));
+    MatAdd(layer.weights, dW);
+    MatFree(dW);
 }
 
 Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
@@ -23,8 +23,12 @@ Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
-    return MatDot(MatTranspose(layer.weights), MatMult( 
-                   MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid), dCost_dActv));
+    Matrix dSig = MatMult(MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid), dCost_dActv);
+    Matrix trasnp = MatTranspose(layer.weights);
+    Matrix res = MatDot(trasnp, dSig); 
+    MatFree(trasnp);
+    MatFree(dSig);
+    return res;
 }
 
 Matrix *BackPropagateInput(Network network, Matrix *activationsLayers,
@@ -58,13 +62,13 @@ void AddToSumNetwork(Network sumNetwork, Matrix *all_dCost_dZ,
 
     UpdateLayer(sumNetwork.layers[0], all_dCost_dZ[0], inputs);
     MatFree(all_dCost_dZ[0]);
-    MatFree(activationsLayers[0]);
     for (size_t i = 1; i < sumNetwork.depth; i++) {
         UpdateLayer(sumNetwork.layers[i], all_dCost_dZ[i],
                     activationsLayers[i - 1]);
         MatFree(all_dCost_dZ[i]);
-        MatFree(activationsLayers[i]);
+        MatFree(activationsLayers[i-1]);
     }
+    MatFree(activationsLayers[sumNetwork.depth-1]);
     free(activationsLayers);
     free(all_dCost_dZ);
 }
@@ -75,7 +79,7 @@ Matrix ValueToRemove(Matrix sumValue, Matrix inertiaValue,
 
     NNValue scalar = -(1.0 - settings.inertia_strength) / batch_size *
                      settings.training_rate;
-    return MatAdd(MatMultScalar(sumValue, scalar),
+    return MatAdd(MatMultScalar(MatCopy(sumValue, "ValueToRemove"), scalar),
                   MatMultScalar(inertiaValue, settings.inertia_strength));
 }
 
@@ -85,22 +89,21 @@ void UpdateNetwork(Network network, Network sumNetwork, Network inertiaNetwork,
 
         Layer layer = network.layers[l];
         Layer sumLayer = sumNetwork.layers[l];
-        Layer inertiaLayer = inertiaNetwork.layers[l];
+        Layer* inertiaLayers = inertiaNetwork.layers;
 
         // update biases
-        Matrix bdif = ValueToRemove(sumLayer.biases, inertiaLayer.biases,
+        Matrix bdif = ValueToRemove(sumLayer.biases, inertiaLayers[l].biases,
                                     settings, batch_size);
         MatAdd(layer.biases, bdif);
-        inertiaLayer.biases = MatMultScalar(bdif, -1);
+        MatFree(inertiaLayers[l].biases);
+        inertiaLayers[l].biases = MatMultScalar(bdif, -1);
 
         // update weights
-        Matrix wdif = ValueToRemove(sumLayer.weights, inertiaLayer.weights,
+        Matrix wdif = ValueToRemove(sumLayer.weights, inertiaLayers[l].weights,
                                     settings, batch_size);
         MatAdd(layer.weights, wdif);
-        inertiaLayer.weights = MatMultScalar(wdif, -1);
-
-        MatFree(bdif);
-        MatFree(wdif);
+        MatFree(inertiaLayers[l].weights);
+        inertiaLayers[l].weights = MatMultScalar(wdif, -1);
     }
 }
 
