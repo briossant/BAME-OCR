@@ -1,13 +1,32 @@
 #include "matrices.h"
 
+
+void PrintError(){
+    printf(" ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄ \n▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌\n▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌\n▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌\n▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░▌       ▐░▌▐░█▄▄▄▄▄▄▄█░▌\n▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌\n▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀█░█▀▀ ▐░█▀▀▀▀█░█▀▀ ▐░▌       ▐░▌▐░█▀▀▀▀█░█▀▀ \n▐░▌          ▐░▌     ▐░▌  ▐░▌     ▐░▌  ▐░▌       ▐░▌▐░▌     ▐░▌  \n▐░█▄▄▄▄▄▄▄▄▄ ▐░▌      ▐░▌ ▐░▌      ▐░▌ ▐░█▄▄▄▄▄▄▄█░▌▐░▌      ▐░▌ \n▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌\n ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀ \n");
+                                                                 
+}
+
+
 void CheckIfSameMatDim(Matrix matA, Matrix matB) {
     if (matA.h != matB.h || matA.w != matB.w){
-        printf("EEEEEEEEEERRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR\n");
+        PrintError();
         MatPrint(matA);
         MatPrint(matB);
         errx(0, "Matrix A and B must have the same dimensions");
     }
 }
+
+
+Matrix MatTranspose(Matrix mat){
+    char* label;
+    asprintf(&label, "Transpose of [%s]", mat.label);
+    Matrix res = MatInit(mat.h, mat.w, 0, label);
+    for (size_t i = 0; i < mat.w; i++)
+        for (size_t j = 0; j < mat.h; j++)
+            res.mat[j][i] = mat.mat[i][j];
+    return res;
+}
+
 
 // add term by term, matrices should have the same size
 Matrix MatAdd(Matrix matA, Matrix matB) {
@@ -30,7 +49,7 @@ Matrix MatSub(Matrix matA, Matrix matB) {
 // matrix dot product
 Matrix MatDot(Matrix matA, Matrix matB){
     if (matA.w != matB.h) {
-        printf("EEEEEEEEEERRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR\n");
+        PrintError();
         MatPrint(matA);
         MatPrint(matB);
         errx(0, "MatDot: matrix size aren't right");

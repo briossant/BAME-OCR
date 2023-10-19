@@ -2,6 +2,20 @@
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
+void PrintTitle(){
+    printf(" ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
+    printf("▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
+    printf("▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
+    printf("▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
+    printf("░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
+    printf("░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
+    printf("▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
+    printf(" ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
+    printf(" ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
+    printf("      ░                                         ░                \n\n\n");
+}
+
+
 void train(size_t epoch, NNValue trRate) {
     printf("~|~ Training ~|~\n\n");
 
@@ -82,6 +96,7 @@ void mnist(size_t epoch, NNValue learning_rate, size_t batch_size,
 }
 
 int main(int argc, char **argv) {
+    PrintTitle();
     if (argc < 2) {
         printHelp();
         return 1;

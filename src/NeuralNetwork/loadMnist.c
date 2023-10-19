@@ -48,7 +48,7 @@ Matrix GetImage(FILE *file, size_t image_size) {
 Matrix LoadMnistImages(char *path) {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        errx(1, "loadMnistImages: unable to open dataset file (%s)", path);
+        errx(1, "loadMnistImages: unable to open dataset file (%s), did you run downLoadMnist.sh?", path);
     }
 
     // 0: magic number ; 1: number of images ; 2: image height ; 3: image width
@@ -72,7 +72,7 @@ Matrix LoadMnistImages(char *path) {
 Matrix LoadMnistLabels(char *path) {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        errx(1, "loadMnistLabels: unable to open dataset file (%s)", path);
+        errx(1, "loadMnistLabels: unable to open dataset file (%s), did you run downLoadMnist.sh?", path);
     }
 
     // 0: magic number ; 1: number of labels ;

@@ -34,6 +34,9 @@ Matrix MatSetVector(Matrix mat, Matrix vect, size_t index);
 
 Bool MatIsVector(Matrix mat);
 
+
+Matrix MatTranspose(Matrix mat);
+
 // perform calculus in place for matA, the matB should remained unchanged.
 
 // add term by term, matrices should have the same size

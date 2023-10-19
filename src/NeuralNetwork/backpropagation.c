@@ -20,7 +20,7 @@ Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
-    return MatMult(MatDot(layer.weights, dCost_dActv),
+    return MatMult(MatDot(dCost_dActv, MatTranspose(layer.weights)),
                    MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid));
 }
 
