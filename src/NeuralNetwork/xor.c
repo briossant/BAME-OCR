@@ -2,19 +2,28 @@
 #include <stdio.h>
 #include "NeuralNetwork.h"
 
-void PrintTitle(){
-    printf(" ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
-    printf("▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
-    printf("▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
-    printf("▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
-    printf("░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
-    printf("░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
-    printf("▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
-    printf(" ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
-    printf(" ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
-    printf("      ░                                         ░                \n\n\n");
+void PrintTitle() {
+    printf(
+        " ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
+    printf(
+        "▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
+    printf(
+        "▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
+    printf(
+        "▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
+    printf(
+        "░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
+    printf(
+        "░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
+    printf(
+        "▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
+    printf(
+        " ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
+    printf(
+        " ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
+    printf("      ░                                         ░                "
+           "\n\n\n");
 }
-
 
 void train(size_t epoch, NNValue trRate) {
     printf("~|~ Training ~|~\n\n");
@@ -30,8 +39,10 @@ void train(size_t epoch, NNValue trRate) {
     NNValue *outputsl[] = {(NNValue[]){1}, (NNValue[]){1}, (NNValue[]){0},
                            (NNValue[]){0}};
 
-    Matrix inputsm = {.w = trSetSize, .h = 2, .mat = outputsl, .label = "inputs"};
-    Matrix outputsm = {.w = trSetSize, .h = 1, .mat = inputsl, .label = "outputs"};
+    Matrix inputsm = {
+        .w = trSetSize, .h = 2, .mat = outputsl, .label = "inputs"};
+    Matrix outputsm = {
+        .w = trSetSize, .h = 1, .mat = inputsl, .label = "outputs"};
 
     TrainingSettings sett = {.training_rate = trRate,
                              .batch_size = 1,
@@ -45,6 +56,9 @@ void train(size_t epoch, NNValue trRate) {
     Matrix res = Propagate(inputsm, network);
     printf("Final tests:  \n");
     MatPrint(res);
+
+    freeNetwork(network);
+    MatFree(res);
 }
 
 void save(char *filepath) {

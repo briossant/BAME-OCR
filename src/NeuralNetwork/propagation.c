@@ -11,8 +11,12 @@ Matrix WeightedSum(Matrix activations, Layer layer) {
 NNValue Pow2(NNValue x) { return pow(x, 2); }
 
 NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs) {
-    return MatSum(
-        MatApplyFct(MatSub(MatCopy(expectedOutputs, "CostFunction"), outputActivations), Pow2));
+    Matrix mat = MatApplyFct(
+        MatSub(MatCopy(expectedOutputs, "CostFunction"), outputActivations),
+        Pow2);
+    NNValue sum = MatSum(mat);
+    MatFree(mat);
+    return sum;
 }
 
 NNValue Sigmoid(NNValue x) { return 1 / (1 + exp(-x)); }

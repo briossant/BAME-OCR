@@ -1,6 +1,6 @@
 #ifndef MATRICES_H
 #define MATRICES_H
-#define _GNU_SOURCE 
+#define _GNU_SOURCE
 
 #include <err.h>
 #include <stddef.h>
@@ -9,8 +9,10 @@
 
 #include "../precision.h"
 
+#define LABEL_TRANSFORM 0
+
 typedef struct Matrix {
-    char* label;
+    char *label;
     size_t w;
     size_t h;
     NNValue **mat;
@@ -18,13 +20,13 @@ typedef struct Matrix {
 
 typedef NNValue (*MatFct)(NNValue x);
 
-Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label);
+Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char *label);
 
 void MatPrint(Matrix mat);
 
-Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label);
+Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char *label);
 
-Matrix MatCopy(Matrix mat, char* label);
+Matrix MatCopy(Matrix mat, char *label);
 
 void MatFree(Matrix mat);
 
@@ -33,7 +35,6 @@ Matrix MatGetVector(Matrix mat, size_t index);
 Matrix MatSetVector(Matrix mat, Matrix vect, size_t index);
 
 Bool MatIsVector(Matrix mat);
-
 
 Matrix MatTranspose(Matrix mat);
 

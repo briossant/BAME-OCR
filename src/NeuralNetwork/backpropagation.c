@@ -7,25 +7,31 @@ NNValue DSigmoid(NNValue x) { return x * (1 - x); }
 
 // cost function derivative over the output activations
 Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
-    return MatMultScalar(MatSub(MatCopy(outputActivations, "FirstDCostDActv"), expectedOutputs),
-                         2);
+    return MatMultScalar(
+        MatSub(MatCopy(outputActivations, "FirstDCostDActv"), expectedOutputs),
+        2);
 }
 
 void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
     MatAdd(layer.biases, dCost);
-    Matrix dW = MatDot(dCost, MatTranspose(lastActv));
+    Matrix trans = MatTranspose(lastActv);
+    Matrix dW = MatDot(dCost, trans);
     MatAdd(layer.weights, dW);
     MatFree(dW);
+    MatFree(trans);
 }
 
 Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
-    return MatMult(MatApplyFct(MatCopy(activations, "DCostDZ"), DSigmoid), dCost_dActv);
+    return MatMult(MatApplyFct(MatCopy(activations, "DCostDZ"), DSigmoid),
+                   dCost_dActv);
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
-    Matrix dSig = MatMult(MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid), dCost_dActv);
+    Matrix dSig =
+        MatMult(MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid),
+                dCost_dActv);
     Matrix trasnp = MatTranspose(layer.weights);
-    Matrix res = MatDot(trasnp, dSig); 
+    Matrix res = MatDot(trasnp, dSig);
     MatFree(trasnp);
     MatFree(dSig);
     return res;
@@ -61,16 +67,10 @@ void AddToSumNetwork(Network sumNetwork, Matrix *all_dCost_dZ,
                      Matrix *activationsLayers, Matrix inputs) {
 
     UpdateLayer(sumNetwork.layers[0], all_dCost_dZ[0], inputs);
-    MatFree(all_dCost_dZ[0]);
     for (size_t i = 1; i < sumNetwork.depth; i++) {
         UpdateLayer(sumNetwork.layers[i], all_dCost_dZ[i],
                     activationsLayers[i - 1]);
-        MatFree(all_dCost_dZ[i]);
-        MatFree(activationsLayers[i-1]);
     }
-    MatFree(activationsLayers[sumNetwork.depth-1]);
-    free(activationsLayers);
-    free(all_dCost_dZ);
 }
 
 // watchout sumValue and inertiaValue are modified by the function
@@ -89,7 +89,7 @@ void UpdateNetwork(Network network, Network sumNetwork, Network inertiaNetwork,
 
         Layer layer = network.layers[l];
         Layer sumLayer = sumNetwork.layers[l];
-        Layer* inertiaLayers = inertiaNetwork.layers;
+        Layer *inertiaLayers = inertiaNetwork.layers;
 
         // update biases
         Matrix bdif = ValueToRemove(sumLayer.biases, inertiaLayers[l].biases,
@@ -127,6 +127,14 @@ NNValue BackPropagation(Network network, TrainingSettings settings,
             BackPropagateInput(network, activationsLayers, outputs);
 
         AddToSumNetwork(sumNetwork, all_dCost_dZ, activationsLayers, inputs);
+        MatFree(inputs);
+        MatFree(outputs);
+        for (size_t i = 0; i < network.depth; i++) {
+            MatFree(activationsLayers[i]);
+            MatFree(all_dCost_dZ[i]);
+        }
+        free(activationsLayers);
+        free(all_dCost_dZ);
     }
 
     UpdateNetwork(network, sumNetwork, inertiaNetwork, settings, batch.size);

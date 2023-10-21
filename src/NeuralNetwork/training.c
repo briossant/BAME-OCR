@@ -19,11 +19,14 @@ InputBatch *MakeInputsBatch(Matrix inputs, Matrix outputs, size_t nbr_of_batch,
                             size_t batch_size) {
     InputBatch *res = malloc(sizeof(InputBatch) * nbr_of_batch);
     for (size_t i = 0; i < nbr_of_batch; i++) {
-        Matrix input = {
-            .w = batch_size, .h = inputs.h, .mat = inputs.mat + i * batch_size, .label = "inputs"};
+        Matrix input = {.w = batch_size,
+                        .h = inputs.h,
+                        .mat = inputs.mat + i * batch_size,
+                        .label = "inputs"};
         Matrix output = {.w = batch_size,
                          .h = outputs.h,
-                         .mat = outputs.mat + i * batch_size, .label="outputs"};
+                         .mat = outputs.mat + i * batch_size,
+                         .label = "outputs"};
 
         InputBatch batch = {
             .size = batch_size, .inputs = input, .outputs = output};
@@ -58,4 +61,6 @@ void TrainNetwork(Network network, Matrix inputs, Matrix outputs,
         // if (i % (1 + epochs / 100) == 0);
         printf("~~{ [Training Epoch]: %ld -> [Accuracy]: %f }\n", i, err);
     }
+
+    free(batchs);
 }

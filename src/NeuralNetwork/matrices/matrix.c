@@ -1,6 +1,6 @@
 #include "matrices.h"
 
-Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label) {
+Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char *label) {
     NNValue **list = malloc(sizeof(NNValue) * w);
     for (size_t i = 0; i < w; i++) {
         list[i] = malloc(sizeof(NNValue) * h);
@@ -13,7 +13,8 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char* label) {
 }
 
 void MatPrint(Matrix mat) {
-    printf("\n~~ [%s] MATRIX (width: %zu | height: %zu) ~~ \n", mat.label, mat.w, mat.h);
+    printf("\n~~ [%s] MATRIX (width: %zu | height: %zu) ~~ \n", mat.label,
+           mat.w, mat.h);
     for (size_t i = 0; i < mat.w; ++i) {
         printf("[%2zu]|", i);
         for (size_t j = 0; j < mat.h; j++) {
@@ -24,7 +25,7 @@ void MatPrint(Matrix mat) {
     printf("~~ [%s] MATRIX END ~~ \n\n", mat.label);
 }
 
-Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label) {
+Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char *label) {
     NNValue **list = malloc(sizeof(NNValue) * w);
     for (size_t i = 0; i < w; i++) {
         list[i] = malloc(sizeof(NNValue) * h);
@@ -36,7 +37,7 @@ Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char* label) {
     return mat;
 }
 
-Matrix MatCopy(Matrix mat, char* label) {
+Matrix MatCopy(Matrix mat, char *label) {
     NNValue **copy = malloc(sizeof(NNValue) * mat.w);
     for (size_t i = 0; i < mat.w; i++) {
         copy[i] = malloc(sizeof(NNValue) * mat.h);
@@ -63,8 +64,11 @@ Matrix MatGetVector(Matrix mat, size_t index) {
     for (size_t i = 0; i < mat.h; i++) {
         Vector[0][i] = mat.mat[index][i];
     }
-    char* label;
-    asprintf(&label, "Vector of %s", mat.label);
+    char *label;
+    if (LABEL_TRANSFORM)
+        asprintf(&label, "Vector of %s", mat.label);
+    else
+        label = "vector";
     Matrix vector = {.w = 1, .h = mat.h, .mat = Vector, .label = label};
     return vector;
 }
