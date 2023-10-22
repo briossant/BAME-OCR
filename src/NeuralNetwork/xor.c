@@ -28,8 +28,8 @@ void PrintTitle() {
 void train(size_t epoch, NNValue trRate) {
     printf("~|~ Training ~|~\n\n");
 
-    size_t layers_size[] = {2, 42, 42, 42, 1};
-    Network network = newNetwork(layers_size, 5);
+    size_t layers_size[] = {2, 6, 1};
+    Network network = newNetwork(layers_size, 3);
 
     size_t trSetSize = 4;
 
@@ -55,6 +55,7 @@ void train(size_t epoch, NNValue trRate) {
     // create new fct to propagate on multi inputs layer matrix
     Matrix res = Propagate(inputsm, network);
     printf("Final tests:  \n");
+    MatPrint(inputsm);
     MatPrint(res);
 
     freeNetwork(network);

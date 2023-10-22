@@ -48,7 +48,10 @@ Matrix GetImage(FILE *file, size_t image_size) {
 Matrix LoadMnistImages(char *path) {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        errx(1, "loadMnistImages: unable to open dataset file (%s), did you run downLoadMnist.sh?", path);
+        errx(1,
+             "loadMnistImages: unable to open dataset file (%s), did you run "
+             "downLoadMnist.sh?",
+             path);
     }
 
     // 0: magic number ; 1: number of images ; 2: image height ; 3: image width
@@ -57,7 +60,8 @@ Matrix LoadMnistImages(char *path) {
     printf("Loading images (magic: %d) -> nbr: %d  h: %d  w: %d\n", headers[0],
            headers[1], headers[2], headers[3]);
 
-    Matrix images = MatInit(headers[1], headers[2] * headers[3], 0, "Mnist images");
+    Matrix images =
+        MatInit(headers[1], headers[2] * headers[3], 0, "Mnist images");
     size_t image_size = headers[2] * headers[3];
     for (int i = 0; i < headers[1]; i++) {
         Matrix img = GetImage(file, image_size);
@@ -72,7 +76,10 @@ Matrix LoadMnistImages(char *path) {
 Matrix LoadMnistLabels(char *path) {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        errx(1, "loadMnistLabels: unable to open dataset file (%s), did you run downLoadMnist.sh?", path);
+        errx(1,
+             "loadMnistLabels: unable to open dataset file (%s), did you run "
+             "downLoadMnist.sh?",
+             path);
     }
 
     // 0: magic number ; 1: number of labels ;
@@ -83,7 +90,8 @@ Matrix LoadMnistLabels(char *path) {
     unsigned char *buffer = malloc(headers[1] * sizeof(unsigned char));
     fread(buffer, sizeof(char), headers[1], file);
 
-    Matrix labels = MatInit(headers[1], NBR_OF_DIFFERENT_LABELS, IS_NOT_LABEL, "Mnist labels");
+    Matrix labels = MatInit(headers[1], NBR_OF_DIFFERENT_LABELS, IS_NOT_LABEL,
+                            "Mnist labels");
     for (int i = 0; i < headers[1]; i++) {
         labels.mat[i][buffer[i]] = IS_LABEL;
     }
@@ -95,8 +103,10 @@ Matrix LoadMnistLabels(char *path) {
 }
 
 void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining) {
+    printf("|||||||||||||||||| Loading Mnist ||||||||||||||||||||||\n");
     *images = LoadMnistImages(isForTraining ? TRAINING_IMAGES_PATH
                                             : TESTING_IMAGES_PATH);
     *labels = LoadMnistLabels(isForTraining ? TRAINING_LABELS_PATH
                                             : TESTING_LABELS_PATH);
+    printf("|||||||||||||||||| Mnist Loaded |||||||||||||||||||||||\n\n");
 }
