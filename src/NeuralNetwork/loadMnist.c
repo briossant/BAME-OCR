@@ -6,10 +6,10 @@
 #define NBR_HEADERS_IMAGES 4
 #define NBR_HEADERS_LABELS 2
 
-#define TRAINING_IMAGES_PATH "dataset/nbr240k.img"
-#define TESTING_IMAGES_PATH "dataset/nbr40k.img"
-#define TRAINING_LABELS_PATH "dataset/nbr240k.label"
-#define TESTING_LABELS_PATH "dataset/nbr40k.label"
+#define TRAINING_IMAGES_PATH "dataset/nbr60k.img"
+#define TESTING_IMAGES_PATH "dataset/nbr10k.img"
+#define TRAINING_LABELS_PATH "dataset/nbr60k.label"
+#define TESTING_LABELS_PATH "dataset/nbr10k.label"
 
 #define CHARS_IN_INT32 sizeof(int32_t) / sizeof(char)
 #define NBR_OF_DIFFERENT_LABELS 10

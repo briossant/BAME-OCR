@@ -70,8 +70,9 @@ void TrainNetwork(Network network, Matrix inputs, Matrix outputs,
         freeNetwork(inertiaNetwork);
         err /= nbr_of_batch;
         // if (i % (1 + epochs / 100) == 0);
-        printf("\r〉🟡 Epoch %ld -> %f Accuracy\n", i, err);
+        printf("\r〉🟡 Epoch %ld -> %f Accuracy\n", i + 1, err);
     }
 
     free(batchs);
+    printf("|||||||||||||||||| Training end |||||||||||||||||||||||\n\n");
 }
