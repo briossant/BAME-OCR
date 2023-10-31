@@ -105,8 +105,26 @@ int parse(int argc, char** argv)
     }
     
     int k = 1;
+    // TODO: Optimazation with stack
+    int no_image_input = 1;
+    int no_image_output = 1;
 
-    SDL_Surface* image_converted = SDL_Start(argv[k]);
+    while(k < argc && no_image_input) //Check input
+    {
+        if (strcmp(argv[k], "-i") == 0 || strcmp(argv[k], "--input") == 0) //Input file
+        {
+            SDL_Surface* image_converted = SDL_Start(argv[k]);
+            no_image_input = 0;
+        }
+    }
+
+    if (no_image_input)
+    {
+        print_usage(char* argv[0]);
+    }
+    
+
+    k = 1;
 
     while (k < argc)
     {
@@ -152,7 +170,11 @@ int parse(int argc, char** argv)
         {
             Canny(image_converted);
         }
-        else
+        else if(strcmp(argv[k], "-i") == 0 || strcmp(argv[k], "--input") == 0 || strcmp(argv[k], "-o") == 0 || strcmp(argv[k], "--output") == 0)
+        {
+            // Do nothing
+        }
+        else //FIXME: input and output
         {
             printf("sdl: error: unrecognized command-line option '%s'\n", argv[k]);
             return 0;
@@ -160,7 +182,23 @@ int parse(int argc, char** argv)
         k++;
     }
 
-    SDL_Output(image_converted, argv[k]); // FIXME : no image
+    k = 1;
+
+    while(k < argc && no_image_output) //Check output
+    {
+        if (strcmp(argv[k], "-o") == 0 || strcmp(argv[k], "--output") == 0) //Output file
+        {
+            SDL_Output(image_converted, argv[k]);
+            no_image_output = 0;
+        }
+    }
+
+    if (no_image_output)
+    {
+        print_usage(char* argv[0]);
+    }
+
+
     return 0;
 }
 
