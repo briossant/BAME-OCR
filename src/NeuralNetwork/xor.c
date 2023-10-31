@@ -1,5 +1,6 @@
 #include "printers.h"
 #include "NeuralNetwork.h"
+#include <string.h>
 
 void PrintUsage(void) {
     printf("Usage:\n");
@@ -14,16 +15,20 @@ int main(void) {
     printf("Type \"help\" for more information.\n\n");
     Network network;
     while (42) {
-        char *line = NULL;
+        char *input = NULL;
         size_t len = 0;
-        ssize_t lineSize = 0;
 
         printf("〉");
-        lineSize = getline(&line, &len, stdin);
+        getline(&input, &len, stdin);
+        input[strcspn(input, "\n")] = 0;
 
-        printf("You entered %s, which has %zu chars.\n", line, lineSize - 1);
+        char *ptr = strtok(input, " ");
 
-        free(line);
+        while (ptr != NULL) {
+            printf("'%s'\n", ptr);
+            ptr = strtok(NULL, " ");
+        }
+        free(input);
     }
     return 0;
 }
