@@ -44,14 +44,14 @@ void CreateNetwork(Network *network, size_t argc) {
 
 void trainXOR(Network *network, size_t argc) {
     size_t trSetSize = 4;
-    NNValue *inputsl[] = {(NNValue[]){0, 1}, (NNValue[]){1, 0},
-                          (NNValue[]){0, 0}, (NNValue[]){1, 1}};
-    NNValue *outputsl[] = {(NNValue[]){1}, (NNValue[]){1}, (NNValue[]){0},
-                           (NNValue[]){0}};
-    Matrix inputsm = {
-        .w = trSetSize, .h = 2, .mat = outputsl, .label = "inputs"};
-    Matrix outputsm = {
-        .w = trSetSize, .h = 1, .mat = inputsl, .label = "outputs"};
+    Matrix inputsm = MatInit(trSetSize, 2, 0, "inputs");
+    Matrix outputsm = MatInit(trSetSize, 1, 0, "outputs");
+    inputsm.mat[0][0] = 1;
+    inputsm.mat[0][1] = 1;
+    inputsm.mat[1][1] = 1;
+    inputsm.mat[2][0] = 1;
+    outputsm.mat[1][0] = 1;
+    outputsm.mat[2][0] = 1;
 
     TrainingSettings sett = {.batch_size = 1, .nbr_of_inputs = trSetSize};
     sett.training_rate = strtod(strtok(NULL, " "), NULL);
