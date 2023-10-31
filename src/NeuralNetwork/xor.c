@@ -1,29 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "NeuralNetwork.h"
-
-void PrintTitle() {
-    printf(
-        " ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
-    printf(
-        "▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
-    printf(
-        "▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
-    printf(
-        "▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
-    printf(
-        "░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
-    printf(
-        "░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
-    printf(
-        "▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
-    printf(
-        " ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
-    printf(
-        " ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
-    printf("      ░                                         ░                "
-           "\n\n\n");
-}
+#include "printers.h"
 
 void train(size_t epoch, NNValue trRate) {
     printf("~|~ Training ~|~\n\n");
@@ -66,7 +44,7 @@ void save(char *filepath) {
     printf("saving\n");
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
-     SaveNetwork( network,filepath);
+    // SaveNetwork( network,filepath);
 }
 
 void load(char *filepath) {

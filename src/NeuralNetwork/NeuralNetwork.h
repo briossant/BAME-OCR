@@ -67,11 +67,6 @@ Network copyAndResetNetwork(Network network);
 void freeNetwork(Network network);
 
 ////////////////////////////////////
-// Printers
-
-void printNetwork(Network network);
-
-////////////////////////////////////
 // Mnist Loading
 
 // load mnist data into Matrix *images and Matrix *labels

@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include "printers.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,14 +41,7 @@ void TrainNetwork(Network network, Matrix inputs, Matrix outputs,
                   TrainingSettings settings) {
     printf("|||||||||||||||||| Start Training |||||||||||||||||||||\n\n");
     size_t nbr_of_batch = settings.nbr_of_inputs / settings.batch_size;
-    printf(
-        "〉⎧⏵⏵⏵ SETTINGS\n〉⎬> nbr_of_batch: %ld\n〉⎬> nbr_of_inputs: %ld \n"
-        "〉⎬> batch_size: %ld\n"
-        "〉⎬> training_rate: %f\n〉⎬> epochs: %ld \n〉⎬> inertia_strength: %f\n"
-        "〉⎩⏴⏴⏴ SETTINGS END\n\n",
-        nbr_of_batch, settings.nbr_of_inputs, settings.batch_size,
-        settings.training_rate, settings.epochs, settings.inertia_strength);
-
+    PrintSettings(settings);
     InputBatch *batchs =
         MakeInputsBatch(inputs, outputs, nbr_of_batch, settings.batch_size);
 
