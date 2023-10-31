@@ -2,14 +2,16 @@
 #include "NeuralNetwork.h"
 #include <string.h>
 
-#define CMD_COUNT 1
+#define INPUT_LAYER_SIZE 2
+#define OUTPUT_LAYER_SIZE 1
+#define CMD_COUNT 2
 
-void PrintUsage(Network *network) {
+void PrintUsage(Network *network, size_t argc) {
     printf("Usage:\n");
-    printf("〉new [input layer] [hidden layer] ... [output layer]: create a "
-           "new network\n");
+    printf("〉help : show this message\n");
+    printf("〉new [hidden layer size] ... : create a new network\n");
 
-    printf("END\n");
+    printf("\n");
 }
 
 size_t GetArgc(char *input) {
@@ -21,18 +23,38 @@ size_t GetArgc(char *input) {
     return res;
 }
 
+void CreateNetwork(Network *network, size_t argc) {
+    size_t *layers_size = malloc(sizeof(size_t) * (argc + 2));
+    *layers_size = INPUT_LAYER_SIZE;
+    *(layers_size + argc + 1) = OUTPUT_LAYER_SIZE;
+    size_t i = 0;
+    while (i++ < argc) {
+        size_t x;
+        if ((x = atoi(strtok(NULL, " "))) > 0)
+            layers_size[i] = x;
+        else {
+            printf("Layer sizes must be positive integer.\n");
+        }
+    }
+    *network = newNetwork(layers_size, argc + 2);
+    printNetwork(*network);
+}
+
 struct parseEl {
     char *cmd_name;
     size_t min_argc;
-    void (*fct)(Network *network);
+    void (*fct)(Network *network, size_t argc);
 };
 
-struct parseEl parseList[] = {{"help", 0, PrintUsage}};
+struct parseEl parseList[] = {{"help", 0, PrintUsage},
+                              {"new", 0, CreateNetwork}};
 
 int main(void) {
     PrintTitle();
     printf("Type \"help\" for more information.\n\n");
-    Network network;
+    Network *network = malloc(sizeof(Network));
+    *network =
+        newNetwork((size_t[]){INPUT_LAYER_SIZE, 42, OUTPUT_LAYER_SIZE}, 3);
     while (42) {
         // get user input
         char *input = NULL;
@@ -57,7 +79,7 @@ int main(void) {
         else if (argc < parseList[i].min_argc)
             printf("Not enough arguments. Type 'help' for help.\n");
         else
-            parseList[i].fct(&network);
+            parseList[i].fct(network, argc);
 
         free(input);
     }
