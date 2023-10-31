@@ -1,3 +1,4 @@
+#include <SDL2/SDL_surface.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -16,7 +17,7 @@ void ArroundGaussianBlur (SDL_Surface* image);
 
 SDL_Surface* Rotate (SDL_Surface* image, double angle);
 
-SDL_Surface* Canny (SDL_Surface* image);
+SDL_Surface* Canny(SDL_Surface* image);
 
 SDL_Surface* Intensity_Gradian (SDL_Surface* image);
 
@@ -30,3 +31,5 @@ void Thresholdhysteresis(SDL_Surface* image);
 
 
 Uint8 ComputeSeuil(SDL_Surface* image);
+
+int hough_transform(SDL_Surface* image, int pas);

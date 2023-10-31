@@ -1,6 +1,7 @@
 #include "ImageProcess.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_surface.h>
 #include <err.h>
 
 int main(int argc, char *argv[])
@@ -29,18 +30,20 @@ int main(int argc, char *argv[])
     SDL_FreeSurface(image);
 
 
-    GreyScale(image_converted);
+    //GreyScale(image_converted);
     //BlacknWhite(image_converted);
     //Contrast(image_converted);
-    GaussianBlur(image_converted);
+    //GaussianBlur(image_converted);
     //Bright(image_converted);
     //ArroundGaussianBlur(image_converted);
     //image_converted = Rotate(image_converted, 35);
     //image_converted = Canny(image_converted);
-    image_converted = Intensity_Gradian(image_converted);
-    image_converted1 = Orientation_Gradian(image_converted);
-    image_converted = Supp_Maxima(image_converted, image_converted1);
-    Thresholdhysteresis(image_converted);
+    //image_converted = Intensity_Gradian(image_converted);
+    //image_converted1 = Orientation_Gradian(image_converted);
+    //image_converted = Supp_Maxima(image_converted, image_converted1);
+    //Thresholdhysteresis(image_converted);
+    image_converted = Canny(image_converted);
+    hough_transform(image_converted, 1);
     //GaussianBlur(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
@@ -49,7 +52,8 @@ int main(int argc, char *argv[])
     }
 
     SDL_FreeSurface(image_converted);
-    
+    SDL_FreeSurface(image_converted1);
+
     IMG_Quit();
     SDL_Quit();
 

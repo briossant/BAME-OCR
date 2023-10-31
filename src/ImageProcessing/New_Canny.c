@@ -7,6 +7,28 @@
 #include <math.h>
 #include <stdlib.h>
 
+
+SDL_Surface* Canny(SDL_Surface* image)
+{
+    GreyScale(image);
+    GaussianBlur(image);
+
+    SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
+    SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
+    SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
+    SDL_FreeSurface(image);
+
+    image_converted = Intensity_Gradian(image_converted);
+    image_converted1 = Orientation_Gradian(image_converted);
+    image_converted = Supp_Maxima(image_converted, image_converted1);
+    Thresholdhysteresis(image_converted);
+    SDL_FreeSurface(image_converted1);
+
+
+    return image_converted;
+}
+
+
 int convolution_grayscale(SDL_Surface* image, int x, int y
         , int* kernel, int kernelWidth)
 {
@@ -51,7 +73,6 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image)
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, width
             , height, 32, format->format);
 
-    //Uint32* pixtab = image->pixels;
     Uint32* new_pixtab = image_converted->pixels;
 
     int grad_x = 0;
@@ -66,7 +87,7 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image)
                            0,0,0,
                            1,2,1};
 
-// possible ajustement des bornes pour plus ou moins de precision sur les bords de l'image
+// limit can be ajust for more or less precision
 
     for (int y = 2; y < height-2; y++) 
     {
@@ -82,6 +103,8 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image)
         }
     }
 
+    //SDL_FreeSurface(image);
+
     return image_converted;
 }
 
@@ -94,7 +117,6 @@ SDL_Surface* Orientation_Gradian (SDL_Surface* image)
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, width
             , height, 32, format->format);
 
-    //Uint32* pixtab = image->pixels;
     Uint32* new_pixtab = image_converted->pixels;
 
     int grad_x = 0;
@@ -122,7 +144,8 @@ SDL_Surface* Orientation_Gradian (SDL_Surface* image)
                     , (Uint8)grad, (Uint8)grad, 255);
         }
     }
-
+    //need change modif in place
+    //SDL_FreeSurface(image);
     return image_converted;
 }
 
@@ -223,6 +246,7 @@ SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image,
 
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, width, 
             height, 32, format->format);
+
     Uint32* new_pixtab = image_converted->pixels;
 
     Uint32* pixtab_intensity = Intensity_Gradian_Image->pixels;
@@ -244,7 +268,9 @@ SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image,
                     , Intensity_Gradian_Image, x, y);
         }
     }
-
+    
+    //SDL_FreeSurface(Intensity_Gradian_Image);
+    //SDL_FreeSurface(Orientation_Gradian_Image);
     return image_converted;
 }
 
@@ -310,7 +336,8 @@ void Thresholdhysteresis(SDL_Surface* image)
     {
         for (int x = 0; x < width; x++) 
         {
-            SDL_GetRGBA(pixtab[y * width + x], format, &col, &trash, &trash, &trash);
+            SDL_GetRGBA(pixtab[y * width + x], format, &col, &trash, 
+                    &trash, &trash);
 
             if (col == 127)
             {
