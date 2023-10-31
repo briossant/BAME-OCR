@@ -7,8 +7,8 @@
 void MnistTraining(TrainingSettings settings) {
     printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
 
-    size_t number_of_layers = 3;
-    size_t layers_size[] = {INPUT_SIZE, 16, OUTPUT_SIZE};
+    size_t number_of_layers = 4;
+    size_t layers_size[] = {INPUT_SIZE, 32, 23, OUTPUT_SIZE};
     Network network = newNetwork(layers_size, number_of_layers);
 
     printNetwork(network);

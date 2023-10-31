@@ -61,7 +61,7 @@ void TrainNetwork(Network network, Matrix inputs, Matrix outputs,
         Network inertiaNetwork = copyAndResetNetwork(network);
 
         for (size_t j = 0; j < nbr_of_batch; j++) {
-            printf("\r〉%s [%3ld%%] ⌛", spinner[j / 10 % 10],
+            printf("\r〉%s [%3ld%%] ⌛", spinner[j / 42 % 10],
                    j * 100 / nbr_of_batch);
             fflush(stdout);
             err +=
