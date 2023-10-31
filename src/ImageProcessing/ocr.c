@@ -5,7 +5,8 @@
 //------------------------------
 
 //---Includes
-#include "ImageProcessing/ImageProcess.h"
+//#include "ImageProcessing/ImageProcess.h"
+#include "ImageProcess.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdlib.h>
@@ -23,12 +24,31 @@ void print_usage(char* argv0) { // TODO: improve
 
 void print_logo()
 {
-    printf("\n\n\n\n\n\n\n\n\n");
+    printf(
+        " ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
+    printf(
+        "▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
+    printf(
+        "▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
+    printf(
+        "▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
+    printf(
+        "░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
+    printf(
+        "░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
+    printf(
+        "▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
+    printf(
+        " ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
+    printf(
+        " ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
+    printf("      ░                                         ░                "
+           "\n\n\n");
 }
 
 void print_help() // TODO: improve
 {
-    printf("Usage: ocr [options] file...");
+    printf("Usage: ocr [options] file...\n");
 }
 
 SDL_Surface* SDL_Start(char* filename)
@@ -85,14 +105,32 @@ int parse(int argc, char** argv)
     }
     
     int k = 1;
+    // TODO: Optimazation with stack
+    int no_image_input = 1;
+    int no_image_output = 1;
 
-    SDL_Surface* image_converted = SDL_Start(argv[k]);
+    while(k < argc && no_image_input) //Check input
+    {
+        if (strcmp(argv[k], "-i") == 0 || strcmp(argv[k], "--input") == 0) //Input file
+        {
+            SDL_Surface* image_converted = SDL_Start(argv[k]);
+            no_image_input = 0;
+        }
+    }
+
+    if (no_image_input)
+    {
+        print_usage(char* argv[0]);
+    }
+    
+
+    k = 1;
 
     while (k < argc)
     {
         if (strcmp(argv[k], "-h") == 0 || strcmp(argv[k], "--help") == 0) //Help
         { 
-            print_help(argv[0]);
+            print_help();
             return 0;
         }
         else if (strcmp(argv[k], "-v") == 0 || strcmp(argv[k], "--version") == 0) //Version
@@ -128,15 +166,15 @@ int parse(int argc, char** argv)
         { 
             image_converted = Rotate(image_converted, 35);
         }
-        else if (strcmp(argv[k], "-c") == 0 || strcmp(argv[k], "--canny") == 0) //Canny
+        else if (strcmp(argv[k], "-ca") == 0 || strcmp(argv[k], "--canny") == 0) //Canny
         {
             Canny(image_converted);
         }
-        
-        
-
-
-        else
+        else if(strcmp(argv[k], "-i") == 0 || strcmp(argv[k], "--input") == 0 || strcmp(argv[k], "-o") == 0 || strcmp(argv[k], "--output") == 0)
+        {
+            // Do nothing
+        }
+        else //FIXME: input and output
         {
             printf("sdl: error: unrecognized command-line option '%s'\n", argv[k]);
             return 0;
@@ -144,7 +182,23 @@ int parse(int argc, char** argv)
         k++;
     }
 
-    SDL_Output(image_converted, argv[k]);
+    k = 1;
+
+    while(k < argc && no_image_output) //Check output
+    {
+        if (strcmp(argv[k], "-o") == 0 || strcmp(argv[k], "--output") == 0) //Output file
+        {
+            SDL_Output(image_converted, argv[k]);
+            no_image_output = 0;
+        }
+    }
+
+    if (no_image_output)
+    {
+        print_usage(char* argv[0]);
+    }
+
+
     return 0;
 }
 
