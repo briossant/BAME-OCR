@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-W -Wall -Wextra -Wformat=2 -O3#-pg -g
-LDFLAGS= -lm -O3 #-pg -g
+CFLAGS=-W -Wall -Wextra -Wformat=2 -g#-O3#-pg -g
+LDFLAGS= -lm -g #-O3 #-pg -g
 EXEC=xor
 SRC= $(wildcard *.c) $(wildcard matrices/*.c) 
 OBJ= $(SRC:.c=.o)
