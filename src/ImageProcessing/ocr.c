@@ -5,7 +5,8 @@
 //------------------------------
 
 //---Includes
-#include "ImageProcessing/ImageProcess.h"
+//#include "ImageProcessing/ImageProcess.h"
+#include "ImageProcess.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdlib.h>
@@ -28,7 +29,7 @@ void print_logo()
 
 void print_help() // TODO: improve
 {
-    printf("Usage: ocr [options] file...");
+    printf("Usage: ocr [options] file...\n");
 }
 
 SDL_Surface* SDL_Start(char* filename)
@@ -92,7 +93,7 @@ int parse(int argc, char** argv)
     {
         if (strcmp(argv[k], "-h") == 0 || strcmp(argv[k], "--help") == 0) //Help
         { 
-            print_help(argv[0]);
+            print_help();
             return 0;
         }
         else if (strcmp(argv[k], "-v") == 0 || strcmp(argv[k], "--version") == 0) //Version
@@ -128,14 +129,10 @@ int parse(int argc, char** argv)
         { 
             image_converted = Rotate(image_converted, 35);
         }
-        else if (strcmp(argv[k], "-c") == 0 || strcmp(argv[k], "--canny") == 0) //Canny
+        else if (strcmp(argv[k], "-ca") == 0 || strcmp(argv[k], "--canny") == 0) //Canny
         {
             Canny(image_converted);
         }
-        
-        
-
-
         else
         {
             printf("sdl: error: unrecognized command-line option '%s'\n", argv[k]);
@@ -144,7 +141,7 @@ int parse(int argc, char** argv)
         k++;
     }
 
-    SDL_Output(image_converted, argv[k]);
+    SDL_Output(image_converted, argv[k]); // FIXME : no image
     return 0;
 }
 
