@@ -66,7 +66,7 @@ void save(char *filepath) {
     printf("saving\n");
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
-    // SaveNetwork( network,filepath);
+     SaveNetwork( network,filepath);
 }
 
 void load(char *filepath) {
