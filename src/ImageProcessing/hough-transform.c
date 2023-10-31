@@ -35,7 +35,7 @@ int hough_transform(SDL_Surface * image, int pas)
 
     int rho = 0;
 
-    float rad = M_PI/180;
+    float rad = (M_PI/180);
 
     for (int y = 0; y<image->h; ++y) 
     {
@@ -45,10 +45,10 @@ int hough_transform(SDL_Surface * image, int pas)
 
             if (r==255) 
             {
-               for (int theta=0; theta<180; theta+=pas) 
+               for (int theta=0; theta<180; ++theta) 
                {
-                    rho = x*cosf((float)theta*rad) 
-                        + (image->h-y)*sinf((float)theta*rad);
+                    rho = x*cosf((float)((theta))*rad) 
+                        + y*sinf((float)((theta))*rad);
                     
                     SDL_GetRGBA(mat[theta*matrice->w+rho], format, &r1
                             , &g1, &b1, &a1);

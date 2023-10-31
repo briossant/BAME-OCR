@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     //image_converted = Supp_Maxima(image_converted, image_converted1);
     //Thresholdhysteresis(image_converted);
     image_converted = Canny(image_converted);
-    hough_transform(image_converted, 1);
+    hough_transform(image_converted, 45);
     //GaussianBlur(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
