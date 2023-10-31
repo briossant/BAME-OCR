@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_surface.h>
 #include <err.h>
+#include <math.h>
 
 int main(int argc, char *argv[])
 {
