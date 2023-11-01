@@ -43,7 +43,7 @@ int hough_transform(SDL_Surface * image, char* output_file, int pas)
         {
             SDL_GetRGBA(pixtab[y*image->w + x], format, &r, &g, &b, &a);
 
-            if (r==255) 
+            if (r!=0) 
             {
                for (int theta=0; theta<180; ++theta) 
                {
@@ -53,8 +53,8 @@ int hough_transform(SDL_Surface * image, char* output_file, int pas)
                     SDL_GetRGBA(mat[theta*matrice->w+rho], format, &r1
                             , &g1, &b1, &a1);
 
-                    mat[theta*matrice->w+rho] = SDL_MapRGBA(format, r1+1, 
-                            g1+1, b1+1, 255);
+                    mat[theta*matrice->w+rho] = SDL_MapRGBA(format, r1+2, 
+                            g1+2, b1+2, 255);
                }
             } 
         }

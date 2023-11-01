@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     hough_transform(image_converted, "tmp.png", 5);
     //draw_line(image_converted, 0, 371, 497, 0);
     
-    SDL_Surface* tmp = NULL;
+    /*SDL_Surface* tmp = NULL;
     tmp = IMG_Load("tmp.png");
     if (tmp == NULL) 
     {
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    draw_hough_line(image_converted, tmp, 10);
+    draw_hough_line(image_converted, tmp, 10);*/
     //GaussianBlur(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
