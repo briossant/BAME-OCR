@@ -12,6 +12,7 @@ void PrintUsage(Network *network, size_t argc) {
 
     printf("\n🟢 Usage:\n");
     printf("〉help : show this message\n");
+    printf("〉quit : exit program\n");
     printf("〉new [hidden layer size] ... : create a new network\n");
     printf("〉train [learning rate] [epochs] [inertia strength] : train the "
            "network\n");
@@ -42,7 +43,8 @@ void loadXOR(Network *network, size_t argc) {
 
     printf("Loading isn't operational yet.\n");
     return;
-    // *network = LoadNetwork(strtok(NULL, " "));
+    // freeNetwork(*network);
+    //  *network = LoadNetwork(strtok(NULL, " "));
 }
 
 void CreateNetwork(Network *network, size_t argc) {
@@ -58,8 +60,10 @@ void CreateNetwork(Network *network, size_t argc) {
             printf("Layer sizes must be positive integer.\n");
         }
     }
+    freeNetwork(*network);
     *network = newNetwork(layers_size, argc + 2);
     printNetwork(*network);
+    free(layers_size);
 }
 
 void trainXOR(Network *network, size_t argc) {
@@ -94,6 +98,8 @@ void testXOR(Network *network, size_t argc) {
 
     printf("\n*** 🔴 prediction: %d (real: %lf) ***\n\n",
            (int)(res.mat[0][0] + 0.5), res.mat[0][0]);
+    MatFree(mat);
+    MatFree(res);
 }
 
 struct parseEl {
@@ -127,6 +133,10 @@ int main(void) {
         size_t argc = GetArgc(input);
         char *cmd_name = strtok(input, " ");
 
+        // exit if requested
+        if (strcmp(cmd_name, "quit") == 0)
+            break;
+
         // exec command or print error
         size_t i = 0;
         while (i < CMD_COUNT && strcmp(cmd_name, parseList[i].cmd_name) != 0)
@@ -140,5 +150,7 @@ int main(void) {
 
         free(input);
     }
+    freeNetwork(*network);
+    printf("Goodbye!\n");
     return 0;
 }
