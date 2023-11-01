@@ -1,10 +1,20 @@
 #include "NeuralNetwork.h"
+#include "precision.h"
 #include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-
+NNValue* matrix_to_array(Matrix mat)
+{
+    NNValue* array = (NNValue *)malloc(sizeof(NNValue)*(mat.h*mat.w));
+     for (size_t i = 0; i < mat.w; ++i) {
+            for (size_t j = 0; j < mat.h; j++) {
+                array[ i*mat.h + j ]= mat.mat[i][j];
+            }
+        }
+     return array;
+}
 void SaveNetwork(Network network, char* filepath)
 {
    FILE * file= fopen( filepath, "w"); // this will clear the file so we can write on it, 
@@ -18,9 +28,24 @@ void SaveNetwork(Network network, char* filepath)
    }
    
    fprintf(file, "NN** %ld %ld \n", network.input_size,network.depth);
-   for (size_t i=0; i<network.input_size; i++)
+   for (size_t i=0; i<network.depth; i++)
    {
-       fprintf(file,"%ld size: %ld \n", i, network.layers[i].size);
+       fprintf(file,"Layer %ld\nWeights:", i);
+        NNValue * weights = matrix_to_array(network.layers[i].weights);
+        for (size_t k=0; k<network.layers[i].weights.w* network.layers[i].weights.h; k++)
+        {
+            fprintf(file, "%lf ",weights[k]);
+        }
+        free(weights);
+            fprintf(file,"\nBiases:");
+        NNValue * biases = matrix_to_array(network.layers[i].weights);
+        for (size_t k=0; k<network.layers[i].weights.w* network.layers[i].weights.h; k++)
+        {
+            fprintf(file, "%lf ",biases[k]);
+        }
+
+        fprintf(file,"\n");
+        free(biases);
    }
    fflush(file);
    fclose(file);
@@ -84,9 +109,10 @@ double* get_numbers ( char* str)
     
     int input_size = numbers[0];
     int depth_layer= numbers[1]; 
-    // D fois 
-    // layer size L
-    // node l fois
+    // depth layers = number of layers, size of layers[] 
+    //Layers size-> number of nods 
+    //width of biases 
+    //height of biases 
     //remember to free(numbers) every single time
     // -1?? beacuse the input layer isn't a proper layer  
     Layer *layers = malloc(sizeof(Layer) * numbers[depth_layer]); // the array needs to be created before
@@ -101,9 +127,6 @@ double* get_numbers ( char* str)
         int i=0;
         l++;
         //create the new layer with layer size then put all the nods inside
-        Node* nods = malloc ( sizeof (Node) * layer_size);
-        while (layer_size>0 && fgets(line, l, file)!= NULL)
-        {   
             int n=0;
             if (line != NULL)
             {
@@ -127,7 +150,7 @@ double* get_numbers ( char* str)
                 
             }
 
-            layers[i]=new_layer( nods, layer_size);
+            layers[i]=new_layer(layer_size);
             i++;
         }
         
