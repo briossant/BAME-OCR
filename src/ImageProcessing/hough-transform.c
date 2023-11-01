@@ -148,25 +148,7 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
                 int y2 = rho*sin(theta)-R*cos(theta);
                 
     
-              /* 
-                if (x1<0) 
-                {
-                    x1 = 0;
-                }
-                if (x2<0) 
-                {
-                    x2 = 0;
-                }
-                if (y1<0) 
-                {
-                    y1 = 0;
-                }
-                if (y2<0) 
-                {
-                    y2 = 0;
-                }
-*/
-                printf("x1= %d  y1= %d  x2= %d  y2= %d\n",x1,y1,x2,y2);
+                //printf("x1= %d  y1= %d  x2= %d  y2= %d\n",x1,y1,x2,y2);
 
 
                 draw_line(image, x1, y1, x2, y2);
@@ -176,9 +158,3 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
     }
 
 }
-
-
-
-
-
-
