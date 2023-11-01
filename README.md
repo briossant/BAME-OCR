@@ -24,7 +24,7 @@ Details on those below.
 
 ### Image processing
 
-The image processing can be found under src/NeuralNetwork/ 
+The image processing can be found under ```src/ImageProcessing/```
 
 Run ```make``` to compile and then ```./ImageProcess``` to enter the CLI.
 The program doesn't take any arguments.
@@ -47,19 +47,19 @@ CLI usage:
 
 ### XOR Neural Network
 
-The neural network can be found under src/NeuralNetwork/ 
+The neural network can be found under ```src/NeuralNetwork/```
 
 Run ```make``` to compile and then ```./xor``` to enter the CLI.
 The program doesn't take any arguments.
 
 CLI usage:
 
-* 〉help : show this message
-* 〉new [hidden layer size] ...: create a new network
-* 〉train [learning rate] [epochs] [inertia strength]: train the network
-* 〉run [0 or 1] [0 or 1]: run the prediction on those inputs
-* 〉save [filename]: save the network
-* 〉load [filename]: load the network
+* 〉 help : show this message
+* 〉 new [hidden layer size] ... : create a new network
+* 〉 train [learning rate] [epochs] [inertia strength]: train the network
+* 〉 run [0 or 1] [0 or 1]: run the prediction on those inputs
+* 〉 save [filename]: save the network
+* 〉 load [filename]: load the network
 
 
 ### Sudoku solver
