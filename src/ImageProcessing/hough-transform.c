@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-SDL_surface* hough_transform(SDL_Surface * image, int pas)
+int hough_transform(SDL_Surface * image, char* output_file, int pas)
 {
     int R = sqrt(image->h*image->h+image->w*image->w);
 
@@ -60,10 +60,12 @@ SDL_surface* hough_transform(SDL_Surface * image, int pas)
         }
     }
 
-    if (IMG_SavePNG(matrice, "hough_transform.png") != 0) 
+    
+    if (IMG_SavePNG(matrice, "tmp.png") != 0) 
     {
         printf("Error when trying to save the image : %s\n", IMG_GetError());
     }
+    
 
     return 1;
 }
@@ -141,11 +143,19 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
             
             if (r>seuil) 
             {
-                
+               int a = cos(y);
+               int b = sin(y);
+               int x0 = a * x;
+               int y0 = b * x;
+
+               int x1 = x0 + R*(-b);
+               int y1 = y0 + R*(a);
+               int x2 = x0 - R*(-b);
+               int y2 = y0 - R*(a);
+
+               draw_line(image, abs(x1), abs(y1), abs(x2), abs(y2));
             }
             
-            mat[y*hough_pic->w + x] = SDL_MapRGBA(image->format, 0, 
-                    0, 0, 255);
         }
     }
 

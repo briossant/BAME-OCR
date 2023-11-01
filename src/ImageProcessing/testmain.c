@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
-//    SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
+    SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
 
@@ -44,8 +44,18 @@ int main(int argc, char *argv[])
     //image_converted = Supp_Maxima(image_converted, image_converted1);
     //Thresholdhysteresis(image_converted);
 //    image_converted = Canny(image_converted);
-    hough_transform(image_converted, 5);
+    hough_transform(image_converted, "tmp.png", 5);
     //draw_line(image_converted, 0, 371, 497, 0);
+    
+    SDL_Surface* tmp = NULL;
+    tmp = IMG_Load("tmp.png");
+    if (tmp == NULL) 
+    {
+        printf("Can't load image : %s\n", IMG_GetError());
+        return 0;
+    }
+
+    draw_hough_line(image_converted, tmp, 10);
     //GaussianBlur(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
@@ -54,7 +64,7 @@ int main(int argc, char *argv[])
     }
 
     SDL_FreeSurface(image_converted);
-//    SDL_FreeSurface(image_converted1);
+    SDL_FreeSurface(image_converted1);
 
     IMG_Quit();
     SDL_Quit();
