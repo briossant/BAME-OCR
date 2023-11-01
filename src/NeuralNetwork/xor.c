@@ -4,15 +4,20 @@
 
 #define INPUT_LAYER_SIZE 2
 #define OUTPUT_LAYER_SIZE 1
-#define CMD_COUNT 4
+#define CMD_COUNT 6
 
 void PrintUsage(Network *network, size_t argc) {
-    printf("Usage:\n");
+    (void)network;
+    (void)argc;
+
+    printf("\n🟢 Usage:\n");
     printf("〉help : show this message\n");
     printf("〉new [hidden layer size] ... : create a new network\n");
     printf("〉train [learning rate] [epochs] [inertia strength] : train the "
            "network\n");
     printf("〉run [0 or 1] [0 or 1] : run the prediction on those inputs\n");
+    printf("〉save [filename] : save the network\n");
+    printf("〉load [filename] : load the network\n");
     printf("\n");
 }
 
@@ -23,6 +28,21 @@ size_t GetArgc(char *input) {
         if (*(p++) == ' ')
             ++res;
     return res;
+}
+
+void saveXOR(Network *network, size_t argc) {
+    (void)argc;
+
+    SaveNetwork(*network, strtok(NULL, " "));
+}
+
+void loadXOR(Network *network, size_t argc) {
+    (void)network;
+    (void)argc;
+
+    printf("Loading isn't operational yet.\n");
+    return;
+    // *network = LoadNetwork(strtok(NULL, " "));
 }
 
 void CreateNetwork(Network *network, size_t argc) {
@@ -43,6 +63,8 @@ void CreateNetwork(Network *network, size_t argc) {
 }
 
 void trainXOR(Network *network, size_t argc) {
+    (void)argc;
+
     size_t trSetSize = 4;
     Matrix inputsm = MatInit(trSetSize, 2, 0, "inputs");
     Matrix outputsm = MatInit(trSetSize, 1, 0, "outputs");
@@ -62,13 +84,16 @@ void trainXOR(Network *network, size_t argc) {
 }
 
 void testXOR(Network *network, size_t argc) {
+    (void)argc;
+
     Matrix mat = MatInit(1, 2, 0, "input");
     mat.mat[0][0] = atoi(strtok(NULL, " "));
     mat.mat[0][1] = atoi(strtok(NULL, " "));
 
     Matrix res = Propagate(mat, *network);
 
-    MatPrint(res);
+    printf("\n*** 🔴 prediction: %d (real: %lf) ***\n\n",
+           (int)(res.mat[0][0] + 0.5), res.mat[0][0]);
 }
 
 struct parseEl {
@@ -77,10 +102,9 @@ struct parseEl {
     void (*fct)(Network *network, size_t argc);
 };
 
-struct parseEl parseList[] = {{"help", 0, PrintUsage},
-                              {"new", 0, CreateNetwork},
-                              {"train", 3, trainXOR},
-                              {"run", 2, testXOR}};
+struct parseEl parseList[] = {
+    {"help", 0, PrintUsage}, {"new", 0, CreateNetwork}, {"train", 3, trainXOR},
+    {"run", 2, testXOR},     {"save", 1, saveXOR},      {"load", 1, loadXOR}};
 
 int main(void) {
     PrintTitle();
@@ -93,7 +117,7 @@ int main(void) {
         char *input = NULL;
         size_t len = 0;
         printf("〉");
-        if (getline(&input, &len, stdin) == 1)
+        if (getline(&input, &len, stdin) <= 1)
             continue;
 
         // remove trailing newline from user inputs
