@@ -45,10 +45,10 @@ SDL_Surface* hough_transform(SDL_Surface * image, int pas)
 
             if (r!=0) 
             {
-               for (int theta=0; theta<180; ++theta) 
+               for (int theta=0; theta<180; theta+=pas) 
                {
-                    rho = x*cosf((float)theta*rad) 
-                        + y*sinf((float)theta*rad);
+                    rho = x*cosf((float)theta) 
+                        + y*sinf((float)theta);
                     
                     SDL_GetRGBA(mat[theta*matrice->w+rho], format, &r1
                             , &g1, &b1, &a1);
@@ -98,10 +98,14 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
 
     while (current_x != x2 || current_y != y2) 
     {
-        Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
-            + current_x * 4;
+        if (current_x >=0 && current_x < image->w 
+                && current_y >= 0 && current_y < image->h) 
+        {
+            Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
+                + current_x * 4;
 
-        *(Uint32 *)pixel = color;
+            *(Uint32 *)pixel = color;
+        }
 
         int err2 = 2 * err;
         if (err2 > -dy) 
@@ -115,8 +119,9 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
             current_y += sy;
         }
     }
-
 }
+
+
 
 void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
 { 
@@ -128,24 +133,22 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
 
     Uint8 r,g,b,a;
 
-    for (int y = 0; y<hough_pic->h; ++y) 
+    for (int theta = 0; theta<hough_pic->h; ++theta) 
     {
-        for (int x =0; x<hough_pic->w; ++x) 
+        for (int rho =0; rho<hough_pic->w; ++rho) 
         {
-            SDL_GetRGBA(mat[y*hough_pic->w +x],format, &r, &g, &b, &a);
+            SDL_GetRGBA(mat[theta*hough_pic->w +rho],format, &r, &g, &b, &a);
             
             if (r>seuil) 
             {
-               int a = cos(y);
-               int b = sin(y);
-               int x0 = a * x;
-               int y0 = b * x;
-
-               int x1 = x0 + R*(-b);
-               int y1 = y0 + R*(a);
-               int x2 = x0 - R*(-b);
-               int y2 = y0 - R*(a);
-               
+                
+                int x1 = rho*cos(theta)-R*sin(theta);
+                int y1 = rho*sin(theta)+R*cos(theta);
+                int x2 = rho*cos(theta)+R*sin(theta);
+                int y2 = rho*sin(theta)-R*cos(theta);
+                
+    
+              /* 
                 if (x1<0) 
                 {
                     x1 = 0;
@@ -162,16 +165,16 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
                 {
                     y2 = 0;
                 }
-
+*/
                 printf("x1= %d  y1= %d  x2= %d  y2= %d\n",x1,y1,x2,y2);
 
-               draw_line(image, x1, y1, x2, y2);
+
+                draw_line(image, x1, y1, x2, y2);
             }
             
         }
     }
 
-               IMG_SavePNG(image, "tmp2.png");
 }
 
 
