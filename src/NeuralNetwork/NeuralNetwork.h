@@ -74,7 +74,9 @@ void freeNetwork(Network network);
 // loadMnist.c
 void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining);
 // don't forget to init rand() with srand(time(NULL));
-void MnistTraining(TrainingSettings settings);
+void MnistTraining(TrainingSettings settings, Network network);
+
+void MnistTesting(Network network);
 
 ////////////////////////////////////
 // Propagation

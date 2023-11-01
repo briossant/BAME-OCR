@@ -4,12 +4,23 @@
 #define INPUT_SIZE 28 * 28
 #define OUTPUT_SIZE 10
 
-void MnistTraining(TrainingSettings settings) {
-    printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
+void MnistTesting(Network network) {
 
-    size_t number_of_layers = 4;
-    size_t layers_size[] = {INPUT_SIZE, 32, 23, OUTPUT_SIZE};
-    Network network = newNetwork(layers_size, number_of_layers);
+    Matrix inputs;
+    Matrix outputs;
+    LoadMnist(&inputs, &outputs, False);
+
+    NNValue final_value = TestPropagation(inputs, outputs, network);
+
+    MatFree(inputs);
+    MatFree(outputs);
+    printf("//////////////////////////////////////////////////////////////////"
+           "\n\n");
+    printf("*** 🔴 Success rate: %f %% ***\n\n", final_value);
+}
+
+void MnistTraining(TrainingSettings settings, Network network) {
+    printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
 
     printNetwork(network);
     printf("\n");
@@ -20,12 +31,6 @@ void MnistTraining(TrainingSettings settings) {
     settings.nbr_of_inputs = inputs.w;
 
     TrainNetwork(network, inputs, outputs, settings);
-
-    LoadMnist(&inputs, &outputs, False);
-
-    NNValue final_value = TestPropagation(inputs, outputs, network);
-
-    printf("//////////////////////////////////////////////////////////////////"
-           "\n\n");
-    printf("*** Final accuracy: %f %% ***\n\n", final_value);
+    MatFree(inputs);
+    MatFree(outputs);
 }
