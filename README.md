@@ -50,19 +50,19 @@ The program doesn't take any arguments.
 
 CLI usage:
 
-* a, all                   Apply all the filters for the OCR
-* i, input [filename]      Input file
-* o, output [filename]     Output file
-* h, help                  Display this help message
-* v, version               Display version information
-* g, greyscale             Convert the image to grayscale
-* bw, blackwhite           Convert the image to black and white
-* c, contrast              Adjust the image contrast
-* gb, gaussianblur         Apply Gaussian blur to the image
-* b, bright                Adjust the image brightness
-* ag, arroundgaussianblur  Apply Gaussian blur to the image
-* r, rotate [angle]        Rotate the image
-* ca, canny                Apply Canny filters to the image
+* a, all: Apply all the filters for the OCR
+* i, input [filename]: Input file
+* o, output [filename]: Output file
+* h, help: Display this help message
+* v, version: Display version information
+* g, greyscale: Convert the image to grayscale
+* bw, blackwhite: Convert the image to black and white
+* c, contrast: Adjust the image contrast
+* gb, gaussianblur: Apply Gaussian blur to the image
+* b, bright: Adjust the image brightness
+* ag, arroundgaussianblur: Apply Gaussian blur to the image
+* r, rotate [angle]: Rotate the image
+* ca, canny: Apply Canny filters to the image
 
 ### XOR Neural Network
 
@@ -74,11 +74,11 @@ The program doesn't take any arguments.
 CLI usage:
 
 * 〉help : show this message
-* 〉new [hidden layer size] ... : create a new network
-* 〉train [learning rate] [epochs] [inertia strength] : train the network
-* 〉run [0 or 1] [0 or 1] : run the prediction on those inputs
-* 〉save [filename] : save the network
-* 〉load [filename] : load the network
+* 〉new [hidden layer size] ...: create a new network
+* 〉train [learning rate] [epochs] [inertia strength]: train the network
+* 〉run [0 or 1] [0 or 1]: run the prediction on those inputs
+* 〉save [filename]: save the network
+* 〉load [filename]: load the network
 
 
 ### Sudoku solver
