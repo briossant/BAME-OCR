@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-W -Wall -Wextra -O0 -g
+CFLAGS=-W -Wall -Wextra -O3 # -g
 LDFLAGS= -lSDL2 -lGL -lSDL2_image -lm 
 EXEC=test
 SRC= $(wildcard *.c)
