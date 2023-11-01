@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-int hough_transform(SDL_Surface * image, int pas)
+SDL_surface* hough_transform(SDL_Surface * image, int pas)
 {
     int R = sqrt(image->h*image->h+image->w*image->w);
 
@@ -67,3 +67,92 @@ int hough_transform(SDL_Surface * image, int pas)
 
     return 1;
 }
+
+void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
+{
+    SDL_LockSurface(image);
+
+    Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int sx, sy;
+
+    if (x1 < x2) 
+    {
+        sx = 1;
+    } 
+    else 
+    {
+        sx = -1;
+    }
+
+    if (y1 < y2) 
+    {
+        sy = 1;
+    } 
+    else 
+    {
+        sy = -1;
+    }
+
+    int err = dx - dy;
+    int current_x = x1;
+    int current_y = y1;
+
+    while (current_x != x2 || current_y != y2) 
+    {
+        Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
+            + current_x * 4;
+
+        *(Uint32 *)pixel = color;
+
+        int err2 = 2 * err;
+        if (err2 > -dy) 
+        {
+            err -= dy;
+            current_x += sx;
+        }
+        if (err2 < dx) 
+        {
+            err += dx;
+            current_y += sy;
+        }
+    }
+
+    SDL_UnlockSurface(image);
+}
+
+void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
+{ 
+    int R = sqrt(image->h*image->h+image->w*image->w);
+
+    const SDL_PixelFormat* format = image->format;
+
+    Uint32* mat = hough_pic->pixels;
+
+    Uint8 r,g,b,a;
+
+    for (int y = 0; y<hough_pic->h; ++y) 
+    {
+        for (int x =0; x<hough_pic->w; ++x) 
+        {
+            SDL_GetRGBA(mat[y*hough_pic->w +x],format, &r, &g, &b, &a);
+            
+            if (r>seuil) 
+            {
+                
+            }
+            
+            mat[y*hough_pic->w + x] = SDL_MapRGBA(image->format, 0, 
+                    0, 0, 255);
+        }
+    }
+
+}
+
+
+
+
+
+

@@ -33,3 +33,5 @@ void Thresholdhysteresis(SDL_Surface* image);
 Uint8 ComputeSeuil(SDL_Surface* image);
 
 int hough_transform(SDL_Surface* image, int pas);
+
+void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2);
