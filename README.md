@@ -10,36 +10,17 @@ its CLI, an image processing unit with its CLI and a sudoku solver.
 ## Installation & Requirements
 
 Just clone the master branch for setup.
-The program is written in c and requires the SDL and SDL-image packages.
+
+The program is written in c and requires the SDL2 and SDL2-image packages.
+
 The program is only tested on linux with the gcc compiler.
 
 ## Usage
 
-For the moment every step of the Sudoku solver is separated.
-Run the application in your preferred terminal using the following command:
+Since the project isn't finished, only the sub-program can be used separatly.
+Each of them can be found under ```src/[sub-program name]/```.
 
-You have a Makefile you can use, with the commands clean and all. The Make
-function on it's own will display the "help" menu on the Terminal for you to
-know what arguments to use in function of what you wish to do.
-
-The following arguments are recognised by the make command:
-* 
-*
-*
-*
-*
-### Output:
-
-Outputs for the moment are independent, the outputs vary depending on the
-function you execute. 
- 
-These should be the following outputs:
-
-*
-*
-*
-*
-*
+Details on those below.
 
 ### Image processing
 
