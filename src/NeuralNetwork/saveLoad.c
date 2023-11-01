@@ -30,7 +30,7 @@ void SaveNetwork(Network network, char* filepath)
    fprintf(file, "NN** %ld %ld \n", network.input_size,network.depth);
    for (size_t i=0; i<network.depth; i++)
    {
-       fprintf(file,"Layer %ld\nWeights:", i);
+       fprintf(file,"Layer %ld\nLayer Size:%ld\nWeights:", i, network.layers[i].size);
         NNValue * weights = matrix_to_array(network.layers[i].weights);
         for (size_t k=0; k<network.layers[i].weights.w* network.layers[i].weights.h; k++)
         {
