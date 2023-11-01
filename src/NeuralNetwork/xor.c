@@ -66,12 +66,13 @@ void save(char *filepath) {
     printf("saving\n");
     size_t layers_size[] = {2, 4, 2};
     Network network = newNetwork(layers_size, 3);
-     SaveNetwork( network,filepath);
+    SaveNetwork( network,filepath);
 }
 
-void load(char *filepath) {
+Network load(char *filepath) {
     printf("loading\n");
-    // Network network = LoadNetwork(filepath);
+    Network network=LoadNetwork(filepath);
+    return network;
 }
 
 void solve(char input[2]) {

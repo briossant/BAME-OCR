@@ -1,10 +1,12 @@
 #include "NeuralNetwork.h"
+#include "matrices/matrices.h"
 #include "precision.h"
 #include <iso646.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define BUFFER_SIZE 200;
 NNValue* matrix_to_array(Matrix mat)
 {
     NNValue* array = (NNValue *)malloc(sizeof(NNValue)*(mat.h*mat.w));
@@ -14,6 +16,17 @@ NNValue* matrix_to_array(Matrix mat)
             }
         }
      return array;
+}
+
+Matrix array_to_matrix(double* array, size_t w, size_t h) 
+{
+        Matrix copy = MatInit(w, h, 0.0, "FromLoad");
+        for (size_t i = 0; i < w; i++) {
+            for (size_t j = 0; j < h; j++)
+                copy.mat[i][j]=array[ i*h + j ];
+        }
+   
+        return copy;
 }
 void SaveNetwork(Network network, char* filepath)
 {
@@ -80,7 +93,7 @@ double* get_numbers ( char* str)
     return numbers;
 }
 
-/*Network LoadNetwork(char *filepath)
+Network LoadNetwork(char *filepath)
 {
 
     FILE * file= fopen( filepath, "r");  
@@ -90,90 +103,49 @@ double* get_numbers ( char* str)
         printf ("Error this file does not exist or can't be opened\n");
         exit(1);
     }
-    int l=0;
-    char* line;
-
-    fgets(line,l, file);
-
-    if (line == NULL) { 
+    char line[200];
+    if (fgets(line, 200, file)== NULL) { 
         printf("The file was empty\n");
         exit(1); 
-    }       
+    }
 
-    double* numbers = get_numbers(line);
-    if ( sizeof(numbers) < 2)
+    double* numbers =get_numbers(line);
+    if (sizeof(numbers)<2)
     {
-        printf ("there was no size or depth for the network\n"); 
+        printf("There was not enough parameters for the depth and input, or way too much for the network");
         exit(1);
     }
-    
-    int input_size = numbers[0];
-    int depth_layer= numbers[1]; 
-    // depth layers = number of layers, size of layers[] 
-    //Layers size-> number of nods 
-    //width of biases 
-    //height of biases 
-    //remember to free(numbers) every single time
-    // -1?? beacuse the input layer isn't a proper layer  
-    Layer *layers = malloc(sizeof(Layer) * numbers[depth_layer]); // the array needs to be created before
-    
-    size_t D = numbers[1];
-    l++;
-    while ( D>0 && fgets(line, l, file)!= NULL)
-    {
-        numbers = get_numbers(line);
-        // new layer put layer size L 
-        size_t layer_size = numbers[0];
-        int i=0;
-        l++;
-        //create the new layer with layer size then put all the nods inside
-            int n=0;
-            if (line != NULL)
-            {
-                numbers=get_numbers(line);
-                int node_weight= (int)numbers[0];
-                double node_bias= numbers[1];
-                l++;
-                double* weight = malloc(sizeof(double) * node_weight);
-                if ( fgets(line, l , file)!= NULL)
-                {
-                    numbers= get_numbers(line);
-                    for (int i=0; i<node_weight; i++)
-                    {
-                        weight[i]=numbers[i];
-                    }
-                }
-                nods[n]=new_node(node_weight, weight, node_bias);
-                n++;
-                layer_size--;
-                l++;
-                
-            }
-
-            layers[i]=new_layer(layer_size);
-            i++;
-        }
-        
-
-        if (layer_size!=0)
+    double input_size= numbers[0];
+    double depth_layer=numbers[1];
+    Layer* layers = (Layer*)malloc(sizeof(Layer)*depth_layer); 
+    while (fgets(line, 200, file)!= NULL) { 
+        double* number_of_layer =get_numbers(line);
+        double* size_of_layer =get_numbers(fgets(line,200,file));
+        if (fgets(line, 200, file)==NULL) 
         {
-            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layer\n", layer_size, D);
+            printf("error on weights");
             exit(1);
         }
-        D--;
-        l++;
+        Matrix weights =array_to_matrix(get_numbers(line), size_of_layer[0],depth_layer );
+        if (fgets(line, 200, file)==NULL) 
+        {
+            printf("error on biases");
+            exit(1);
+        }
+        Matrix biases =array_to_matrix(get_numbers(line), 1,depth_layer );
+        Layer layer;{
+        layer.biases=biases;
+        layer.weights=weights;
+        layer.size= size_of_layer[0];
+        }
+        layers[(int)number_of_layer[0]]=layer;
     }
-    if (D!=0)
-    {
-        printf( "the file did not have all the Layers, stoped at %ld layer\n",D); 
-        exit(1);
-    }
-    
     Network network = { // this is the new Network declaration
-        .input_size = input_size, 
+        .input_size =input_size, 
         .depth = depth_layer,
         .layers = layers
     };  
     return network;
-}*/
+
+}
 
