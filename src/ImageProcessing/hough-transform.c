@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-int hough_transform(SDL_Surface * image, char* output_file, int pas)
+SDL_Surface* hough_transform(SDL_Surface * image, int pas)
 {
     int R = sqrt(image->h*image->h+image->w*image->w);
 
@@ -47,8 +47,8 @@ int hough_transform(SDL_Surface * image, char* output_file, int pas)
             {
                for (int theta=0; theta<180; ++theta) 
                {
-                    rho = x*cosf((float)((theta))*rad) 
-                        + y*sinf((float)((theta))*rad);
+                    rho = x*cosf((float)theta*rad) 
+                        + y*sinf((float)theta*rad);
                     
                     SDL_GetRGBA(mat[theta*matrice->w+rho], format, &r1
                             , &g1, &b1, &a1);
@@ -60,19 +60,13 @@ int hough_transform(SDL_Surface * image, char* output_file, int pas)
         }
     }
 
+    IMG_SavePNG(matrice, "tmp.png");
     
-    if (IMG_SavePNG(matrice, "tmp.png") != 0) 
-    {
-        printf("Error when trying to save the image : %s\n", IMG_GetError());
-    }
-    
-
-    return 1;
+    return matrice;
 }
 
 void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
 {
-    SDL_LockSurface(image);
 
     Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
 
@@ -122,7 +116,6 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
         }
     }
 
-    SDL_UnlockSurface(image);
 }
 
 void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
@@ -152,13 +145,33 @@ void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
                int y1 = y0 + R*(a);
                int x2 = x0 - R*(-b);
                int y2 = y0 - R*(a);
+               
+                if (x1<0) 
+                {
+                    x1 = 0;
+                }
+                if (x2<0) 
+                {
+                    x2 = 0;
+                }
+                if (y1<0) 
+                {
+                    y1 = 0;
+                }
+                if (y2<0) 
+                {
+                    y2 = 0;
+                }
 
-               draw_line(image, abs(x1), abs(y1), abs(x2), abs(y2));
+                printf("x1= %d  y1= %d  x2= %d  y2= %d\n",x1,y1,x2,y2);
+
+               draw_line(image, x1, y1, x2, y2);
             }
             
         }
     }
 
+               IMG_SavePNG(image, "tmp2.png");
 }
 
 

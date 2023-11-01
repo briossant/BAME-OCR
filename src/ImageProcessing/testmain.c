@@ -44,18 +44,9 @@ int main(int argc, char *argv[])
     //image_converted = Supp_Maxima(image_converted, image_converted1);
     //Thresholdhysteresis(image_converted);
 //    image_converted = Canny(image_converted);
-    hough_transform(image_converted, "tmp.png", 5);
+    SDL_Surface* tmp = hough_transform(image_converted, 5);
     //draw_line(image_converted, 0, 371, 497, 0);
-    
-    /*SDL_Surface* tmp = NULL;
-    tmp = IMG_Load("tmp.png");
-    if (tmp == NULL) 
-    {
-        printf("Can't load image : %s\n", IMG_GetError());
-        return 0;
-    }
-
-    draw_hough_line(image_converted, tmp, 10);*/
+    draw_hough_line(image_converted, tmp, 30);
     //GaussianBlur(image_converted);
 
     if (IMG_SavePNG(image_converted, argv[2]) != 0) 
