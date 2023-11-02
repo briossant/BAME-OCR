@@ -26,7 +26,7 @@ size_t GetArgc(char *input) {
     char *p = input;
     size_t res = 0;
     while (*p != 0)
-        if (*(p++) == ' ')
+        if (*(p++) == ' ' && *p != ' ' && *p != 0)
             ++res;
     return res;
 }
