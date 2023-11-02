@@ -64,16 +64,16 @@ CLI usage:
 
 ### Sudoku solver
 
-The Sudoku solver can be found undre ```src/SudokuSolver```
+The Sudoku solver can be found under ```src/SudokuSolver```
 
-Run ```make``` to compile and then use ```./solver <grid>``` to solve the grid
+Run ```make``` to compile and then use ```./solver <filename>``` to solve the grid in the corresponding file.
 
 The grid file need to be a texte file, with extension or not, as you choose.
 
-The solver only accept to format of grid. The format like ```grid_00``` and ```grid_01```
-The solver print the original grid without modification and solution and it print the solved grid
+The solver only accept two format of grid, as shown in ```grid_00``` and ```grid_01``` files.
+The solver print the original grid without modification and it print the solved grid below.
 
-It doesn't save the solved grid
+It doesn't save the solved grid.
 
 ## License 
 
