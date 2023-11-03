@@ -1,0 +1,37 @@
+# Error Management
+- fct with error code
+
+# Build-up all arg
+- +B&W
+
+# Options order
+> input
+0. Bright
+1. Contrast
+2. Greyscale
+3. BlackWhite
+4. GaussianBlur
+5. arroundgaussianblur
+6. canny
+7. rotate
+> ouput
+
+# Errors
+- command incomplete
+- input incomplete
+- output incomplete
+
+# Man
+- Finish parser
+- Revoir princpales étapes
+- Image management order
+- Remove warnings
+- Remove exe
+- Remove TODO ?
+- Pdf git root renamed
+- Optimal picture to test during exam
+- valgrind
+
+# Image PRocess
+- grid detection
+- image cutting

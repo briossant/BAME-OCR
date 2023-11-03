@@ -29,7 +29,6 @@ SDL_Surface* Supp_Maxima(SDL_Surface* Intensity_Gradian_Image, SDL_Surface* Orie
 
 void Thresholdhysteresis(SDL_Surface* image);
 
-
 Uint8 ComputeSeuil(SDL_Surface* image);
 
 SDL_Surface* hough_transform(SDL_Surface* image, int pas);

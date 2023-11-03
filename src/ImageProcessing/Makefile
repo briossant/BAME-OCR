@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-W -Wall -Wextra -O0 -g
 LDFLAGS= -lSDL2 -lGL -lSDL2_image -lm 
-EXEC=test
+EXEC=ImageProcess
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)
 
@@ -15,5 +15,5 @@ test: $(OBJ)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -f test *.o *.d
+	rm -f ImageProcess *.o *.d
 
