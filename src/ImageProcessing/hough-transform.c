@@ -154,6 +154,118 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
     return image;
 }
 
+void gridDetect(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold)
+{
+    int corner_count = 0;
+    int countX = 0;
+    int countY = 0;
+    int sum = 0;
+    int average = 0;
+    int tmp = 0;
+    int last = -1;
+    int k = 0;
+    int enough_corner = 0;
+
+    while (k++ < 1)//countX != 10 || countY != 10)
+    {
+        countX = 0;
+        countY = 0;
+        sum = 0;
+        countX = 0;
+        countY = 0;
+
+        for (int x = 0; x < image->w; x++)
+        {
+            if (abs[x].val > threshold && abs[x].next != 0)
+            {
+                // printf("sumX = %d\n", abs[x].next - x);
+                sum += abs[x].next - x;
+                countX++;
+            }
+        }
+
+        for (int y = 0; y < image->h; y++)
+        {
+            if (ord[y].val > threshold && ord[y].next != 0)
+            {
+                // printf("sumY = %d\n", ord[y].next - y);
+                sum += ord[y].next - y;
+                countY++;
+            }
+        }
+
+        average = sum / (countX + countY);
+        // printf("average = %d\n", average);
+        last = -1;
+
+        for (int x = 0; x < image->w; x++)
+        {
+            if (abs[x].val > threshold)
+            {
+                // if (abs[x].next == x && (last - x > average + tolerance || last - x < average - tolerance))
+                // {
+                //     abs[x].val = -2;
+                //     abs[x].next = x;
+                //     if (last != -1)
+                //         abs[last].next = last;
+                //     last = x;
+                // }
+                if (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance)
+                {
+                    abs[x].val = -2;
+                
+                    if (last != -1 && abs[x].next != x)
+                        abs[last].next = abs[x].next;
+                    last = x;
+                }
+            }
+        }
+
+        last = -1;
+
+        for (int y = 0; y < image->h; y++)
+        {
+            if (ord[y].val > threshold && (ord[y].next - y > average + tolerance || ord[y].next - y < average - tolerance))
+            {
+                ord[y].val = -2;
+
+                if (last != -1 && ord[y].next != y)
+                    ord[last].next = ord[y].next;
+                last = y;
+            }
+        }
+
+        countX = 0;
+        countY = 0;
+
+        // for (int x = 0; x < image->w; x++)
+        // {
+        //     if (abs[x].val > threshold && !enough_corner)
+        //     {
+        //         if (abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance)
+        //         {
+        //             countX++;
+        //         }
+        //         else
+        //         {
+        //             countX = 0;
+        //         }
+        //     }   
+        //     if (countX == 10)
+        //         enough_corner = 1;
+        // }
+
+        // FIXME: corner.prev && case counter
+
+        for (int y = 0; y < image->h; y++)
+        {
+            if (ord[y].val > threshold)
+                countY++;
+        }
+
+    }
+}
+
 SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
 {
     // Init tab
@@ -201,15 +313,15 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     // Remove value under threshold
 
     int last_index = 0;
-    int count = 0; // count the number of corner for the average
-    int sum = 0;
+    // int count = 0; // count the number of corner for the average
+    // int sum = 0;
     for (int x = 0; x < image->w; x++)
     {
         if (abs[x].val > threshold)
         {
             abs[last_index].next = x;
-            count++;
-            sum += x - last_index;
+            // count++;
+            // sum += x - last_index;
             last_index = x;
         }
         else
@@ -225,8 +337,8 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
         if (ord[y].val > threshold)
         {
             ord[last_index].next = y;
-            count++;
-            sum += y - last_index;
+            // count++;
+            // sum += y - last_index;
             last_index = y;
         }
         else
@@ -234,27 +346,30 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     }
     ord[last_index].next = 0;
 
-    int average = sum/count;
-    int tolerance = 10;
+    // int average = sum/count;
+    int tolerance = 15; //FIXME: depend of the picture size
 
     merge_lines(image, abs, ord, tolerance, threshold);
 
+    gridDetect(image, abs, ord, tolerance, threshold);
+
+
     // int count = 0; // count the number of corner (= 10)
 
-        // for (int x = 0; x < image->w; x++)
-        // {
-        //     // if it's too different than the average, val = -1
+    // for (int x = 0; x < image->w; x++)
+    // {
+    //     // if it's too different than the average, val = -1
 
-            
+        
 
-        //     // count the number of corner, we need it 10
-        //     if (abs[x].prev + tolerance > x - average || abs[x].next - tolerance < x + average)
-        //     {
-        //         count++;
-        //     }
-        //     else
-        //         abs[x].val = -1;
-        // }
+    //     // count the number of corner, we need it 10
+    //     // if (abs[x].prev + tolerance > x - average || abs[x].next - tolerance < x + average)
+    //     // {
+    //     //     count++;
+    //     // }
+    //     // else
+    //     //     abs[x].val = -1;
+    // }
     
 
     image = draw(image, abs, ord, threshold);
