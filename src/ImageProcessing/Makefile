@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-W -Wall -Wextra -O3 # -g
-LDFLAGS= -lSDL2 -lGL -lSDL2_image -lm 
+LDFLAGS= -lSDL2 -lSDL2_image -lm 
 EXEC=test
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)
