@@ -8,69 +8,59 @@
 #include <math.h>
 #include <stdlib.h>
 
-SDL_surface* hough_transform(SDL_Surface * image, int pas)
+SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
 {
-    int R = sqrt(image->h*image->h+image->w*image->w);
+    // Init tab
+    int* abs = (int*)calloc(image->w, sizeof(int));
+    int* ord = (int*)calloc(image->h, sizeof(int));
 
-    SDL_Surface* matrice = SDL_CreateRGBSurfaceWithFormat(0, R, 180
-           , 32, image->format->format);
-    
-    Uint32* mat = matrice->pixels;
-
-    for (int y = 0; y<matrice->h; ++y) 
-    {
-        for (int x =0; x<matrice->w; ++x) 
-        {
-            mat[y*matrice->w + x] = SDL_MapRGBA(image->format, 0, 0, 0, 255);
-        }
-    }
-
+    // Init SDL var
+    Uint8 r,g,b,a;
     Uint32* pixtab = image->pixels;
-
     const SDL_PixelFormat* format = image->format;
 
-    Uint8 r,g,b,a;
-
-    Uint8 r1,g1,b1,a1;
-
-    int rho = 0;
-
-    float rad = (M_PI/180);
-
-    for (int y = 0; y<image->h; ++y) 
+    // Get the lines
+    for (int x = 0; x < image->w; x++)
     {
-        for (int x = 0; x<image->w; ++x) 
+        for (int y = 0; y < image->h; y++)
         {
             SDL_GetRGBA(pixtab[y*image->w + x], format, &r, &g, &b, &a);
 
-            if (r==255) 
+            if (r > 200)
             {
-               for (int theta=0; theta<180; ++theta) 
-               {
-                    rho = x*cosf((float)((theta))*rad) 
-                        + y*sinf((float)((theta))*rad);
-                    
-                    SDL_GetRGBA(mat[theta*matrice->w+rho], format, &r1
-                            , &g1, &b1, &a1);
-
-                    mat[theta*matrice->w+rho] = SDL_MapRGBA(format, r1+1, 
-                            g1+1, b1+1, 255);
-               }
-            } 
+                abs[x] += 1;
+                ord[y] += 1;
+            }
         }
     }
 
-    if (IMG_SavePNG(matrice, "hough_transform.png") != 0) 
+    // Get the coordonates of the lines
+    for (int x = 0; x < image->w; x++)
     {
-        printf("Error when trying to save the image : %s\n", IMG_GetError());
+        // printf("abs=%d\n", abs[x]);
+        if (abs[x] > threshold)
+        {
+            draw_line(image, x, 0, x, image->h);
+        }
     }
 
-    return 1;
+    for (int y = 0; y < image->h; y++)
+    {
+        // printf("ord=%d\n", ord[y]);
+        if (ord[y] > threshold)
+        {
+            draw_line(image, 0, y, image->w, y);
+        }
+    }
+
+    free(abs);
+    free(ord);
+
+    return image;
 }
 
 void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
 {
-    SDL_LockSurface(image);
 
     Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
 
@@ -102,10 +92,14 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
 
     while (current_x != x2 || current_y != y2) 
     {
-        Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
-            + current_x * 4;
+        if (current_x >=0 && current_x < image->w 
+                && current_y >= 0 && current_y < image->h) 
+        {
+            Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
+                + current_x * 4;
 
-        *(Uint32 *)pixel = color;
+            *(Uint32 *)pixel = color;
+        }
 
         int err2 = 2 * err;
         if (err2 > -dy) 
@@ -119,40 +113,4 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
             current_y += sy;
         }
     }
-
-    SDL_UnlockSurface(image);
 }
-
-void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil)
-{ 
-    int R = sqrt(image->h*image->h+image->w*image->w);
-
-    const SDL_PixelFormat* format = image->format;
-
-    Uint32* mat = hough_pic->pixels;
-
-    Uint8 r,g,b,a;
-
-    for (int y = 0; y<hough_pic->h; ++y) 
-    {
-        for (int x =0; x<hough_pic->w; ++x) 
-        {
-            SDL_GetRGBA(mat[y*hough_pic->w +x],format, &r, &g, &b, &a);
-            
-            if (r>seuil) 
-            {
-                
-            }
-            
-            mat[y*hough_pic->w + x] = SDL_MapRGBA(image->format, 0, 
-                    0, 0, 255);
-        }
-    }
-
-}
-
-
-
-
-
-
