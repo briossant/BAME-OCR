@@ -11,6 +11,7 @@
 typedef struct {
     int val;
     int next;
+    int prev;
 } corner;
 
 void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
@@ -87,7 +88,6 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
 {
     int moy = 0;
     int not_ready = 1;
-    int k = 0;
     int tmp = 0;
 
     while (not_ready)
@@ -98,171 +98,173 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
         // Compare the distance with the others corner
         for (int x = 0; x < image->w; x++)
         {
-            if (abs[x].val != -1 && abs[x].next != 0)
+            // if 2 corner à too close, merge them
+            if (abs[x].val != -1 && abs[x].next != x && abs[x].next - tolerance < x)
             {
-                // if 2 corner à too close, merge them
-                if (abs[x].next - tolerance < x)
-                { 
-                    moy = (abs[x].next + x) / 2;
-                    
-                    tmp = abs[abs[x].next].next;
-                    abs[abs[x].next].val = -1;
-                    abs[abs[x].next].next = abs[x].next;
+
+                // printf("x = %d, next = %d\n", x, abs[x].next);
+                moy = (abs[x].next + x) / 2;
+                
+                tmp = abs[abs[x].next].next;
+                abs[abs[x].next].val = -1;
+                abs[abs[x].next].next = abs[x].next;
+                abs[abs[x].next].prev = abs[x].next; //
 
 
-                    abs[moy].val = threshold+1;
-                    abs[moy].next = tmp;
-                    
-                    if (x != moy)
-                    {
-                        abs[x].val = -1;
-                        abs[x].next = x;
-                    }
-
-                    not_ready = 1;                   
+                abs[moy].val = abs[x].val; //
+                abs[moy].next = tmp;
+                abs[moy].prev = abs[x].prev;
+                
+                if (x != moy)
+                {
+                    abs[x].val = -1;
+                    abs[x].next = x;
+                    abs[x].prev = x;
                 }
+
+                not_ready = 1;                   
             }
         }
 
         for (int y = 0; y < image->h; y++)
         {
-            if (ord[y].val != -1 && ord[y].next != 0)
+            // if 2 corner à too close, merge them
+            if (ord[y].val != -1 && ord[y].next != y && ord[y].next - tolerance < y)
             {
-                // if 2 corner à too close, merge them
-                if (ord[y].next - tolerance < y && ord[y].next != y)
+                printf("y = %d, next = %d\n", y, ord[y].next);
+                moy = (ord[y].next + y) / 2;
+                
+                tmp = ord[ord[y].next].next;
+                if (tmp == ord[y].next)
                 {
-                    moy = (ord[y].next + y) / 2;
-                    
-                    tmp = ord[ord[y].next].next;
-                    ord[ord[y].next].val = -1;
-                    ord[ord[y].next].next = ord[y].next;
-
-                    ord[moy].val = threshold+1;
-                    ord[moy].next = tmp;
-
-                    if (y != moy)
-                    {
-                        ord[y].val = -1;
-                        ord[y].next = y;
-                    }    
-
-                    not_ready = 1;   
+                    tmp = y;
                 }
+
+                ord[ord[y].next].val = -1;
+                ord[ord[y].next].next = ord[y].next;
+                ord[ord[y].next].prev = ord[y].next; //
+
+                ord[moy].val = ord[y].val; //
+                ord[moy].next = tmp;
+
+                if (ord[y].prev == y)
+                {
+                    ord[moy].prev = moy;
+                }
+                else
+                    ord[moy].prev = ord[y].prev;
+
+                if (y != moy)
+                {
+                    ord[y].val = -1;
+                    ord[y].next = y;
+                    ord[y].prev = y;
+                }    
+
+                not_ready = 1;   
             }
-        }
+        }  
     }
     return image;
 }
 
-void gridDetect(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold)
+int averagePos(SDL_Surface* image, corner* abs, corner* ord, int threshold)
 {
-    int corner_count = 0;
-    int countX = 0;
-    int countY = 0;
+    int count = 0;
     int sum = 0;
-    int average = 0;
-    int tmp = 0;
-    int last = -1;
-    int k = 0;
-    int enough_corner = 0;
 
-    while (k++ < 1)//countX != 10 || countY != 10)
+    // Count the number of corners
+    for (int x = 0; x < image->w; x++)
     {
-        countX = 0;
-        countY = 0;
-        sum = 0;
-        countX = 0;
-        countY = 0;
-
-        for (int x = 0; x < image->w; x++)
+        if (abs[x].val > threshold && abs[x].next != 0)
         {
-            if (abs[x].val > threshold && abs[x].next != 0)
-            {
-                // printf("sumX = %d\n", abs[x].next - x);
-                sum += abs[x].next - x;
-                countX++;
-            }
+            sum += abs[x].next - x;
+            count++;
         }
+    }
 
-        for (int y = 0; y < image->h; y++)
+    for (int y = 0; y < image->h; y++)
+    {
+        if (ord[y].val > threshold && ord[y].next != 0)
         {
-            if (ord[y].val > threshold && ord[y].next != 0)
-            {
-                // printf("sumY = %d\n", ord[y].next - y);
-                sum += ord[y].next - y;
-                countY++;
-            }
+            sum += ord[y].next - y;
+            count++;
         }
+    }
+    printf("Average: %d\n", sum / (count));
+    return sum / (count);
+}
 
-        average = sum / (countX + countY);
-        // printf("average = %d\n", average);
-        last = -1;
+void excludeLine(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold)
+{
+    int average = averagePos(image, abs, ord, threshold);
 
-        for (int x = 0; x < image->w; x++)
-        {
-            if (abs[x].val > threshold)
-            {
-                // if (abs[x].next == x && (last - x > average + tolerance || last - x < average - tolerance))
-                // {
-                //     abs[x].val = -2;
-                //     abs[x].next = x;
-                //     if (last != -1)
-                //         abs[last].next = last;
-                //     last = x;
-                // }
-                if (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance)
-                {
-                    abs[x].val = -2;
-                
-                    if (last != -1 && abs[x].next != x)
-                        abs[last].next = abs[x].next;
-                    last = x;
-                }
-            }
-        }
-
-        last = -1;
-
-        for (int y = 0; y < image->h; y++)
-        {
-            if (ord[y].val > threshold && (ord[y].next - y > average + tolerance || ord[y].next - y < average - tolerance))
-            {
-                ord[y].val = -2;
-
-                if (last != -1 && ord[y].next != y)
-                    ord[last].next = ord[y].next;
-                last = y;
-            }
-        }
-
-        countX = 0;
-        countY = 0;
-
-        // for (int x = 0; x < image->w; x++)
+    for (int x = 0; x < image->w; x++)
+    {
+        // if (abs[x].val > threshold)
         // {
-        //     if (abs[x].val > threshold && !enough_corner)
-        //     {
-        //         if (abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance)
-        //         {
-        //             countX++;
-        //         }
-        //         else
-        //         {
-        //             countX = 0;
-        //         }
-        //     }   
-        //     if (countX == 10)
-        //         enough_corner = 1;
+        //     printf("x = %d had to be exclude : %d\n", x, (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance) 
+        //     || (x - abs[x].prev > average + tolerance || x - abs[x].prev < average - tolerance));
+        //     printf("x = %d, x.next = %d\n", x, abs[x].next);
+        //     printf("x = %d, x.prev = %d\n", x, abs[x].prev);
         // }
 
-        // FIXME: corner.prev && case counter
-
-        for (int y = 0; y < image->h; y++)
+        if (abs[x].val > threshold 
+            && (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance) 
+            && (x - abs[x].prev > average + tolerance || x - abs[x].prev < average - tolerance))
         {
-            if (ord[y].val > threshold)
-                countY++;
+            abs[x].val = -2;
+        
+            if (abs[x].prev != x && abs[x].next != x)
+            {
+                abs[abs[x].prev].next = abs[x].next;
+                abs[abs[x].next].prev = abs[x].prev;
+            }   
         }
+    }
 
+    for (int y = 0; y < image->h; y++)
+    {
+        if (ord[y].val > threshold 
+            && (ord[y].next - y > average + tolerance || ord[y].next - y < average - tolerance)
+            && (y - ord[y].prev > average + tolerance || y - ord[y].prev < average - tolerance))
+        {
+            ord[y].val = -2;
+
+            if (ord[y].prev != y && ord[y].next != y)
+            {
+                ord[ord[y].prev].next = ord[y].next;
+                ord[ord[y].next].prev = ord[y].prev;
+            }
+        }
+    }
+}
+
+void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold, int average)
+{
+    int countX = 0;
+    int sequenceStarted = -1;
+
+    for (int x = 0; x < image->w; x++)
+    {
+        // if the line is ok
+        if (abs[x].val > threshold 
+                && abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance
+                && x - abs[x].prev < average + tolerance && x - abs[x].prev > average - tolerance)
+        {
+             
+        }
+    }
+
+    for (int y = 0; y < image->h; y++)
+    {
+        // if the line is ok
+        if (ord[y].val > threshold 
+            && ord[y].next - y < average + tolerance && ord[y].next - y > average - tolerance
+            && y - ord[y].prev < average + tolerance && y - ord[y].prev > average - tolerance)
+        {
+
+        }
     }
 }
 
@@ -280,12 +282,14 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
         {
             abs[x].val = 0;
             abs[x].next = x;
+            abs[x].prev = x;
             x++;
         }
         if (y < image->h)
         {
             ord[y].val = 0;
             ord[y].next = y;
+            ord[y].prev = y;
             y++;
         }
     }
@@ -311,67 +315,71 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     }
 
     // Remove value under threshold
+    // If a value is above threshold : set next and prev
+    // Prop:    the fisrt value prev = itself
+    //          the last value next = itself
 
     int last_index = 0;
-    // int count = 0; // count the number of corner for the average
-    // int sum = 0;
     for (int x = 0; x < image->w; x++)
     {
         if (abs[x].val > threshold)
         {
-            abs[last_index].next = x;
-            // count++;
-            // sum += x - last_index;
+            if (last_index == 0)
+                abs[x].prev = x;
+            else
+            {
+                abs[x].prev = last_index;
+                abs[last_index].next = x;
+            }
             last_index = x;
         }
         else
             abs[x].val = -1;
     }
-    abs[last_index].next = 0;
+    abs[last_index].next = last_index;
 
-    
     last_index = 0;
 
     for (int y = 0; y < image->h; y++)
     {
         if (ord[y].val > threshold)
         {
-            ord[last_index].next = y;
-            // count++;
-            // sum += y - last_index;
+            if (last_index == 0)
+                ord[y].prev = y;
+            else
+            {
+                ord[y].prev = last_index;
+                ord[last_index].next = y;
+            }
             last_index = y;
         }
         else
             ord[y].val = -1;
     }
-    ord[last_index].next = 0;
+    ord[last_index].next = last_index;
 
-    // int average = sum/count;
-    int tolerance = 15; //FIXME: depend of the picture size
+    int tolerance = threshold/20; //FIXME: depend of the picture size
 
-    merge_lines(image, abs, ord, tolerance, threshold);
+    // merge_lines(image, abs, ord, tolerance, threshold);
 
-    gridDetect(image, abs, ord, tolerance, threshold);
-
-
-    // int count = 0; // count the number of corner (= 10)
-
-    // for (int x = 0; x < image->w; x++)
+    // printf("tabX = [\n");
+    // for (int i = 0; i < image->w; i++)
     // {
-    //     // if it's too different than the average, val = -1
-
-        
-
-    //     // count the number of corner, we need it 10
-    //     // if (abs[x].prev + tolerance > x - average || abs[x].next - tolerance < x + average)
-    //     // {
-    //     //     count++;
-    //     // }
-    //     // else
-    //     //     abs[x].val = -1;
+    //     if (abs[i].val != -1)
+    //         printf("%d:\t(val = %d, next = %d, prev = %d),\n",i , abs[i].val, abs[i].next, abs[i].prev);
     // }
-    
+    // printf("]\n\n");
 
+    // printf("tabY = [\n");
+    // for (int i = 0; i < image->h; i++)
+    // {
+    //     if (ord[i].val != -1)
+    //         printf("%d:\t(val = %d, next = %d, prev = %d),\n",i , ord[i].val, ord[i].next, ord[i].prev);
+    // }
+    // printf("]\n\n");
+
+    // excludeLine(image, abs, ord, tolerance, threshold);
+  
     image = draw(image, abs, ord, threshold);
 
     free(abs);
