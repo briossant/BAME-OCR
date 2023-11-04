@@ -133,24 +133,26 @@ Network LoadNetwork(char *filepath) {
         printformat();
         exit(1);
     }
-    double input_size = numbers[0];
-    double depth_layer = numbers[1];
+    size_t input_size = numbers[0];
+    size_t depth_layer = numbers[1];
     Layer *layers = (Layer *)malloc(sizeof(Layer) * depth_layer);
+
+    size_t previous_layer_size = input_size;
+    // buffer will be too small for big layers
     while (fgets(line, 200, file) != NULL) {
-        double number_of_layer = get_numbers(line, &size)[0];
+        int layer_index = get_numbers(line, &size)[0];
         if (fgets(line, 200, file) == NULL) {
             printf("fgets failed or reached end of file\n");
             exit(1);
         }
-        double size_of_layer = get_numbers(line, &size)[0];
+        size_t layer_size = get_numbers(line, &size)[0];
         if (fgets(line, 200, file) == NULL) {
             printf("error on weights");
             exit(1);
         }
 
-        Matrix weights =
-            array_to_matrix(get_numbers(line, &size),
-                            (int)size / (int)depth_layer, depth_layer);
+        Matrix weights = array_to_matrix(get_numbers(line, &size),
+                                         previous_layer_size, layer_size);
         MatPrint(weights);
         printf("%d size for weights, %d\n", size, (int)size / (int)depth_layer);
         if (fgets(line, 200, file) == NULL) {
@@ -158,14 +160,12 @@ Network LoadNetwork(char *filepath) {
             exit(1);
         }
         Matrix biases =
-            array_to_matrix(get_numbers(line, &size), depth_layer, 1);
-        Layer layer;
-        {
-            layer.biases = biases;
-            layer.weights = weights;
-            layer.size = size_of_layer;
-        }
-        layers[(int)number_of_layer] = layer;
+            array_to_matrix(get_numbers(line, &size), 1, layer_size);
+        Layer layer = {
+            .biases = biases, .weights = weights, .size = layer_size};
+
+        layers[layer_index] = layer;
+        previous_layer_size = layer_size;
     }
     Network network = {// this is the new Network declaration
                        .input_size = input_size,
@@ -174,6 +174,7 @@ Network LoadNetwork(char *filepath) {
     fflush(file);
     fclose(file);
     free(numbers);
-    SaveNetwork(network, "loaded.txt");
+    printNetwork(network);
+    SaveNetwork(network, "loadedNetwork");
     return network;
 }
