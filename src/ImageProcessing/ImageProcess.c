@@ -214,7 +214,7 @@ uplet sort_argv(char* argv0, char* input, int argc)
         {
             res.argv[i] = 6;
         }
-        else if (strcmp(arg, "dg") == 0 || strcmp(arg, "griddetection") == 0) //Canny
+        else if (strcmp(arg, "gd") == 0 || strcmp(arg, "griddetection") == 0) //Canny
         {
             res.argv[i] = 8;
         }
@@ -242,7 +242,7 @@ int ImageProcess(uplet argv)
 
     for(int i = 0; i < argv.argc; i++)
     {
-        printf("%d\n", argv.argv[i]);
+        // printf("%d\n", argv.argv[i]);
         if (argv.argv[i] == 2) //GreyScale
         {
             GreyScale(image_converted);
@@ -275,7 +275,7 @@ int ImageProcess(uplet argv)
         { 
             image_converted = Rotate(image_converted, argv.angle);
         }
-        else if (argv.argv[i] == 7) //GridDetection
+        else if (argv.argv[i] == 8) //GridDetection
         { 
             image_converted = hough_transform(image_converted, 300);
         }

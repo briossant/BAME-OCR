@@ -84,7 +84,7 @@ SDL_Surface* draw(SDL_Surface * image, corner* abs, corner* ord, int threshold)
     return image;
 }
 
-SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold)
+SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int tolerance)
 {
     int moy = 0;
     int not_ready = 1;
@@ -210,7 +210,7 @@ int averagePos(SDL_Surface* image, corner* abs, corner* ord, int threshold)
             count++;
         }
     }
-    printf("Average: %d\n", sum / (count));
+    // printf("Average: %d\n", sum / (count));
     return sum / (count);
 }
 
@@ -261,8 +261,8 @@ void excludeLine(SDL_Surface* image, corner* abs, corner* ord, int tolerance, in
 
 void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold, int average)
 {
-    int countX = 0;
-    int sequenceStarted = -1;
+    // int countX = 0;
+    // int sequenceStarted = -1;
 
     for (int x = 0; x < image->w; x++)
     {
@@ -377,7 +377,7 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     }
     ord[last_index].next = last_index;
 
-    int tolerance = threshold/20; //FIXME: depend of the picture size
+    // int tolerance = threshold/20; //FIXME: depend of the picture size
 
     // merge_lines(image, abs, ord, tolerance, threshold);
 
