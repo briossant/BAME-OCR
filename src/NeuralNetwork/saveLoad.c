@@ -104,7 +104,8 @@ Network LoadNetwork(char *filepath) {
     int size = 0;
     double *numbers = get_numbers(line, &size);
     if (size != 2) {
-        printf("There was not enough parameters for the depth and input, or way too much for the network\n");
+        printf("There was not enough parameters for the depth and input, or "
+               "way too much for the network\n");
         printformat();
         exit(1);
     }
@@ -113,7 +114,6 @@ Network LoadNetwork(char *filepath) {
     Layer *layers = (Layer *)malloc(sizeof(Layer) * depth_layer);
 
     size_t previous_layer_size = input_size;
-    // buffer will be too small for big layers
     while (fgets(line, 200, file) != NULL) {
         int layer_index = get_numbers(line, &size)[0];
         if (fgets(line, 200, file) == NULL) {
@@ -121,6 +121,8 @@ Network LoadNetwork(char *filepath) {
             exit(1);
         }
         size_t layer_size = get_numbers(line, &size)[0];
+
+        // buffer will be too small for big layers
         if (fgets(line, 200, file) == NULL) {
             printf("error on weights");
             exit(1);
@@ -128,6 +130,8 @@ Network LoadNetwork(char *filepath) {
 
         Matrix weights = array_to_matrix(get_numbers(line, &size),
                                          previous_layer_size, layer_size);
+
+        // buffer will be too small for big layers
         if (fgets(line, 200, file) == NULL) {
             printf("error on biases");
             exit(1);
