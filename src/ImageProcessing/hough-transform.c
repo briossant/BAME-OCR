@@ -131,12 +131,31 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
             // if 2 corner à too close, merge them
             if (ord[y].val != -1 && ord[y].next != y && ord[y].next - tolerance < y)
             {
-                // printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
+                printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
                 moy = (ord[y].next + y) / 2;
                 tmp = ord[ord[y].next].next;
 
-                ord[moy].val = ord[y].val;
+                ord[ord[y].next].val = -1;
+                ord[ord[y].next].next = ord[y].next;
+                ord[ord[y].next].prev = ord[y].next;
 
+                ord[moy].val = ord[y].val;
+                if (tmp == ord[y].next) // FIXME: Sol tmp
+                {
+                    ord[moy].next = moy;
+                }
+                else
+                    ord[moy].next = tmp;
+                ord[moy].prev = ord[y].prev;
+
+                if (y != moy)
+                {
+                    ord[y].val = -1;
+                    ord[y].next = y;
+                    ord[y].prev = y;
+                }
+
+                not_ready = 1; 
             }
         }
     }
@@ -333,9 +352,9 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     }
     ord[last_index].next = last_index;
 
-    // int tolerance = threshold/20; //FIXME: depend of the picture size
+    int tolerance = threshold/20; //FIXME: depend of the picture size
 
-    // merge_lines(image, abs, ord, tolerance, threshold);
+    merge_lines(image, abs, ord, tolerance);
 
     // printf("tabX = [\n");
     // for (int i = 0; i < image->w; i++)
