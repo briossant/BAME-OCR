@@ -14,7 +14,8 @@
 5. arroundgaussianblur
 6. canny
 7. rotate
-8. griddetection
+9. griddetection
+8. Auto_Rotate
 > ouput
 
 # Errors

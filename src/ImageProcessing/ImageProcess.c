@@ -53,6 +53,7 @@ void print_help(char* argv0)
     printf("r, rotate [angle]        Rotate the image with the angle\n");
     printf("ca, canny                Apply Canny filters to the image\n");
     printf("gd, griddetection        Create markers for the grid\n");
+    printf("ar, autorotate           Rotate the image\n");
 }
 
 // Input
@@ -216,6 +217,10 @@ uplet sort_argv(char* argv0, char* input, int argc)
         }
         else if (strcmp(arg, "gd") == 0 || strcmp(arg, "griddetection") == 0) //Canny
         {
+            res.argv[i] = 9;
+        }
+        else if (strcmp(arg, "ar") == 0 || strcmp(arg, "autorotate") == 0) //Auto_Rotate
+        {
             res.argv[i] = 8;
         }
         else
@@ -275,9 +280,13 @@ int ImageProcess(uplet argv)
         { 
             image_converted = Rotate(image_converted, argv.angle);
         }
-        else if (argv.argv[i] == 8) //GridDetection
+        else if (argv.argv[i] == 9) //GridDetection
         { 
             image_converted = hough_transform(image_converted, 300);
+        }
+        else if (argv.argv[i] == 8) //GridDetection
+        { 
+            Auto_Rotate(image_converted);
         }
     }
 
