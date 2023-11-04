@@ -131,7 +131,7 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
             // if 2 corner à too close, merge them
             if (ord[y].val != -1 && ord[y].next != y && ord[y].next - tolerance < y)
             {
-                printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
+                // printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
                 moy = (ord[y].next + y) / 2;
                 tmp = ord[ord[y].next].next;
 
