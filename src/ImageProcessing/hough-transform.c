@@ -326,6 +326,13 @@ void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int threshold)
         if (i == 0)
             break;
     }
+
+    if (ord[0].val > threshold)
+    {
+
+    }
+
+
 }
 
 SDL_Surface* hough_transform(SDL_Surface * image, int threshold, int state)
@@ -432,6 +439,44 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold, int state)
     if (state > 3)
     {
         gridDetection(image, abs, ord, threshold);
+    }
+    if (state > 4)
+    {
+        int tabX[10];
+        int i = 0;
+        for (int x = 0; x < image->w; x++)
+        {
+            if (abs[x].val > threshold)
+            {
+                printf("x = %d\n", x);
+                tabX[i] = x;
+                i++;
+                if (i == 11)
+                    break;
+            }
+        }
+
+        int tabY[10];
+        i = 0;
+        for (int y = 0; y < image->h; y++)
+        {
+            if (ord[y].val > threshold)
+            {
+                printf("y = %d\n", y);
+                tabY[i] = y;
+                i++;
+                if (i == 11)
+                    break;
+            }
+        }
+
+        for (i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                Crop(image, tabX[i], tabY[j], tabX[i+1], tabY[j], tabX[i], tabY[j+1], tabX[i+1], tabY[j+1], strcat("Crop"+('0'+ i + 10*j), ".png"));
+            }  
+        }
     }
 
     // printf("tabX = [\n");
