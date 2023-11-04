@@ -60,10 +60,6 @@ SDL_Surface* SDL_Start(char* filename)
 {
     // SDL Init
 
-    if(0 != SDL_Init(SDL_INIT_VIDEO))
-    {
-        errx(1, "Unable to initialize SDL: %s\n", SDL_GetError());
-    }
 
     SDL_Surface* image = NULL;
     image = IMG_Load(filename);
@@ -301,6 +297,11 @@ size_t GetArgc(char *input) {
 
 int main(int argc, char** argv) {
     (void)argc; // Unused variable
+    
+    if(0 != SDL_Init(SDL_INIT_VIDEO))
+    {
+        errx(1, "Unable to initialize SDL: %s\n", SDL_GetError());
+    }
 
     // Parser
     int res = 0;

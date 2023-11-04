@@ -15,5 +15,5 @@ test: $(OBJ)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -f test *.o *.d
+	rm -f ImageProcess *.o *.d
 
