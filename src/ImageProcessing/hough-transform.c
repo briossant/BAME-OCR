@@ -108,12 +108,15 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
                 tmp = abs[abs[x].next].next;
                 abs[abs[x].next].val = -1;
                 abs[abs[x].next].next = abs[x].next;
-                abs[abs[x].next].prev = abs[x].next; //
+                abs[abs[x].next].prev = abs[x].next;
 
 
-                abs[moy].val = abs[x].val; //
-                abs[moy].next = tmp;
+                abs[moy].val = abs[x].val;
                 abs[moy].prev = abs[x].prev;
+                if (tmp == abs[x].next)
+                    abs[moy].next = moy;
+                else
+                    abs[moy].next = tmp;
                 
                 if (x != moy)
                 {
@@ -140,14 +143,12 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
                 ord[ord[y].next].prev = ord[y].next;
 
                 ord[moy].val = ord[y].val;
-                if (tmp == ord[y].next) // FIXME: Sol tmp
-                {
+                ord[moy].prev = ord[y].prev;
+                if (tmp == ord[y].next)
                     ord[moy].next = moy;
-                }
                 else
                     ord[moy].next = tmp;
-                ord[moy].prev = ord[y].prev;
-
+                
                 if (y != moy)
                 {
                     ord[y].val = -1;
@@ -232,37 +233,102 @@ void excludeLine(SDL_Surface* image, corner* abs, corner* ord, int tolerance, in
             }
         }
     }
+
+    // int last = 0;
+    // while (last < image->w && abs[last].val < threshold)
+    //     last++;
+
+    // for (int x = last; x < image->w; x++)
+    // {
+
+    //     if (abs[x].val > threshold
+    //         && (x - last > average + tolerance || x - last < average - tolerance))
+    //     {
+    //         abs[x].val = -2;
+    //         last = x;
+        
+    //         // if (abs[x].prev != x && abs[x].next != x)
+    //         // {
+    //         //     abs[abs[x].prev].next = abs[x].next;
+    //         //     abs[abs[x].next].prev = abs[x].prev;
+    //         // }   
+    //     }
+    // }
+
+    // last = 0;
+    // while (last < image-> h && ord[last].val < threshold)
+    //     last++;
+
+    // for (int y = last; y < image->h; y++)
+    // {
+    //     if (ord[y].val > threshold 
+    //         && (y - last > average + tolerance || y - last < average - tolerance))
+    //     {
+    //         ord[y].val = -2;
+    //         last = y;
+
+    //         // if (ord[y].prev != y && ord[y].next != y)
+    //         // {
+    //         //     ord[ord[y].prev].next = ord[y].next;
+    //         //     ord[ord[y].next].prev = ord[y].prev;
+    //         // }
+    //     }
+    // }
 }
 
-void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold, int average)
+void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int threshold)
 {
     // int countX = 0;
     // int sequenceStarted = -1;
 
+    // for (int x = 0; x < image->w; x++)
+    // {
+    //     // if the line is ok
+    //     if (abs[x].val > threshold 
+    //             && abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance
+    //             && x - abs[x].prev < average + tolerance && x - abs[x].prev > average - tolerance)
+    //     {
+             
+    //     }
+    // }
+
+    // for (int y = 0; y < image->h; y++)
+    // {
+    //     // if the line is ok
+    //     if (ord[y].val > threshold 
+    //         && ord[y].next - y < average + tolerance && ord[y].next - y > average - tolerance
+    //         && y - ord[y].prev < average + tolerance && y - ord[y].prev > average - tolerance)
+    //     {
+
+    //     }
+    // }
+
+    int i = 2;
     for (int x = 0; x < image->w; x++)
     {
-        // if the line is ok
-        if (abs[x].val > threshold 
-                && abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance
-                && x - abs[x].prev < average + tolerance && x - abs[x].prev > average - tolerance)
+        if (abs[x].val > threshold)
         {
-             
+            abs[x].val = -2;
+            i--;
         }
+        if (i == 0)
+            break;
     }
 
-    for (int y = 0; y < image->h; y++)
+    i = 2;
+    for (int x = image->w; x > 0 ; x--)
     {
-        // if the line is ok
-        if (ord[y].val > threshold 
-            && ord[y].next - y < average + tolerance && ord[y].next - y > average - tolerance
-            && y - ord[y].prev < average + tolerance && y - ord[y].prev > average - tolerance)
+        if (abs[x].val > threshold)
         {
-
+            abs[x].val = -2;
+            i--;
         }
+        if (i == 0)
+            break;
     }
 }
 
-SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
+SDL_Surface* hough_transform(SDL_Surface * image, int threshold, int state)
 {
     // Init tab
     corner* abs = (corner*)malloc(image->w * sizeof(corner));
@@ -352,9 +418,21 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     }
     ord[last_index].next = last_index;
 
-    int tolerance = threshold/20; //FIXME: depend of the picture size
+    int tolerance = threshold/20;
 
-    merge_lines(image, abs, ord, tolerance);
+    
+    if (state > 1)
+    {
+        merge_lines(image, abs, ord, tolerance);
+    }
+    if (state > 2)
+    {
+        excludeLine(image, abs, ord, tolerance, threshold);
+    }
+    if (state > 3)
+    {
+        gridDetection(image, abs, ord, threshold);
+    }
 
     // printf("tabX = [\n");
     // for (int i = 0; i < image->w; i++)
@@ -371,8 +449,6 @@ SDL_Surface* hough_transform(SDL_Surface * image, int threshold)
     //         printf("%d:\t(val = %d, next = %d, prev = %d),\n",i , ord[i].val, ord[i].next, ord[i].prev);
     // }
     // printf("]\n\n");
-
-    // excludeLine(image, abs, ord, tolerance, threshold);
   
     image = draw(image, abs, ord, threshold);
 
