@@ -14,15 +14,7 @@ SDL_Surface* Rotate (SDL_Surface* image, double angle)
     double c = cos(angle / 180* pi);
     double s = sin(angle / 180* pi);
 
-    int max = 0;
-    if (height > width)
-    {
-        max = height;
-    }
-    else
-    {
-        max = width;
-    }
+    int max = sqrt(height*height+width*width);
 
     double CenterX = max / 2.0;
     double CenterY = max / 2.0;
