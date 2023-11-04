@@ -135,54 +135,10 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
                 moy = (ord[y].next + y) / 2;
                 tmp = ord[ord[y].next].next;
 
-                // moy
                 ord[moy].val = ord[y].val;
 
-                if (ord[y].prev == y) // merge first line
-                {
-                    ord[moy].next = tmp;
-                    ord[moy].prev = moy; 
-                }
-                else if (ord[ord[y].next].next == ord[y].next) // merge with last line
-                {
-
-                    ord[moy].next = moy;
-                    ord[moy].prev = ord[y].prev;
-
-                    // next 2, tmp
-                    ord[tmp].prev = moy;
-
-                    // prev 2
-                    ord[ord[y].prev].next = moy;
-                }
-                else
-                {
-                    // moy                    
-                    ord[moy].next = tmp;
-                    ord[moy].prev = ord[y].prev;
-
-                    // next 2, tmp
-                    ord[tmp].prev = moy;
-
-                    // prev 2
-                    ord[ord[y].prev].next = moy;
-                }
-                // next
-                ord[ord[y].next].val = -1;
-                ord[ord[y].next].next = ord[y].next;
-                ord[ord[y].next].prev = ord[y].next;
-
-                // y, prev
-                if (y != moy)
-                    {
-                        ord[y].val = -1;
-                        ord[y].next = y;
-                        ord[y].prev = y;
-                    }   
-                
-                not_ready = 1;   
             }
-        }  
+        }
     }
     return image;
 }
