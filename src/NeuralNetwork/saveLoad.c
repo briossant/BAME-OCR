@@ -84,13 +84,11 @@ double *get_numbers(char *str, int *size) {
             double value = atof(token);
             numbers = (double *)realloc(numbers, sizeof(double) * (count + 1));
             numbers[count] = value;
-            printf("%lf\n", value);
             count++;
         }
         token = strtok(NULL, " ");
     }
     *size = count;
-    printf("done\n");
     return numbers;
 }
 
@@ -128,8 +126,7 @@ Network LoadNetwork(char *filepath) {
     int size = 0;
     double *numbers = get_numbers(line, &size);
     if (size != 2) {
-        printf("There was not enough parameters for the depth and input, or "
-               "way too much for the network\n");
+        printf("There was not enough parameters for the depth and input, or way too much for the network\n");
         printformat();
         exit(1);
     }
@@ -153,8 +150,6 @@ Network LoadNetwork(char *filepath) {
 
         Matrix weights = array_to_matrix(get_numbers(line, &size),
                                          previous_layer_size, layer_size);
-        MatPrint(weights);
-        printf("%d size for weights, %d\n", size, (int)size / (int)depth_layer);
         if (fgets(line, 200, file) == NULL) {
             printf("error on biases");
             exit(1);
@@ -174,7 +169,5 @@ Network LoadNetwork(char *filepath) {
     fflush(file);
     fclose(file);
     free(numbers);
-    printNetwork(network);
-    SaveNetwork(network, "loadedNetwork");
     return network;
 }
