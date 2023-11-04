@@ -131,36 +131,55 @@ SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int toler
             // if 2 corner à too close, merge them
             if (ord[y].val != -1 && ord[y].next != y && ord[y].next - tolerance < y)
             {
-                printf("y = %d, next = %d\n", y, ord[y].next);
+                // printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
                 moy = (ord[y].next + y) / 2;
-                
                 tmp = ord[ord[y].next].next;
-                if (tmp == ord[y].next)
+
+                // moy
+                ord[moy].val = ord[y].val;
+
+                if (ord[y].prev == y) // merge first line
                 {
-                    tmp = y;
+                    ord[moy].next = tmp;
+                    ord[moy].prev = moy; 
                 }
-
-                ord[ord[y].next].val = -1;
-                ord[ord[y].next].next = ord[y].next;
-                ord[ord[y].next].prev = ord[y].next; //
-
-                ord[moy].val = ord[y].val; //
-                ord[moy].next = tmp;
-
-                if (ord[y].prev == y)
+                else if (ord[ord[y].next].next == ord[y].next) // merge with last line
                 {
-                    ord[moy].prev = moy;
-                }
-                else
+
+                    ord[moy].next = moy;
                     ord[moy].prev = ord[y].prev;
 
-                if (y != moy)
-                {
-                    ord[y].val = -1;
-                    ord[y].next = y;
-                    ord[y].prev = y;
-                }    
+                    // next 2, tmp
+                    ord[tmp].prev = moy;
 
+                    // prev 2
+                    ord[ord[y].prev].next = moy;
+                }
+                else
+                {
+                    // moy                    
+                    ord[moy].next = tmp;
+                    ord[moy].prev = ord[y].prev;
+
+                    // next 2, tmp
+                    ord[tmp].prev = moy;
+
+                    // prev 2
+                    ord[ord[y].prev].next = moy;
+                }
+                // next
+                ord[ord[y].next].val = -1;
+                ord[ord[y].next].next = ord[y].next;
+                ord[ord[y].next].prev = ord[y].next;
+
+                // y, prev
+                if (y != moy)
+                    {
+                        ord[y].val = -1;
+                        ord[y].next = y;
+                        ord[y].prev = y;
+                    }   
+                
                 not_ready = 1;   
             }
         }  
