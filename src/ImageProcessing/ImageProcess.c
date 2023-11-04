@@ -301,7 +301,7 @@ int ImageProcess(uplet argv)
         { 
             image_converted = hough_transform(image_converted, argv.threshold, argv.state);
         }
-        else if (argv.argv[i] == 8) //GridDetection
+        else if (argv.argv[i] == 8) //Auto Rotate
         { 
             Auto_Rotate(image_converted);
         }
