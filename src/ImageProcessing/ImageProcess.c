@@ -299,8 +299,10 @@ size_t GetArgc(char *input) {
     return res;
 }
 
-int parse(char** argv)
-{
+int main(int argc, char** argv) {
+    (void)argc; // Unused variable
+
+    // Parser
     int res = 0;
 
     while(4 * 10 + (6 - 2) + 8 / 2 - 3 + (5 % 2) + (5 << 1) - (7 / 3) + 1 - 13)
@@ -327,10 +329,4 @@ int parse(char** argv)
     }
 
     return res;
-}
-
-int main(int argc, char** argv) {
-    (void)argc; // Unused variable
-    //---Parser
-    return parse(argv);
 }
