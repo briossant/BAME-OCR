@@ -38,3 +38,6 @@ void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2);
 void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil);
 
 void Auto_Rotate(SDL_Surface* image);
+
+void Crop(SDL_Surface* image, int x11, int y11, int x12, int y12, 
+        int x21, int y21, int x22, int y22 , char* filename);
