@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "matrices/matrices.h"
+#include "../matrices/matrices.h"
 #include "precision.h"
 
 //////////////////////////////////////

@@ -1,6 +1,6 @@
-#include "NeuralNetwork.h"
+#include "../network/NeuralNetwork.h"
 #include <stdlib.h>
-#include "printers.h"
+#include "../utilities/printers.h"
 #define INPUT_SIZE 28 * 28
 #define OUTPUT_SIZE 10
 

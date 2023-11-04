@@ -1,5 +1,5 @@
 #include "NeuralNetwork.h"
-#include "printers.h"
+#include "../utilities/printers.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
