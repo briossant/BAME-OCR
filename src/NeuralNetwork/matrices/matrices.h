@@ -60,5 +60,6 @@ Matrix MatApplyFct(Matrix mat, MatFct matFct);
 
 // sum of all the terms
 NNValue MatSum(Matrix mat);
-
+NNValue *matrix_to_array(Matrix mat);
+Matrix array_to_matrix (double *array, size_t w, size_t h);
 #endif

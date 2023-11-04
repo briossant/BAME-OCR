@@ -6,28 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-NNValue *matrix_to_array(Matrix mat) {
-    NNValue *array = (NNValue *)malloc(sizeof(NNValue) * (mat.h * mat.w));
-    for (size_t i = 0; i < mat.w; ++i) {
-        for (size_t j = 0; j < mat.h; j++) {
-            array[i * mat.h + j] = mat.mat[i][j];
-        }
-    }
-    return array;
-}
-
-Matrix array_to_matrix(double *array, size_t w, size_t h) {
-    Matrix copy = MatInit(w, h, 0, "FromLoad");
-    int k = 0;
-    for (size_t i = 0; i < w; i++) {
-        for (size_t j = 0; j < h; j++) {
-            copy.mat[i][j] = array[k];
-            k++;
-        }
-    }
-
-    return copy;
-}
 void SaveNetwork(Network network, char *filepath) {
     FILE *file =
         fopen(filepath,
