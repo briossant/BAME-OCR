@@ -1,6 +1,3 @@
-# Error Management
-- fct with error code
-
 # Build-up all arg
 - +B&W
 
@@ -25,12 +22,7 @@
 
 # Man
 - Finish parser
-- Revoir princpales étapes
-- Image management order
-- Remove warnings
 - Remove exe
-- Remove TODO ?
-- Pdf git root renamed
 - Optimal picture to test during exam
 - valgrind
 
