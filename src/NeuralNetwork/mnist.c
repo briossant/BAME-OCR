@@ -2,8 +2,8 @@
 #include "network/NeuralNetwork.h"
 #include <string.h>
 
-#define INPUT_LAYER_SIZE 2
-#define OUTPUT_LAYER_SIZE 1
+#define INPUT_LAYER_SIZE 784
+#define OUTPUT_LAYER_SIZE 10
 #define CMD_COUNT 6
 
 void PrintUsage(Network *network, size_t argc) {
@@ -14,9 +14,9 @@ void PrintUsage(Network *network, size_t argc) {
     printf("〉help : show this message\n");
     printf("〉quit : exit program\n");
     printf("〉new [hidden layer size] ... : create a new network\n");
-    printf("〉train [learning rate] [epochs] [inertia strength] : train the "
-           "network\n");
-    printf("〉run [0 or 1] [0 or 1] : run the prediction on those inputs\n");
+    printf("〉train [learning rate] [epochs] [inertia strength] [batch size] : "
+           "train the network\n");
+    printf("〉test : test network performance on the test database\n");
     printf("〉save [filename] : save the network\n");
     printf("〉load [filename] : load the network\n");
     printf("\n");
@@ -26,7 +26,7 @@ size_t GetArgc(char *input) {
     char *p = input;
     size_t res = 0;
     while (*p != 0)
-        if (*(p++) == ' ' && *p != ' ' && *p != 0)
+        if (*(p++) == ' ')
             ++res;
     return res;
 }
@@ -69,37 +69,20 @@ void CreateNetwork(Network *network, size_t argc) {
 void trainXOR(Network *network, size_t argc) {
     (void)argc;
 
-    size_t trSetSize = 4;
-    Matrix inputsm = MatInit(trSetSize, 2, 0, "inputs");
-    Matrix outputsm = MatInit(trSetSize, 1, 0, "outputs");
-    inputsm.mat[0][0] = 1;
-    inputsm.mat[0][1] = 1;
-    inputsm.mat[1][1] = 1;
-    inputsm.mat[2][0] = 1;
-    outputsm.mat[1][0] = 1;
-    outputsm.mat[2][0] = 1;
-
-    TrainingSettings sett = {.batch_size = 1, .nbr_of_inputs = trSetSize};
+    TrainingSettings sett = {.nbr_of_inputs = 42}; // 42 is dummy value (will be
+                                                   // change by MnistTraining)
     sett.training_rate = strtod(strtok(NULL, " "), NULL);
     sett.epochs = atoi(strtok(NULL, " "));
     sett.inertia_strength = strtod(strtok(NULL, " "), NULL);
+    sett.batch_size = atoi(strtok(NULL, " "));
 
-    TrainNetwork(*network, inputsm, outputsm, sett);
+    MnistTraining(sett, *network);
 }
 
 void testXOR(Network *network, size_t argc) {
     (void)argc;
 
-    Matrix mat = MatInit(1, 2, 0, "input");
-    mat.mat[0][0] = atoi(strtok(NULL, " "));
-    mat.mat[0][1] = atoi(strtok(NULL, " "));
-
-    Matrix res = Propagate(mat, *network);
-
-    printf("\n*** 🔴 prediction: %d (real: %lf) ***\n\n",
-           (int)(res.mat[0][0] + 0.5), res.mat[0][0]);
-    MatFree(mat);
-    MatFree(res);
+    MnistTesting(*network);
 }
 
 struct parseEl {
@@ -109,8 +92,8 @@ struct parseEl {
 };
 
 struct parseEl parseList[] = {
-    {"help", 0, PrintUsage}, {"new", 0, CreateNetwork}, {"train", 3, trainXOR},
-    {"run", 2, testXOR},     {"save", 1, saveXOR},      {"load", 1, loadXOR}};
+    {"help", 0, PrintUsage}, {"new", 0, CreateNetwork}, {"train", 4, trainXOR},
+    {"test", 0, testXOR},    {"save", 1, saveXOR},      {"load", 1, loadXOR}};
 
 int main(void) {
     PrintTitle();

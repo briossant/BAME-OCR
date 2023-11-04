@@ -1,6 +1,5 @@
 #include "NeuralNetwork.h"
 #include "err.h"
-#include "matrices/matrices.h"
 #include <stddef.h>
 #include <stdlib.h>
 

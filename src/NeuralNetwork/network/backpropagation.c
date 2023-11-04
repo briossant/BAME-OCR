@@ -1,5 +1,4 @@
 #include "NeuralNetwork.h"
-#include "matrices/matrices.h"
 #include <stdio.h>
 
 // sigmoid derivative with x = Sigmoid(...)
