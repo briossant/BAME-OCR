@@ -52,7 +52,7 @@ void print_help(char* argv0)
     printf("ag, arroundgaussianblur  Apply Gaussian blur to the image\n");
     printf("r, rotate [angle]        Rotate the image with the angle\n");
     printf("ca, canny                Apply Canny filters to the image\n");
-    printf("gd, griddetection        Create markers for the grid\n");
+    printf("gd, griddetection [a][b] Create markers for the grid\n");
     printf("ar, autorotate           Rotate the image\n");
 }
 
@@ -100,6 +100,8 @@ typedef struct {
     int argc;
     char* output;
     int stop;
+    int threshold;
+    int state;
 } uplet;
 
 uplet sort_argv(char* argv0, char* input, int argc)
@@ -202,11 +204,11 @@ uplet sort_argv(char* argv0, char* input, int argc)
         }
         else if (strcmp(arg, "r") == 0 || strcmp(arg, "rotate") == 0) //Rotate
         {
-            res.argv[i++] = 7;
+            res.argv[i] = 7;
             arg = strtok(NULL, " ");
             if (arg == NULL)
             {
-                res.stop = -1;
+                res.stop = -2;
                 break;
             }
             res.angle = atoi(arg);
@@ -218,6 +220,20 @@ uplet sort_argv(char* argv0, char* input, int argc)
         else if (strcmp(arg, "gd") == 0 || strcmp(arg, "griddetection") == 0) //Canny
         {
             res.argv[i] = 9;
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.threshold = atoi(arg);
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.state = atoi(arg);
         }
         else if (strcmp(arg, "ar") == 0 || strcmp(arg, "autorotate") == 0) //Auto_Rotate
         {
@@ -229,6 +245,7 @@ uplet sort_argv(char* argv0, char* input, int argc)
             res.stop = 1;
             break;
         }
+        i++;
     } while ((arg = strtok(NULL, " ")) != NULL);
 
     if ((no_image_input || no_image_output) && res.stop != 1)
@@ -282,7 +299,7 @@ int ImageProcess(uplet argv)
         }
         else if (argv.argv[i] == 9) //GridDetection
         { 
-            image_converted = hough_transform(image_converted, 300);
+            image_converted = hough_transform(image_converted, argv.threshold, argv.state);
         }
         else if (argv.argv[i] == 8) //GridDetection
         { 
@@ -335,6 +352,8 @@ int main(int argc, char** argv) {
             res = ImageProcess(tmp);
         else if (tmp.stop == -1)
             print_fatal_error(argv[0]);
+        else if (tmp.stop == -2)
+            printf("%s: fatal error: no good arguments\n", argv[0]);
         free(input);
     }
 

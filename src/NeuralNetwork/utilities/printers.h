@@ -1,7 +1,7 @@
 #ifndef PRINTERS_H
 #define PRINTERS_H
 
-#include "NeuralNetwork.h"
+#include "../network/NeuralNetwork.h"
 
 void PrintSettings(TrainingSettings settings);
 void PrintTitle();

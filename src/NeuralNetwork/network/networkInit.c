@@ -1,5 +1,4 @@
 #include "NeuralNetwork.h"
-#include "matrices/matrices.h"
 
 NNValue startingValue() {
     return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
@@ -12,7 +11,8 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
     }
 
     Layer layer = {.size = layer_size,
-                   .biases = MatInitWithFct(1, layer_size, startingValue, "Biases"),
+                   .biases =
+                       MatInitWithFct(1, layer_size, startingValue, "Biases"),
                    .weights = MatInitWithFct(before_layer_size, layer_size,
                                              startingValue, "Weights")};
 
@@ -57,7 +57,8 @@ Network copyAndResetNetwork(Network network) {
 
         Layer layer = {.size = layer_size,
                        .biases = MatInit(1, layer_size, 0.0, "Biases"),
-                       .weights = MatInit(weights_size, layer_size, 0.0, "Weights")};
+                       .weights =
+                           MatInit(weights_size, layer_size, 0.0, "Weights")};
         weights_size = layer_size;
         layers[l] = layer;
     }

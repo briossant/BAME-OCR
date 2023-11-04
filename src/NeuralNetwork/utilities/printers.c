@@ -1,4 +1,4 @@
-#include "NeuralNetwork.h"
+#include "../network/NeuralNetwork.h"
 
 void PrintSettings(TrainingSettings settings) {
     size_t nbr_of_batch = settings.nbr_of_inputs / settings.batch_size;
