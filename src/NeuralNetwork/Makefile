@@ -20,5 +20,5 @@ mnist: $(OBJ) mnist.o
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -f xor mnist *.o *.d
+	rm -f xor mnist *.o *.d */*.d */*.o
 
