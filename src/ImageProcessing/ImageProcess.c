@@ -37,9 +37,10 @@ void print_fatal_error(char* argv0)
 
 void print_help(char* argv0)
 {
+    print_logo();
     printf("Usage: %s [options]\n", argv0);
     printf("Options:\n");
-    printf("a, all                   Apply all the filters for the OCR\n");
+    printf("a, all                   Apply all the filters for the OCR\n"); // TODO: Complete or remove
     printf("i, input [filename]      Input file\n");
     printf("o, output [filename]     Output file\n");
     printf("h, help                  Display this help message\n");
@@ -108,7 +109,7 @@ uplet sort_argv(char* argv0, char* input, int argc)
 {
     uplet res;
     res.stop = 0;
-    res.argv = (int*)malloc((argc)*sizeof(int));
+    res.argv = (int*)malloc((argc)*sizeof(int)); // FIXME
     res.argc = argc-2;
     for (int i = 0; i < res.argc; i++)
         res.argv[i] = -1;
@@ -213,13 +214,31 @@ uplet sort_argv(char* argv0, char* input, int argc)
             }
             res.angle = atoi(arg);
         }
-        else if (strcmp(arg, "ca") == 0 || strcmp(arg, "canny") == 0) //Canny
+        else if (strcmp(arg, "ca") == 0 || strcmp(arg, "canny") == 0) // Canny
         {
             res.argv[i] = 6;
         }
-        else if (strcmp(arg, "gd") == 0 || strcmp(arg, "griddetection") == 0) //Canny
+        else if (strcmp(arg, "gd") == 0 || strcmp(arg, "griddetection") == 0) // Grid Detection
         {
             res.argv[i] = 9;
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.threshold = atoi(arg);
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.state = atoi(arg);
+        }
+        else if (strcmp(arg, "ho") == 0 || strcmp(arg, "hough") == 0) // Hough
+        {
+            res.argv[i] = 10;
             arg = strtok(NULL, " ");
             if (arg == NULL)
             {
@@ -265,45 +284,49 @@ int ImageProcess(uplet argv)
     for(int i = 0; i < argv.argc; i++)
     {
         // printf("%d\n", argv.argv[i]);
-        if (argv.argv[i] == 2) //GreyScale
+        if (argv.argv[i] == 2) // GreyScale
         {
             GreyScale(image_converted);
         }
-        else if (argv.argv[i] == 3) //BlacknWhite
+        else if (argv.argv[i] == 3) // BlacknWhite
         {
             BlacknWhite(image_converted);
         }
-        else if (argv.argv[i] == 1) //Contrast
+        else if (argv.argv[i] == 1) // Contrast
         {
             Contrast(image_converted);
         }
-        else if (argv.argv[i] == 4) //GaussianBlur
+        else if (argv.argv[i] == 4) // GaussianBlur
         {
             GaussianBlur(image_converted);
         }
-        else if (argv.argv[i] == 0) //Bright
+        else if (argv.argv[i] == 0) // Bright
         {
             Bright(image_converted);
         }
-        else if (argv.argv[i] == 5) //ArroundGaussianBlur
+        else if (argv.argv[i] == 5) // Arround Gaussian Blur
         {
             ArroundGaussianBlur(image_converted);
         }
-        else if (argv.argv[i] == 6) //Canny
+        else if (argv.argv[i] == 6) // Canny
         {
             image_converted = Canny(image_converted);
         }
-        else if (argv.argv[i] == 7) //Rotate
+        else if (argv.argv[i] == 7) // Rotate
         { 
             image_converted = Rotate(image_converted, argv.angle);
         }
-        else if (argv.argv[i] == 9) //GridDetection
+        else if (argv.argv[i] == 8) // Auto Rotate
+        { 
+            Auto_Rotate(image_converted);
+        }
+        else if (argv.argv[i] == 9) // GridDetection
         { 
             image_converted = hough_transform(image_converted, argv.threshold, argv.state);
         }
-        else if (argv.argv[i] == 8) //Auto Rotate
+        else if (argv.argv[i] == 10) // Hough
         { 
-            Auto_Rotate(image_converted);
+            image_converted = new_hough_transform(image_converted, argv.state, argv.threshold);
         }
     }
 

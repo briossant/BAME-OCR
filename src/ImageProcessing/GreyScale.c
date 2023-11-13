@@ -26,7 +26,7 @@ void GreyScale(SDL_Surface* image)
             Uint8 gris = 0.3*r+0.59*g+0.11*b;
 
             // Update the pixel
-            pixtab[y * width + x] = SDL_MapRGBA(format, gris, gris, gris,a);
+            pixtab[y * width + x] = SDL_MapRGBA(format, gris, gris, gris, a);
         }
     }
     /*

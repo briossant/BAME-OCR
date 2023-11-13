@@ -33,6 +33,8 @@ Uint8 ComputeSeuil(SDL_Surface* image);
 
 SDL_Surface* hough_transform(SDL_Surface* image, int threshold, int state);
 
+SDL_Surface* new_hough_transform(SDL_Surface* image, int delta, int threshold);
+
 void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2);
 
 void draw_hough_line(SDL_Surface* image, SDL_Surface* hough_pic, int seuil);
