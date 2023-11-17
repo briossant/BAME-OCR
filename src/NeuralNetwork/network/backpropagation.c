@@ -1,9 +1,6 @@
 #include "NeuralNetwork.h"
 #include <stdio.h>
 
-// sigmoid derivative with x = Sigmoid(...)
-NNValue DSigmoid(NNValue x) { return x * (1 - x); }
-
 // cost function derivative over the output activations
 Matrix FirstDCostDActv(Matrix outputActivations, Matrix expectedOutputs) {
     return MatMultScalar(
@@ -20,15 +17,16 @@ void UpdateLayer(Layer layer, Matrix dCost, Matrix lastActv) {
     MatFree(trans);
 }
 
-Matrix DCostDZ(Matrix dCost_dActv, Matrix activations) {
-    return MatMult(MatApplyFct(MatCopy(activations, "DCostDZ"), DSigmoid),
+Matrix DCostDZ(Layer layer, Matrix dCost_dActv, Matrix activations) {
+    return MatMult(MatApplyFct(MatCopy(activations, "DCostDZ"),
+                               layer.activFcts.dSquishFct),
                    dCost_dActv);
 }
 
 Matrix GetNewDCostDActv(Layer layer, Matrix activations, Matrix dCost_dActv) {
-    Matrix dSig =
-        MatMult(MatApplyFct(MatCopy(activations, "newDCostDActv"), DSigmoid),
-                dCost_dActv);
+    Matrix dSig = MatMult(MatApplyFct(MatCopy(activations, "newDCostDActv"),
+                                      layer.activFcts.dSquishFct),
+                          dCost_dActv);
     Matrix trasnp = MatTranspose(layer.weights);
     Matrix res = MatDot(trasnp, dSig);
     MatFree(trasnp);
@@ -45,7 +43,8 @@ Matrix *BackPropagateInput(Network network, Matrix *activationsLayers,
         FirstDCostDActv(activationsLayers[outputLayerI], outputs);
 
     all_dCost_dZ[outputLayerI] =
-        DCostDZ(dCost_dActv, activationsLayers[outputLayerI]);
+        DCostDZ(network.layers[outputLayerI], dCost_dActv,
+                activationsLayers[outputLayerI]);
 
     for (size_t l = outputLayerI; l > 0; l--) {
         Matrix new_dCost_dActv = GetNewDCostDActv(
@@ -54,7 +53,8 @@ Matrix *BackPropagateInput(Network network, Matrix *activationsLayers,
         MatFree(dCost_dActv);
         dCost_dActv = new_dCost_dActv;
 
-        all_dCost_dZ[l - 1] = DCostDZ(dCost_dActv, activationsLayers[l - 1]);
+        all_dCost_dZ[l - 1] =
+            DCostDZ(network.layers[l], dCost_dActv, activationsLayers[l - 1]);
     }
 
     MatFree(dCost_dActv);

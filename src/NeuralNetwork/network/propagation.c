@@ -18,10 +18,9 @@ NNValue CostFunction(Matrix outputActivations, Matrix expectedOutputs) {
     return sum;
 }
 
-NNValue Sigmoid(NNValue x) { return 1 / (1 + exp(-x)); }
-
 Matrix PropagateLayer(Matrix lastActivation, Layer layer) {
-    return MatApplyFct(WeightedSum(lastActivation, layer), Sigmoid);
+    return MatApplyFct(WeightedSum(lastActivation, layer),
+                       layer.activFcts.squishFct);
 }
 
 Matrix Propagate(Matrix inputs, Network network) {

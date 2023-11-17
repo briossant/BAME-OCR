@@ -95,9 +95,6 @@ Matrix PropagateLayer(Matrix lastActivation, Layer layer);
 
 Matrix WeightedSum(Matrix activations, Layer layer);
 
-// may switch to ReLU function later on
-NNValue Sigmoid(NNValue x);
-
 // propagate on all of the input layer of the Matrix inputs and compare it with
 // the Matrix outputs to return a success rate (in %)
 NNValue TestPropagation(Matrix inputs, Matrix outputs, Network network);

@@ -1,4 +1,7 @@
 #include "NeuralNetwork.h"
+#include "activationFunctions.h"
+
+extern ActivationFunctions SigmoidFcts;
 
 NNValue startingValue() {
     return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
@@ -9,8 +12,8 @@ Layer newLayer(size_t layer_size, size_t before_layer_size) {
     if (layer_size < 1) {
         errx(0, "a layer needs at least one node (layers_size < 1)");
     }
-
     Layer layer = {.size = layer_size,
+                   .activFcts = SigmoidFcts,
                    .biases =
                        MatInitWithFct(1, layer_size, startingValue, "Biases"),
                    .weights = MatInitWithFct(before_layer_size, layer_size,
