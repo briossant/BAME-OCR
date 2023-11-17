@@ -1,7 +1,7 @@
 #include "NeuralNetwork.h"
-#include "activationFunctions.h"
 
 extern ActivationFunctions SigmoidFcts;
+extern ActivationFunctions ReLUFcts;
 
 NNValue startingValue() {
     return ((NNValue)rand() / RAND_MAX * 2.0 - 1.0); // * STARTING_RANGE -> may
