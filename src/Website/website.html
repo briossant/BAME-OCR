@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://fonts.googleeapis.com/css2?family=Catamaran&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content= "with=device-width, initial-scale=1.0">
+    <link rel ="stylesheet" herf="sticky.css">
+    
+  <title>BAME-OCR</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: "Trebuchet MS", Helvetica, sans-serif
+        }
+        
+        img{
+            width: 100%;
+        }
+        h6{font-family:'Brush Script MT', cursive;}
+        .headertext
+        {
+            list-style: none;
+            display: inline-block;
+            padding: 8px 12px;
+        }
+        ul{
+            list-decoration-style: none;
+            list-style: none;
+           
+        }
+        a{
+            text-decoration: none;
+            color: black;
+        }
+        a:hover{
+            color: blue;
+        }
+        .ProjectText
+        {
+            width: 70%;
+            display: inline-block;
+            margin-left:70px;
+        }
+        .github 
+        {
+            display: inline-block;
+            
+        }
+        .Solver{
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left:70px ;
+            background-color:#727878;
+ 
+        }
+        .About-us{
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left:70px ;
+            background-color:#727878;
+
+        }
+        .project{
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left:70px ;
+        }
+        .Navigation{
+            position: fixed;
+            width: 100%;
+        }
+        .Navigation ul {
+              list-style: none;
+            background: rgba(0,0,0,0);
+            overflow: hidden;
+            color: white;
+            padding: 0;
+            text-align: center;
+            margin: 0;
+            transition: ls;
+        }
+        .Navigation.black ul {
+            background: #000;
+        }
+        .Navigation ul li{
+            display: inline-block;
+            padding: 20px;
+        }
+            
+    </style>
+</head>
+
+<body>
+
+    <div class="Navigation">
+        <ul>
+        <li><a href="Home">Home</a></li>
+         <li><a href="Solver">Solver</a></li>
+         <li><a href="project">Project</a></li>
+        <li><a href="About-us">About Us</a></li>
+         </ul>
+    </div>
+    <div class="Home">
+        <img src= "Screenshot (4).png">
+    </div>
+    <div class= "headertext">
+     <h6>BAME-OCR is a software built in C to solve sudoku with AI</h6>  
+    </div>
+    <div class='Solver'>
+        <h3>
+            Hard Sudoku problem? Solve it here: 
+        </h3>
+
+    </div>
+    <div class="project">
+        <div class ='github'>
+            <ul>
+                <a href= "https://github.com/briossant/BAME-OCR">
+                <li> 
+                    <i class="fa fa-github"></i> Github
+                </a>
+                </li>
+            </ul>
+        </div>
+        <div class= 'ProjectText'>
+            <h4>
+                About the Project
+            </h4>
+            <p> 
+                This project is a sudoku solver using AI. The AI will solve the sudoku grid you give as an image and will return the image with the numbers missing in a different color. You can checkout our github if you are curiouos.
+            </p>
+        </div>
+        
+    </div>
+    <div class="About-us">
+    <div class= 'ProjectText'>
+        <h4>
+            About Us 
+        </h4>
+        <p> 
+            This project was made by Brieuc Crosson, Antoine Lassagne, Enzo Juhel et Maia Bucamp over their second year at EPITA University. They are amazing people who have made this project possible.
+        </p>
+    </div>
+    </div>
+
+    <sript src = "htttps://code.jquuery.com/jquery-3.5.1js"></script>
+        <script>
+            $(window).scroll(function(){
+            if ($(window).scrollTop())
+            {
+                $("Navigation").addClass("black");        
+            }
+            else{
+            $("Navigation").removeClass("black"); 
+            }
+            });
+        </script>
+       
+</body>
+
+</html>
