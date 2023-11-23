@@ -35,12 +35,13 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       if (r < 127)
         continue;
 
-      for (double theta = 0; theta < M_PI; theta += step) {
-        int raw = (double)x * cos(theta) + (double)y * sin(theta) + h_acc / 2;
+      for (int theta = 0; theta < w_acc; theta += 1) {
+        int raw = (double)x * cos((double)theta / w_acc * M_PI) +
+                  (double)y * sin((double)theta / w_acc * M_PI) + h_acc / 2;
         raw >>= 1;
         // if (raw == 0)
         // raw = (double)y * cos(theta) + (double)x * sin(theta);
-        size_t coo = (int)(theta / M_PI * w_acc) + raw * w_acc;
+        size_t coo = theta + raw * w_acc;
         SDL_GetRGBA(pixtab_acc[coo], format, &r, &g, &b, &a);
         if (r >= 255) {
           continue;
