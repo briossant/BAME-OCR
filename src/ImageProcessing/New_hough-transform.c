@@ -12,8 +12,9 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
 
   int height = image->h;
   int width = image->w;
-  int w_acc = 400;
-  int h_acc = 400;
+  int w_acc = 1000;
+  int h_acc = 2 * sqrt(height * height + width * width);
+  double step = 0.001;
   const SDL_PixelFormat *format = image->format;
 
   SDL_Surface *accumu =
@@ -25,8 +26,6 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   for (int y = 0; y < h_acc * w_acc; y++) {
     pixtab_acc[y] = SDL_MapRGBA(format, 0, 0, 0, 255);
   }
-  double theta_max = M_PI / 2;
-  double raw_max = sqrt(w_acc * w_acc + h_acc * h_acc);
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
@@ -36,12 +35,17 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       if (r < 127)
         continue;
 
-      double raw = sqrt(x * x + y * y);
-      double theta = acos((double)x / raw);
-
-      size_t coo = (theta / theta_max) * w_acc + raw / raw_max * h_acc;
-      SDL_GetRGBA(pixtab[coo], format, &r, &g, &b, &a);
-      pixtab_acc[coo] = SDL_MapRGBA(format, r + 1, g + 1, b + 1, a);
+      for (double theta = 0; theta < M_PI; theta += step) {
+        int raw = (double)x * cos(theta) + (double)y * sin(theta);
+        if (raw == 0)
+          raw = 1;
+        size_t coo = (theta / M_PI * w_acc) + -(raw - h_acc / 2) * w_acc;
+        SDL_GetRGBA(pixtab_acc[coo], format, &r, &g, &b, &a);
+        if (r >= 255) {
+          continue;
+        }
+        pixtab_acc[coo] = SDL_MapRGBA(format, r + 1, g + 1, b + 1, a);
+      }
     }
   }
   return accumu;
