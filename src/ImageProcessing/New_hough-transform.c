@@ -14,7 +14,7 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   int width = image->w;
   int w_acc = 1000;
   int h_acc = 2 * sqrt(height * height + width * width);
-  double step = 0.001;
+  int step = delta;
   const SDL_PixelFormat *format = image->format;
 
   SDL_Surface *accumu =
@@ -35,13 +35,14 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       if (r < 127)
         continue;
 
-      for (int theta = 0; theta < w_acc; theta += 1) {
-        int raw = (double)x * cos((double)theta / w_acc * M_PI) +
-                  (double)y * sin((double)theta / w_acc * M_PI) + h_acc / 2;
+      for (int theta = 0; theta < w_acc * step; theta += 1) {
+        int raw = (double)x * cos((double)theta / step / w_acc * M_PI) +
+                  (double)y * sin((double)theta / step / w_acc * M_PI) +
+                  h_acc / 2;
         raw >>= 1;
         // if (raw == 0)
         // raw = (double)y * cos(theta) + (double)x * sin(theta);
-        size_t coo = theta + raw * w_acc;
+        size_t coo = theta / step + raw * w_acc;
         SDL_GetRGBA(pixtab_acc[coo], format, &r, &g, &b, &a);
         if (r >= 255) {
           continue;
@@ -56,10 +57,19 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       Uint8 r, g, b, a;
       SDL_GetRGBA(pixtab_acc[y * width + x], format, &r, &g, &b, &a);
       if (r > threshold) {
-        // dessiner droite
+        int rho = x / 2;
+        rho -= h_acc / 2;
+        double a = cos((double)y / w_acc * M_PI);
+        double b = sin((double)y / w_acc * M_PI);
+        int x1 = a * rho + 10000 * (-b);
+        int y1 = (b * rho + 10000 * (a));
+        int x2 = a * rho - 10000 * (-b);
+        int y2 = (b * rho - 10000 * (a));
+        printf("%d %d -- %d %d\n", x1, y1, x2, y2);
+        draw_line(image, x1, y1, x2, y2);
       }
     }
   }
-
+  IMG_SavePNG(image, "line.png");
   return accumu;
 }
