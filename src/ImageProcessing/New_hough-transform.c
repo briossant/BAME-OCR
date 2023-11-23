@@ -36,10 +36,11 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
         continue;
 
       for (double theta = 0; theta < M_PI; theta += step) {
-        int raw = (double)x * cos(theta) + (double)y * sin(theta);
-        if (raw == 0)
-          raw = 1;
-        size_t coo = (theta / M_PI * w_acc) + -(raw - h_acc / 2) * w_acc;
+        int raw = (double)x * cos(theta) + (double)y * sin(theta) + h_acc / 2;
+        raw >>= 1;
+        // if (raw == 0)
+        // raw = (double)y * cos(theta) + (double)x * sin(theta);
+        size_t coo = (int)(theta / M_PI * w_acc) + raw * w_acc;
         SDL_GetRGBA(pixtab_acc[coo], format, &r, &g, &b, &a);
         if (r >= 255) {
           continue;
@@ -48,5 +49,16 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       }
     }
   }
+
+  for (int y = 0; y < w_acc; y++) {
+    for (int x = 0; x < h_acc; x++) {
+      Uint8 r, g, b, a;
+      SDL_GetRGBA(pixtab_acc[y * width + x], format, &r, &g, &b, &a);
+      if (r > threshold) {
+        // dessiner droite
+      }
+    }
+  }
+
   return accumu;
 }
