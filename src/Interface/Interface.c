@@ -1,3 +1,4 @@
+#include <complex.h>
 #include <gtk/gtk.h>
 
 // Function to handle button click event
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
 
     // Create the main window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "BAME-OCR");
+    gtk_window_set_title(GTK_WINDOW(window), "--- Sudoku Solver --");
     gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -22,9 +23,28 @@ int main(int argc, char *argv[])
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
-    // Create an "Insert Image" label (placeholder)
-    GtkWidget *insert_label = gtk_label_new("Insert Image Placeholder");
-    gtk_box_pack_start(GTK_BOX(vbox), insert_label, TRUE, TRUE, 0);
+    // Add a button with "?" label
+    GtkWidget *button = gtk_button_new_with_label("?");
+    gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
+
+    // Check box with "Step by Step" label
+    GtkWidget *check_button = gtk_check_button_new_with_label("Step by Step");
+    gtk_box_pack_start(GTK_BOX(vbox), check_button, TRUE, TRUE, 0);
+// "solved image will appear here once image is uploaded
+    GtkWidget *image_base = gtk_image_new_from_file("uploaded_base_image.png");
+    gtk_box_pack_start(GTK_BOX(vbox), image_base, TRUE, TRUE, 0);
+
+    // Add an image called "Solved"
+    GtkWidget *image_solved = gtk_image_new_from_file("solved_image.png");
+    //gtk_box_pack_start(GTK_BOX(hbox), image_solved, TRUE, TRUE, 0);
+
+// Create a horizontal box for the upload button and the "Solved" image
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+
+    // Add a button for Sudoku image upload
+    GtkWidget *upload_button = gtk_button_new_with_label("Sudoku Image Upload");
+    gtk_box_pack_start(GTK_BOX(hbox), upload_button, TRUE, TRUE, 0);
 
     // Create a "Solve" button
     GtkWidget *solve_button = gtk_button_new_with_label("Solve");
