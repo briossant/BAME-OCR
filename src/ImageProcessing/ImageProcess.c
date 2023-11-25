@@ -37,10 +37,9 @@ void print_fatal_error(char* argv0)
 
 void print_help(char* argv0)
 {
-    print_logo();
     printf("Usage: %s [options]\n", argv0);
     printf("Options:\n");
-    printf("a, all                   Apply all the filters for the OCR\n"); // TODO: Complete or remove
+    // printf("a, all                   Apply all the filters for the OCR\n"); // TODO: Complete or remove
     printf("i, input [filename]      Input file\n");
     printf("o, output [filename]     Output file\n");
     printf("h, help                  Display this help message\n");
@@ -55,6 +54,7 @@ void print_help(char* argv0)
     printf("ca, canny                Apply Canny filters to the image\n");
     printf("gd, griddetection [a][b] Create markers for the grid\n");
     printf("ar, autorotate           Rotate the image\n");
+    // TODO: add Crop
 }
 
 // Input
@@ -103,6 +103,10 @@ typedef struct {
     int stop;
     int threshold;
     int state;
+    int pt1;
+    int pt2;
+    int pt3;
+    int pt4;
 } uplet;
 
 uplet sort_argv(char* argv0, char* input, int argc)
@@ -254,9 +258,41 @@ uplet sort_argv(char* argv0, char* input, int argc)
             }
             res.state = atoi(arg);
         }
-        else if (strcmp(arg, "ar") == 0 || strcmp(arg, "autorotate") == 0) //Auto_Rotate
+        else if (strcmp(arg, "ar") == 0 || strcmp(arg, "autorotate") == 0) // Auto_Rotate
         {
             res.argv[i] = 8;
+        }
+        else if (strcmp(arg, "cr") == 0 || strcmp(arg, "crop") == 0) // Crop
+        {
+            res.argv[i] = 11;
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.pt1 = atoi(arg); // TODO: Opti
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.pt2 = atoi(arg);
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.pt3 = atoi(arg);
+            arg = strtok(NULL, " ");
+            if (arg == NULL)
+            {
+                res.stop = -2;
+                break;
+            }
+            res.pt4 = atoi(arg);
         }
         else
         {
@@ -275,8 +311,9 @@ uplet sort_argv(char* argv0, char* input, int argc)
 
 int ImageProcess(uplet argv)
 {
-    // Do the action in order
+    line l = {argv.pt1, argv.pt2, argv.pt3, argv.pt4};
 
+    // Do the action in order
     SDL_Surface* image_converted = SDL_Start(argv.input);
     if(image_converted == NULL)
         return 1;
@@ -328,6 +365,10 @@ int ImageProcess(uplet argv)
         { 
             image_converted = new_hough_transform(image_converted, argv.state, argv.threshold);
         }
+        else if (argv.argv[i] == 11) // Crop
+        {
+            image_converted = Crop(image_converted, l);
+        }
     }
 
     SDL_Output(image_converted, argv.output);
@@ -346,6 +387,8 @@ size_t GetArgc(char *input) {
 
 int main(int argc, char** argv) {
     (void)argc; // Unused variable
+
+    print_logo();
     
     if(0 != SDL_Init(SDL_INIT_VIDEO))
     {

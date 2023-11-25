@@ -423,9 +423,9 @@ SDL_Surface *hough_transform(SDL_Surface *image, int threshold, int state) {
 
     for (i = 0; i < 9; i++) {
       for (int j = 0; j < 9; j++) {
-        Crop(image, tabX[i], tabY[j], tabX[i + 1], tabY[j], tabX[i],
-             tabY[j + 1], tabX[i + 1], tabY[j + 1],
-             strcat("Crop" + ('0' + i + 10 * j), ".png"));
+        // Crop(image, tabX[i], tabY[j], tabX[i + 1], tabY[j], tabX[i],
+        //      tabY[j + 1], tabX[i + 1], tabY[j + 1],
+        //      strcat("Crop" + ('0' + i + 10 * j), ".png"));
         // Crop(image, tabX[i], 0, tabX[i], image->h, 0, tabY[j], image->w,
         // tabY[j], strcat("Crop"+('0'+ i + 10*j), ".png"));
       }
