@@ -5,11 +5,9 @@
 
 typedef struct
 {
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-} line;
+    int x;
+    int y;
+} pair;
 
 void BlacknWhite(SDL_Surface *image);
 
@@ -51,4 +49,6 @@ void draw_hough_line(SDL_Surface *image, SDL_Surface *hough_pic, int seuil);
 
 void Auto_Rotate(SDL_Surface *image);
 
-SDL_Surface* Crop(SDL_Surface* image, line l);
+SDL_Surface* Crop(SDL_Surface* image, pair p1, pair p2);
+
+void Crop_grid(SDL_Surface* image, int* lx, int* ly);

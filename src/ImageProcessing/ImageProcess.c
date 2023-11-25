@@ -61,8 +61,6 @@ void print_help(char* argv0)
 SDL_Surface* SDL_Start(char* filename)
 {
     // SDL Init
-
-
     SDL_Surface* image = NULL;
     image = IMG_Load(filename);
     if (image == NULL) 
@@ -103,10 +101,8 @@ typedef struct {
     int stop;
     int threshold;
     int state;
-    int pt1;
-    int pt2;
-    int pt3;
-    int pt4;
+    pair p1;
+    pair p2;
 } uplet;
 
 uplet sort_argv(char* argv0, char* input, int argc)
@@ -271,28 +267,28 @@ uplet sort_argv(char* argv0, char* input, int argc)
                 res.stop = -2;
                 break;
             }
-            res.pt1 = atoi(arg); // TODO: Opti
+            res.p1.x = atoi(arg); // TODO: Opti
             arg = strtok(NULL, " ");
             if (arg == NULL)
             {
                 res.stop = -2;
                 break;
             }
-            res.pt2 = atoi(arg);
+            res.p1.y = atoi(arg);
             arg = strtok(NULL, " ");
             if (arg == NULL)
             {
                 res.stop = -2;
                 break;
             }
-            res.pt3 = atoi(arg);
+            res.p2.x = atoi(arg);
             arg = strtok(NULL, " ");
             if (arg == NULL)
             {
                 res.stop = -2;
                 break;
             }
-            res.pt4 = atoi(arg);
+            res.p2.y = atoi(arg);
         }
         else
         {
@@ -311,8 +307,6 @@ uplet sort_argv(char* argv0, char* input, int argc)
 
 int ImageProcess(uplet argv)
 {
-    line l = {argv.pt1, argv.pt2, argv.pt3, argv.pt4};
-
     // Do the action in order
     SDL_Surface* image_converted = SDL_Start(argv.input);
     if(image_converted == NULL)
@@ -366,8 +360,8 @@ int ImageProcess(uplet argv)
             image_converted = new_hough_transform(image_converted, argv.state, argv.threshold);
         }
         else if (argv.argv[i] == 11) // Crop
-        {
-            image_converted = Crop(image_converted, l);
+        { 
+            image_converted = Crop(image_converted, argv.p1, argv.p2);              
         }
     }
 
