@@ -17,7 +17,7 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
     int height = image->h;
     int width = image->w;
     int h_acc = 2 * sqrt(height * height + width * width);
-    int w_acc = width + h_acc;
+    int w_acc = 180 + delta;
     const SDL_PixelFormat *format = image->format;
 
     size_t *accumu = calloc(w_acc * h_acc, sizeof(size_t));
