@@ -168,6 +168,14 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
     }
   }
 
+  int max = accumu[0];
+  for (int y = 0; y < h_acc * w_acc; y++) {
+    if (accumu[y] > max) {
+      max = accumu[y];
+    }
+  }
+  threshold = max / 4;
+
   size_t nb_droite = 0;
   for (int y = 0; y < h_acc * w_acc; y++) {
     if (accumu[y] > threshold) {
