@@ -321,7 +321,9 @@ int ImageProcess(uplet argv)
         }
         else if (argv.argv[i] == 3) // BlacknWhite
         {
-            BlacknWhite(image_converted);
+            // BlacknWhite(image_converted);
+            InvertColor(image_converted);
+            Balance(image_converted);
         }
         else if (argv.argv[i] == 1) // Contrast
         {

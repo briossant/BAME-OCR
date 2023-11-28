@@ -21,10 +21,10 @@ int void_square(SDL_Surface *image)
   const SDL_PixelFormat* format = image->format;
   Uint32* pixtab = image->pixels;
 
-  for (int y = 0; y < height*width; y++)
+  for (int x = 0; x < height*width; x++)
   {
     Uint8 r, g, b, a;
-    SDL_GetRGBA(pixtab[y],format, &r, &g, &b, &a);
+    SDL_GetRGBA(pixtab[x],format, &r, &g, &b, &a);
     if (!r)
       accu++;
 
