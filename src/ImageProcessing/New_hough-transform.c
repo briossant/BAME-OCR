@@ -144,7 +144,8 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
   free(queue);
 }
 
-SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
+int *new_hough_transform(SDL_Surface *image, int delta, int threshold,
+                         int *return_size) {
 
   int height = image->h;
   int width = image->w;
@@ -181,7 +182,7 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
       max = accumu[y];
     }
   }
-  threshold = max / 4;
+  threshold = max / 3.5;
 
   size_t nb_droite = 0;
   for (int y = 0; y < h_acc * w_acc; y++) {
@@ -192,7 +193,6 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   }
 
   int *matrix = calloc(nb_droite * 4, sizeof(int));
-
   size_t i = 0;
   for (int y = 0; y < h_acc; y++) {
     for (int x = 0; x < w_acc; x++) {
@@ -207,8 +207,10 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
         matrix[i++] = (y0 - 10000 * (A));
         draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
                   matrix[i - 1]);
+        // test of Grid Detection
       }
     }
   }
-  return image;
+  *return_size = nb_droite;
+  return matrix;
 }
