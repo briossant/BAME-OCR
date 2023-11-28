@@ -12,7 +12,7 @@ Number of try to write Hough : 3
 #include <math.h>
 #include <stdlib.h>
 
-#define PATCH_W 36
+/*#define PATCH_W 36
 #define PATCH_H 36
 
 void LocalMaximum(int *accumu, int h_acc, int w_acc, int x, int y) {
@@ -34,6 +34,58 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int x, int y) {
         accumu[coo] = 0;
     }
   }
+}*/
+
+void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
+  size_t size = 242;
+  int *queue = malloc(sizeof(int) * size);
+  size_t i_current = 0;
+  size_t i_insert = 1;
+  queue[0] = coo;
+  int max_coo = coo;
+
+  while (i_current < i_insert) {
+    int x = queue[i_current] % w_acc;
+    int y = queue[i_current] / w_acc;
+    if (x + 1 < w_acc) {
+      if (accumu[coo + 1] > threshold)
+        queue[i_insert++] = coo + 1;
+      if (accumu[coo + 1] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo + 1;
+      } else
+        accumu[coo + 1] = 0;
+    }
+    if (x - 1 < w_acc) {
+      if (accumu[coo - 1] > threshold)
+        queue[i_insert++] = coo - 1;
+      if (accumu[coo - 1] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo - 1;
+      } else
+        accumu[coo - 1] = 0;
+    }
+    if (y + w_acc < h_acc) {
+      if (accumu[coo + w_acc] > threshold)
+        queue[i_insert++] = coo + w_acc;
+      if (accumu[coo + w_acc] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo + w_acc;
+      } else
+        accumu[coo + w_acc] = 0;
+    }
+    if (y - w_acc < h_acc) {
+      if (accumu[coo - w_acc] > threshold)
+        queue[i_insert++] = coo - w_acc;
+      if (accumu[coo - w_acc] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo - w_acc;
+      } else
+        accumu[coo - w_acc] = 0;
+    }
+    ++i_current;
+  }
+  accumu[max_coo] = -accumu[max_coo];
 }
 
 SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
