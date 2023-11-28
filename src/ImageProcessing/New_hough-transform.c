@@ -30,7 +30,7 @@ int void_square(SDL_Surface *image)
 
   }
   accu = accu/(height*width);
-  return accu > 0.25;
+  return accu < 0.25;
 }
 
 SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
@@ -53,11 +53,11 @@ SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
   
   const SDL_Rect src = {.x=x1,.y=y1,.w=x2-x1,.h=y2-y1};
 
-  SDL_Rect dst = {0,0,28,28};
-
   int er = SDL_BlitScaled(image, &src, image_converted,NULL);
   if (er == -1)
     err(0,NULL);
+
+  printf("Is empty? = %i\n",void_square(image_converted));
   return image_converted;
 }
 
