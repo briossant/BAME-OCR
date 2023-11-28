@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "matrices/matrices.h"
+#include "../matrices/matrices.h"
 #include "precision.h"
 
 //////////////////////////////////////
@@ -67,11 +67,6 @@ Network copyAndResetNetwork(Network network);
 void freeNetwork(Network network);
 
 ////////////////////////////////////
-// Printers
-
-void printNetwork(Network network);
-
-////////////////////////////////////
 // Mnist Loading
 
 // load mnist data into Matrix *images and Matrix *labels
@@ -79,7 +74,9 @@ void printNetwork(Network network);
 // loadMnist.c
 void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining);
 // don't forget to init rand() with srand(time(NULL));
-void MnistTraining(TrainingSettings settings);
+void MnistTraining(TrainingSettings settings, Network network);
+
+void MnistTesting(Network network);
 
 ////////////////////////////////////
 // Propagation

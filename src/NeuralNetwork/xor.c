@@ -1,166 +1,155 @@
-#include <stddef.h>
-#include <stdio.h>
-#include "NeuralNetwork.h"
+#include "network/NeuralNetwork.h"
+#include "utilities/printers.h"
+#include <string.h>
 
-void PrintTitle() {
-    printf(
-        " ▄▄▄▄    ▄▄▄       ███▄ ▄███▓▓█████     ▒█████   ▄████▄   ██▀███  \n");
-    printf(
-        "▓█████▄ ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀    ▒██▒  ██▒▒██▀ ▀█  ▓██ ▒ ██▒\n");
-    printf(
-        "▒██▒ ▄██▒██  ▀█▄  ▓██    ▓██░▒███      ▒██░  ██▒▒▓█    ▄ ▓██ ░▄█ ▒\n");
-    printf(
-        "▒██░█▀  ░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄    ▒██   ██░▒▓▓▄ ▄██▒▒██▀▀█▄  \n");
-    printf(
-        "░▓█  ▀█▓ ▓█   ▓██▒▒██▒   ░██▒░▒████▒   ░ ████▓▒░▒ ▓███▀ ░░██▓ ▒██▒\n");
-    printf(
-        "░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░   ░ ▒░▒░▒░ ░ ░▒ ▒  ░░ ▒▓ ░▒▓░\n");
-    printf(
-        "▒░▒   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░     ░ ▒ ▒░   ░  ▒     ░▒ ░ ▒░\n");
-    printf(
-        " ░    ░   ░   ▒   ░      ░      ░      ░ ░ ░ ▒  ░          ░░   ░ \n");
-    printf(
-        " ░            ░  ░       ░      ░  ░       ░ ░  ░ ░         ░     \n");
-    printf("      ░                                         ░                "
-           "\n\n\n");
+#define INPUT_LAYER_SIZE 2
+#define OUTPUT_LAYER_SIZE 1
+#define CMD_COUNT 6
+
+void PrintUsage(Network *network, size_t argc) {
+  (void)network;
+  (void)argc;
+
+  printf("\n🟢 Usage:\n");
+  printf("〉help : show this message\n");
+  printf("〉quit : exit program\n");
+  printf("〉new [hidden layer size] ... : create a new network\n");
+  printf("〉train [learning rate] [epochs] [inertia strength] : train the "
+         "network\n");
+  printf("〉run [0 or 1] [0 or 1] : run the prediction on those inputs\n");
+  printf("〉save [filename] : save the network\n");
+  printf("〉load [filename] : load the network\n");
+  printf("\n");
 }
 
-void train(size_t epoch, NNValue trRate) {
-    printf("~|~ Training ~|~\n\n");
-
-    size_t layers_size[] = {2, 6, 1};
-    Network network = newNetwork(layers_size, 3);
-
-    size_t trSetSize = 4;
-
-    NNValue *inputsl[] = {(NNValue[]){0, 1}, (NNValue[]){1, 0},
-                          (NNValue[]){0, 0}, (NNValue[]){1, 1}};
-
-    NNValue *outputsl[] = {(NNValue[]){1}, (NNValue[]){1}, (NNValue[]){0},
-                           (NNValue[]){0}};
-
-    Matrix inputsm = {
-        .w = trSetSize, .h = 2, .mat = outputsl, .label = "inputs"};
-    Matrix outputsm = {
-        .w = trSetSize, .h = 1, .mat = inputsl, .label = "outputs"};
-
-    TrainingSettings sett = {.training_rate = trRate,
-                             .batch_size = 1,
-                             .epochs = epoch,
-                             .inertia_strength = 0,
-                             .nbr_of_inputs = trSetSize};
-
-    TrainNetwork(network, inputsm, outputsm, sett);
-
-    // create new fct to propagate on multi inputs layer matrix
-    Matrix res = Propagate(inputsm, network);
-    printf("Final tests:  \n");
-    MatPrint(inputsm);
-    MatPrint(res);
-
-    freeNetwork(network);
-    MatFree(res);
+size_t GetArgc(char *input) {
+  char *p = input;
+  size_t res = 0;
+  while (*p != 0)
+    if (*(p++) == ' ')
+      ++res;
+  return res;
 }
 
-void save(char *filepath) {
-    printf("saving\n");
-    size_t layers_size[] = {2, 4, 2};
-    Network network = newNetwork(layers_size, 3);
-    SaveNetwork( network,filepath);
+void saveXOR(Network *network, size_t argc) {
+  (void)argc;
+
+  SaveNetwork(*network, strtok(NULL, " "));
 }
 
-Network load(char *filepath) {
-    printf("loading\n");
-    Network network=LoadNetwork(filepath);
-    return network;
+void loadXOR(Network *network, size_t argc) {
+  (void)network;
+  (void)argc;
+
+  printf("Loading isn't operational yet.\n");
+  return;
+  // freeNetwork(*network);
+  //  *network = LoadNetwork(strtok(NULL, " "));
 }
 
-void solve(char input[2]) {
-    size_t layers_size[] = {2, 4, 2};
-    Network network = newNetwork(layers_size, 3);
-
-    printNetwork(network);
-
-    NNValue *list = malloc(sizeof(NNValue) * 2);
-    list[0] = (NNValue)input[0];
-    list[1] = (NNValue)input[1];
-    Matrix mat = {.h = 2, .w = 1, .mat = &list};
-    Matrix res = Propagate(mat, network);
-
-    printf("Result of %d%d :\n", input[0], input[1]);
-    MatPrint(res);
-}
-
-void printHelp() {
-    printf("Usage:\n./xor t [Epoch] [TrainingRate]: for training\n./xor p "
-           "[0-1] [0-1] : propagate inputs");
-    printf("\n./xor s [filepath] : save\n./xor l [filepath] : to load\n");
-    printf("./xor m [Epochs] [TrainingRate] [BatchSize] [InertiaStrength (0.0 "
-           "to 1.0)] : train on mnist\n");
-}
-
-void mnist(size_t epoch, NNValue learning_rate, size_t batch_size,
-           NNValue inertia_strength) {
-    TrainingSettings sett = {
-        .training_rate = learning_rate,
-        .batch_size = batch_size,
-        .epochs = epoch,
-        .inertia_strength = inertia_strength,
-        .nbr_of_inputs = 42 // dummy value
-    };
-    MnistTraining(sett);
-}
-
-int main(int argc, char **argv) {
-    PrintTitle();
-    if (argc < 2) {
-        printHelp();
-        return 1;
+void CreateNetwork(Network *network, size_t argc) {
+  size_t *layers_size = malloc(sizeof(size_t) * (argc + 2));
+  *layers_size = INPUT_LAYER_SIZE;
+  *(layers_size + argc + 1) = OUTPUT_LAYER_SIZE;
+  size_t i = 0;
+  while (i++ < argc) {
+    size_t x;
+    if ((x = atoi(strtok(NULL, " "))) > 0)
+      layers_size[i] = x;
+    else {
+      printf("Layer sizes must be positive integer.\n");
     }
-    srand(time(NULL));
+  }
+  freeNetwork(*network);
+  *network = newNetwork(layers_size, argc + 2);
+  printNetwork(*network);
+  free(layers_size);
+}
 
-    if (argv[1][0] == 'p') {
-        if (argc < 4) {
-            printHelp();
-            return 1;
-        }
+void trainXOR(Network *network, size_t argc) {
+  (void)argc;
 
-        char input[] = {argv[2][0] - 48, argv[3][0] - 48};
+  size_t trSetSize = 4;
+  Matrix inputsm = MatInit(trSetSize, 2, 0, "inputs");
+  Matrix outputsm = MatInit(trSetSize, 1, 0, "outputs");
+  inputsm.mat[0][0] = 1;
+  inputsm.mat[0][1] = 1;
+  inputsm.mat[1][1] = 1;
+  inputsm.mat[2][0] = 1;
+  outputsm.mat[1][0] = 1;
+  outputsm.mat[2][0] = 1;
 
-        solve(input);
-    } else if (argv[1][0] == 'm') {
-        if (argc < 6) {
-            printHelp();
-            return 1;
-        }
-        size_t epoch;
-        size_t batch_size;
-        sscanf(argv[2], "%zu", &epoch);
-        sscanf(argv[4], "%zu", &batch_size);
-        mnist(epoch, (NNValue)atof(argv[3]), batch_size,
-              (NNValue)atof(argv[5]));
-    } else if (argv[1][0] == 't') {
-        if (argc < 4) {
-            printHelp();
-            return 1;
-        }
-        size_t epoch;
-        sscanf(argv[2], "%zu", &epoch);
-        train(epoch, (NNValue)atof(argv[3]));
-    } else if (argv[1][0] == 's') {
-        if (argc < 3) {
-            printHelp();
-            return 1;
-        }
-        save(argv[2]);
-    } else if (argv[1][0] == 'l') {
-        if (argc < 3) {
-            printHelp();
-            return 1;
-        }
-        load(argv[2]);
-    } else
-        printHelp();
+  TrainingSettings sett = {.batch_size = 1, .nbr_of_inputs = trSetSize};
+  sett.training_rate = strtod(strtok(NULL, " "), NULL);
+  sett.epochs = atoi(strtok(NULL, " "));
+  sett.inertia_strength = strtod(strtok(NULL, " "), NULL);
 
-    return 0;
+  TrainNetwork(*network, inputsm, outputsm, sett);
+}
+
+void testXOR(Network *network, size_t argc) {
+  (void)argc;
+
+  Matrix mat = MatInit(1, 2, 0, "input");
+  mat.mat[0][0] = atoi(strtok(NULL, " "));
+  mat.mat[0][1] = atoi(strtok(NULL, " "));
+
+  Matrix res = Propagate(mat, *network);
+
+  printf("\n*** 🔴 prediction: %d (real: %lf) ***\n\n",
+         (int)(res.mat[0][0] + 0.5), res.mat[0][0]);
+  MatFree(mat);
+  MatFree(res);
+}
+
+struct parseEl {
+  char *cmd_name;
+  size_t min_argc;
+  void (*fct)(Network *network, size_t argc);
+};
+
+struct parseEl parseList[] = {
+    {"help", 0, PrintUsage}, {"new", 0, CreateNetwork}, {"train", 3, trainXOR},
+    {"run", 2, testXOR},     {"save", 1, saveXOR},      {"load", 1, loadXOR}};
+
+int main(void) {
+  PrintTitle();
+  printf("Type \"help\" for more information.\n\n");
+  Network *network = malloc(sizeof(Network));
+  *network = newNetwork((size_t[]){INPUT_LAYER_SIZE, 42, OUTPUT_LAYER_SIZE}, 3);
+  while (42) {
+    // get user input
+    char *input = NULL;
+    size_t len = 0;
+    printf("〉");
+    if (getline(&input, &len, stdin) <= 1)
+      continue;
+
+    // remove trailing newline from user inputs
+    input[strcspn(input, "\n")] = 0;
+
+    // get number of args and command name
+    size_t argc = GetArgc(input);
+    char *cmd_name = strtok(input, " ");
+
+    // exit if requested
+    if (strcmp(cmd_name, "quit") == 0)
+      break;
+
+    // exec command or print error
+    size_t i = 0;
+    while (i < CMD_COUNT && strcmp(cmd_name, parseList[i].cmd_name) != 0)
+      ++i;
+    if (i == CMD_COUNT)
+      printf("Unknown command '%s'. Type 'help' for help.\n", cmd_name);
+    else if (argc < parseList[i].min_argc)
+      printf("Not enough arguments. Type 'help' for help.\n");
+    else
+      parseList[i].fct(network, argc);
+
+    free(input);
+  }
+  freeNetwork(*network);
+  printf("Goodbye!\n");
+  return 0;
 }

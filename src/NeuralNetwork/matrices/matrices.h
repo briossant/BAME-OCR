@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../precision.h"
+#include "../network/precision.h"
 
 #define LABEL_TRANSFORM 0
 
