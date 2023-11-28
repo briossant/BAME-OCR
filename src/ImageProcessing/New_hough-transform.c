@@ -12,21 +12,28 @@ Number of try to write Hough : 3
 #include <math.h>
 #include <stdlib.h>
 
-int LocalMaximum(size_t *accumu, size_t h_acc, size_t w_acc, int x, int y) {
-  size_t max = 0;
-  size_t last_max = 42;
-  // TODO
-  for (int j = y - 1; j <= y + 1; j++) {
-    for (int i = x - 1; i <= x + 1; i++) {
-      if (j >= 0 && j < h_acc && i >= 0 && i < w_acc) {
-        size_t val = accumu[j * w_acc + i];
-        if (val > max)
-          max = val;
-      }
+#define PATCH_W 36
+#define PATCH_H 36
+
+void LocalMaximum(int *accumu, int h_acc, int w_acc, int x, int y) {
+  int max_coo = y * w_acc + x;
+  int max = accumu[max_coo];
+  int w_half = PATCH_W / 2;
+  int coo;
+  accumu[max_coo] = -accumu[max_coo];
+
+  for (int j = y; j <= y + PATCH_H && j < h_acc; j++) {
+    for (int i = x - w_half; i >= 0 && i <= x + w_half && i < w_acc; i++) {
+      coo = j * w_acc + i;
+      if (accumu[coo] > max) {
+        max = accumu[coo];
+        accumu[max_coo] = 0;
+        max_coo = coo;
+        accumu[max_coo] = -accumu[max_coo];
+      } else
+        accumu[coo] = 0;
     }
   }
-
-  return max;
 }
 
 SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
@@ -37,7 +44,7 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   int w_acc = 180 + delta;
   const SDL_PixelFormat *format = image->format;
 
-  size_t *accumu = calloc(w_acc * h_acc, sizeof(size_t));
+  int *accumu = calloc(w_acc * h_acc, sizeof(size_t));
 
   Uint32 *pixtab = image->pixels;
 
@@ -64,8 +71,7 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   for (int y = 0; y < h_acc; y++) {
     for (int x = 0; x < w_acc; x++) {
       if (accumu[y * w_acc + x] > threshold) {
-        // search local max and set zone to 0
-        // FindLocalMax
+        LocalMaximum(accumu, h_acc, w_acc, x, y);
         ++nb_droite;
       }
     }
@@ -73,18 +79,20 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
 
   int *matrix = calloc(nb_droite * 4, sizeof(int));
 
+  size_t i = 0;
   for (int y = 0; y < h_acc; y++) {
     for (int x = 0; x < w_acc; x++) {
-      if (accumu[y * w_acc + x] > threshold) {
+      if (accumu[y * w_acc + x] < -threshold) {
         double rho = y * 2 - (double)h_acc / 2,
                theta = (double)x * M_PI / w_acc;
         double A = cos(theta), B = sin(theta);
         double x0 = A * rho, y0 = B * rho;
-        int x1 = (x0 + 10000 * (-B));
-        int y1 = (y0 + 10000 * (A));
-        int x2 = (x0 - 10000 * (-B));
-        int y2 = (y0 - 10000 * (A));
-        // draw_line(image, x1, y1, x2, y2);
+        matrix[i++] = (x0 + 10000 * (-B));
+        matrix[i++] = (y0 + 10000 * (A));
+        matrix[i++] = (x0 - 10000 * (-B));
+        matrix[i++] = (y0 - 10000 * (A));
+        draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
+                  matrix[i - 1]);
       }
     }
   }
