@@ -37,16 +37,20 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int x, int y) {
 }*/
 
 void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
-  size_t size = 242;
+  size_t size = 24200;
   int *queue = malloc(sizeof(int) * size);
   size_t i_current = 0;
   size_t i_insert = 1;
   queue[0] = coo;
   int max_coo = coo;
 
+  // check for buffer overflow
   while (i_current < i_insert) {
     int x = queue[i_current] % w_acc;
     int y = queue[i_current] / w_acc;
+    coo = queue[i_current];
+    ++i_current; // dequeue
+
     if (x + 1 < w_acc) {
       if (accumu[coo + 1] > threshold)
         queue[i_insert++] = coo + 1;
@@ -56,7 +60,8 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
       } else
         accumu[coo + 1] = 0;
     }
-    if (x - 1 < w_acc) {
+
+    if (x - 1 >= 0) {
       if (accumu[coo - 1] > threshold)
         queue[i_insert++] = coo - 1;
       if (accumu[coo - 1] > accumu[max_coo]) {
@@ -65,6 +70,7 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
       } else
         accumu[coo - 1] = 0;
     }
+
     if (y + w_acc < h_acc) {
       if (accumu[coo + w_acc] > threshold)
         queue[i_insert++] = coo + w_acc;
@@ -74,18 +80,19 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
       } else
         accumu[coo + w_acc] = 0;
     }
-    if (y - w_acc < h_acc) {
-      if (accumu[coo - w_acc] > threshold)
-        queue[i_insert++] = coo - w_acc;
-      if (accumu[coo - w_acc] > accumu[max_coo]) {
-        accumu[max_coo] = 0;
-        max_coo = coo - w_acc;
-      } else
-        accumu[coo - w_acc] = 0;
-    }
-    ++i_current;
+    /* useless bitch
+        if (y - w_acc >= 0) {
+          if (accumu[coo - w_acc] > threshold)
+            queue[i_insert++] = coo - w_acc;
+          if (accumu[coo - w_acc] > accumu[max_coo]) {
+            accumu[max_coo] = 0;
+            max_coo = coo - w_acc;
+          } else
+            accumu[coo - w_acc] = 0;
+        }*/
   }
   accumu[max_coo] = -accumu[max_coo];
+  free(queue);
 }
 
 SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
@@ -120,12 +127,10 @@ SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold) {
   }
 
   size_t nb_droite = 0;
-  for (int y = 0; y < h_acc; y++) {
-    for (int x = 0; x < w_acc; x++) {
-      if (accumu[y * w_acc + x] > threshold) {
-        LocalMaximum(accumu, h_acc, w_acc, x, y);
-        ++nb_droite;
-      }
+  for (int y = 0; y < h_acc * w_acc; y++) {
+    if (accumu[y] > threshold) {
+      LocalMaximum(accumu, h_acc, w_acc, y, threshold);
+      ++nb_droite;
     }
   }
 
