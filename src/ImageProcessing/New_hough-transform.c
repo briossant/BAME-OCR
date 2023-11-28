@@ -35,20 +35,27 @@ int void_square(SDL_Surface *image)
 
 SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
 {
-  int accu = 0;
+
   int height = image->h;
   int width = image->w;
+
+  if(x2>width || x1>width){
+    err(0,"Cordinates of x1 or x2 must be in bounds");
+  }
+  if(y2>height || y1>height){
+    err(0,"Cordinates of y1 or y2 must be in bounds");
+  }
+
   const SDL_PixelFormat* format = image->format;
-  Uint32* pixtab = image->pixels;
 
   SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, 28
             , 28, 32, format->format);  
   
-  const SDL_Rect* src = (x1,y1,x2,y2);
+  const SDL_Rect src = {.x=x1,.y=y1,.w=x2-x1,.h=y2-y1};
 
-  SDL_Rect * dst = (0,0,28,28);
+  SDL_Rect dst = {0,0,28,28};
 
-  int er = SDL_BlitSurface(image, src, image_converted,dst);
+  int er = SDL_BlitScaled(image, &src, image_converted,NULL);
   if (er == -1)
     err(0,NULL);
   return image_converted;

@@ -52,3 +52,5 @@ void Auto_Rotate(SDL_Surface *image);
 SDL_Surface* Crop(SDL_Surface* image, pair p1, pair p2);
 
 void Crop_grid(SDL_Surface* image, int* lx, int* ly);
+
+SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2);
