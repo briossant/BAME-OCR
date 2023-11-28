@@ -12,6 +12,48 @@ Number of try to write Hough : 3
 #include <math.h>
 #include <stdlib.h>
 
+
+int void_square(SDL_Surface *image)
+{
+  int accu = 0;
+  int height = image->h;
+  int width = image->w;
+  const SDL_PixelFormat* format = image->format;
+  Uint32* pixtab = image->pixels;
+
+  for (int y = 0; y < height*width; y++)
+  {
+    Uint8 r, g, b, a;
+    SDL_GetRGBA(pixtab[y],format, &r, &g, &b, &a);
+    if (!r)
+      accu++;
+
+  }
+  accu = accu/(height*width);
+  return accu > 0.25;
+}
+
+SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
+{
+  int accu = 0;
+  int height = image->h;
+  int width = image->w;
+  const SDL_PixelFormat* format = image->format;
+  Uint32* pixtab = image->pixels;
+
+  SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, 28
+            , 28, 32, format->format);  
+  
+  const SDL_Rect* src = (x1,y1,x2,y2);
+
+  SDL_Rect * dst = (0,0,28,28);
+
+  int er = SDL_BlitSurface(image, src, image_converted,dst);
+  if (er == -1)
+    err(0,NULL);
+  return image_converted;
+}
+
 /*#define PATCH_W 36
 #define PATCH_H 36
 
