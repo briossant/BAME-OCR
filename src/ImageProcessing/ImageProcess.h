@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 typedef struct {
-  int x;
-  int y;
+    int x;
+    int y;
 } pair;
 
 void BlacknWhite(SDL_Surface *image);
@@ -43,7 +43,8 @@ SDL_Surface *hough_transform(SDL_Surface *image, int threshold, int state);
 int *new_hough_transform(SDL_Surface *image, int delta, int threshold,
                          int *return_size);
 
-void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2);
+void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
+               Uint32 color);
 
 void draw_hough_line(SDL_Surface *image, SDL_Surface *hough_pic, int seuil);
 
