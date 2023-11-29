@@ -1,4 +1,5 @@
 #include "ImageProcess.h"
+#include <complex.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -65,8 +66,11 @@ void Balance(SDL_Surface *image) {
     int count_white = 0;
     int invert = 0;
 
+    // int ker[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+
     for (int x = 0; x < height * width; x++) {
         SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+        // convolution(image, x % width, x / width, ker, 3);
         if (r > 50) {
             count_white++;
         }
@@ -77,7 +81,7 @@ void Balance(SDL_Surface *image) {
         count += r;
     }
 
-    int middle = (max + min) / 2;
+    int middle = (max + min) / 3;
     middle += count / (width * height);
     middle /= 2;
     //  int threshold = 5;
