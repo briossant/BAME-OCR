@@ -48,8 +48,8 @@ SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
 
   const SDL_PixelFormat* format = image->format;
 
-  SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, 28
-            , 28, 32, format->format);  
+  SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, 32
+            , 32, 32, format->format);  
   
   const SDL_Rect src = {.x=x1,.y=y1,.w=x2-x1,.h=y2-y1};
 
@@ -57,8 +57,21 @@ SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
   if (er == -1)
     err(0,NULL);
 
-  printf("Is empty? = %i\n",void_square(image_converted));
-  return image_converted;
+
+
+  SDL_Surface *image_converted2 = SDL_CreateRGBSurfaceWithFormat(0, 28
+            , 28, 32, format->format);  
+  
+  const SDL_Rect src2 = {.x=2,.y=2,.w=28,.h=28};
+
+  er = SDL_BlitScaled(image_converted, &src2, image_converted2,NULL);
+  if (er == -1)
+    err(0,NULL);
+
+  SDL_FreeSurface(image_converted);  
+
+  // printf("Is empty? = %i\n",void_square(image_converted));
+  return image_converted2;
 }
 
 /*#define PATCH_W 36

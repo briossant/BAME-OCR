@@ -301,7 +301,7 @@ int ImageProcess(uplet argv) {
     {
       // BlacknWhite(image_converted);
       InvertColor(image_converted);
-      Balance(image_converted);
+      // Balance(image_converted);
     } else if (argv.argv[i] == 1) // Contrast
     {
       Contrast(image_converted);
@@ -337,7 +337,8 @@ int ImageProcess(uplet argv) {
 
     } else if (argv.argv[i] == 11) // Crop
     {
-      image_converted = Crop(image_converted, argv.p1, argv.p2);
+      // image_converted = Crop(image_converted, argv.p1, argv.p2);
+      image_converted = Resize_crop(image_converted, argv.p1.x, argv.p1.y, argv.p2.x, argv.p2.y);
     }
   }
 

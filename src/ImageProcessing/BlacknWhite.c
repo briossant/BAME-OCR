@@ -59,6 +59,9 @@ void InvertColor(SDL_Surface* image)
 void Balance(SDL_Surface* image)
 {
     //TODO: Need to compute the average of the most black and the most white pixels to choose a threshold
+    int min = 255;
+    int max = 0;
+    size_t count = 0;
 
     int height = image->h;
     int width = image->w;
@@ -78,7 +81,15 @@ void Balance(SDL_Surface* image)
         {
             count_white++;
         }
+        if (r > max)
+            max = r;
+        if (r < min)
+            min = r;
+        count += r;
     }
+
+    // int middle = count / (height*width);
+    int middle = (max + min)/2;
 
     if (count_white > height*width - count_white) // Black caracter on white background
         invert = 1;
@@ -88,13 +99,13 @@ void Balance(SDL_Surface* image)
     {
         SDL_GetRGBA(pixtab[x],format, &r, &g, &b, &a);
 
-        if (invert && (r > 50 || g > 50 || b > 50))
+        if (invert && r > middle)
         {
             r = 255;
             g = 255;
             b = 255;
         }
-        else if (!invert && (r <= 50 || g <= 50 || b <= 50))
+        else if (!invert && r <= middle)
         {
             r = 0;
             g = 0;
