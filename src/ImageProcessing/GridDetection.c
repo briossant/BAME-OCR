@@ -12,7 +12,7 @@
 
 #define TRESHOLD 4.42
 #define MIN_DIST 32 // set min from image size
-#define diagonal_killer 6
+#define diagonal_killer 4
 
 // recursive function
 int CheckIfDistIsValid(double *points, size_t len, double dist, int i,

@@ -177,6 +177,7 @@ int *new_hough_transform(SDL_Surface *image, int *return_size) {
     }
   }
   int threshold = max / 4;
+  printf("Hough threshold = %i ; max = %i\n", threshold, max);
 
   size_t nb_droite = 0;
   for (int y = 0; y < h_acc * w_acc; y++) {
@@ -196,10 +197,10 @@ int *new_hough_transform(SDL_Surface *image, int *return_size) {
                theta = (double)x * M_PI / w_acc;
         double A = cos(theta), B = sin(theta);
         double x0 = A * rho, y0 = B * rho;
-        matrix[i++] = (x0 + 10000 * (-B));
-        matrix[i++] = (y0 + 10000 * (A));
-        matrix[i++] = (x0 - 10000 * (-B));
-        matrix[i++] = (y0 - 10000 * (A));
+        matrix[i++] = (x0 + h_acc * (-B));
+        matrix[i++] = (y0 + h_acc * (A));
+        matrix[i++] = (x0 - h_acc * (-B));
+        matrix[i++] = (y0 - h_acc * (A));
 
         Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
         draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
