@@ -22,6 +22,8 @@ void GaussianBlur(SDL_Surface *image);
 
 void Bright(SDL_Surface *image);
 
+void Balance(SDL_Surface *image);
+
 void ArroundGaussianBlur(SDL_Surface *image);
 
 SDL_Surface *SDL_Start(char *filename);
@@ -61,6 +63,6 @@ SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2);
 
 void InvertColor(SDL_Surface *image);
 
-void Balance(SDL_Surface *image);
+int void_square(SDL_Surface *image);
 
 int *GridDetection(int *lines, int nbr_of_lines);
