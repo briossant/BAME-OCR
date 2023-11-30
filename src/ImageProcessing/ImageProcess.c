@@ -312,7 +312,7 @@ int ImageProcess(uplet argv) {
       draw_line(image_converted, grid[0], grid[1], grid[2], grid[3], color);
     } else if (argv.argv[i] == 10) // Hough
     {
-      ho_matrix = new_hough_transform(image_converted, &ho_matrix_size);
+      ho_matrix = hough_transform(image_converted, &ho_matrix_size);
 
     } else if (argv.argv[i] == 11) // Crop
     {
@@ -320,7 +320,7 @@ int ImageProcess(uplet argv) {
       image_converted = Resize_crop(image_converted, argv.p1.x, argv.p1.y,
                                     argv.p2.x, argv.p2.y);
 
-      //Balance(image_converted);
+      // Balance(image_converted);
     }
   }
 

@@ -38,14 +38,10 @@ void Thresholdhysteresis(SDL_Surface *image);
 
 Uint8 ComputeSeuil(SDL_Surface *image);
 
-SDL_Surface *hough_transform(SDL_Surface *image, int threshold, int state);
-
-int *new_hough_transform(SDL_Surface *image, int *return_size);
+int *hough_transform(SDL_Surface *image, int *return_size);
 
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
                Uint32 color);
-
-void draw_hough_line(SDL_Surface *image, SDL_Surface *hough_pic, int seuil);
 
 void Auto_Rotate(SDL_Surface *image);
 
