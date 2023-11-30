@@ -1,7 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_surface.h>
+#include <err.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
   int x;
@@ -19,6 +23,10 @@ void GaussianBlur(SDL_Surface *image);
 void Bright(SDL_Surface *image);
 
 void ArroundGaussianBlur(SDL_Surface *image);
+
+SDL_Surface *SDL_Start(char *filename);
+
+int SDL_Output(SDL_Surface *image_converted, char *file);
 
 SDL_Surface *Rotate(SDL_Surface *image, double angle);
 
