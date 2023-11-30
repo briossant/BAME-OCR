@@ -1,156 +1,161 @@
 #include "NeuralNetwork.h"
-#include <iso646.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+void SaveNetwork(Network network, char *filepath) {
+  FILE *file =
+      fopen(filepath,
+            "w"); // this will clear the file so we can write on it,
+                  // if we don't want the
+                  // file to be cleared do: fopen(filepath,"a") for appending
 
-void SaveNetwork(Network network, char* filepath)
-{
-   FILE * file= fopen( filepath, "w"); // this will clear the file so we can write on it, 
-                                       // if we don't want the 
-                                       // file to be cleared do: fopen(filepath,"a") for appending
+  if (file == NULL) {
+    printf("Error this file does not exist\n");
+    exit(1);
+  }
 
-   if (file == NULL)
-   {
-       printf ("Error this file does not exist\n");
-       exit(1);
-   }
-   
-   fprintf(file, "NN** %ld %ld \n", network.input_size,network.depth);
-   for (size_t i=0; i<network.input_size; i++)
-   {
-       fprintf(file,"%ld size: %ld \n", i, network.layers[i].size);
-   }
-   fflush(file);
-   fclose(file);
-
-}
-int isDigit(const char* str) {
-    char* endptr;
-    strtod(str, &endptr);
-    if (*endptr != '\0' && *endptr != '\n') {
-        return 0; // Not a valid double
+  fprintf(file, "NN** %ld %ld \n", network.input_size, network.depth);
+  for (size_t i = 0; i < network.depth; i++) {
+    fprintf(file, "Layer %ld\nLayer Size: %ld\nWeights: ", i,
+            network.layers[i].size);
+    NNValue *weights = matrix_to_array(network.layers[i].weights);
+    for (size_t k = 0;
+         k < network.layers[i].weights.w * network.layers[i].weights.h; k++) {
+      fprintf(file, "%lf ", weights[k]);
     }
+    free(weights);
+    fprintf(file, "\nBiases: ");
+    for (size_t k = 0; k < network.layers[i].biases.h; k++) {
+      fprintf(file, "%lf ", network.layers[i].biases.mat[0][k]);
+    }
+
+    fprintf(file, "\n");
+  }
+  fflush(file);
+  fclose(file);
+}
+
+int isDigit(const char *str) {
+  char *endptr;
+  strtod(str, &endptr);
+  if (endptr != str &&
+      (*endptr == '\0' || (*endptr == '\n' && endptr[1] == '\0'))) {
     return 1; // Valid double
-   
-}
-   
-double* get_numbers ( char* str)
-{
-    char* token = strtok(str, " ");
-    double* numbers = NULL;
-    int count = 0;
-   
-    while (token != NULL) {
-        if (isDigit(token)) {
-                // Convert the token to a double and store it in the            +++numbers array
-            double value = atof(token);
-            numbers = (double*)realloc(numbers, sizeof(double) *  (count + 1));
-            numbers[count] = value;
-            count++;
-        }
-        token = strtok(NULL, " ");
-    }
-    return numbers;
+  }
+  return 0; // Not a valid double
 }
 
-/*Network LoadNetwork(char *filepath)
-{
+double *get_numbers(char *str, int *size) {
+  char *token = strtok(str, " ");
+  double *numbers = NULL;
+  int count = 0;
 
-    FILE * file= fopen( filepath, "r");  
-   
-    if (file == NULL)
-    {
-        printf ("Error this file does not exist or can't be opened\n");
-        exit(1);
+  while (token != NULL) {
+    if (isDigit(token) && strcmp(token, "\n") != 0) {
+      // Convert the token to a double and store it in the +++numbers
+      // array
+      double value = atof(token);
+      numbers = (double *)realloc(numbers, sizeof(double) * (count + 1));
+      numbers[count] = value;
+      count++;
     }
-    int l=0;
-    char* line;
+    token = strtok(NULL, " ");
+  }
+  *size = count;
+  return numbers;
+}
 
-    fgets(line,l, file);
+void printformat(void) {
+  printf(
+      "Format: Neural Network Document\n\nThe format for the Neural Network "
+      "Document is as follows:\n\nNN** <size> <depth>\n- NN** represents the "
+      "neural network version.\n- <size> represents the size of the "
+      "network.\n- <depth> represents the depth of the network.\n\nLayer "
+      "Information:\n- For each layer:\n  - Layer Number: <layer number>\n  "
+      "- Layer Size: <size of layer>\n  - Weights: <list of weights>\n  - "
+      "Biases: <list of biases>\n\nExample:\n\nNN** 2 2\nLayer Number: "
+      "0\nLayer Size: 4\nWeights: -0.226563 -0.778394 0.844753 0.991776 "
+      "-0.351602 -0.969908 -0.249897 -0.933591\nBiases: -0.226563 -0.778394 "
+      "0.844753 0.991776 -0.351602 -0.969908 -0.249897 -0.933591\n\nLayer "
+      "Number: 1\nLayer Size: 2\nWeights: -0.519999 0.739942 -0.320166 "
+      "0.756588 -0.802945 -0.702889 -0.955374 -0.005229\nBiases: -0.519999 "
+      "0.739942 -0.320166 0.756588 -0.802945 -0.702889 -0.955374 -0.005229\n "
+      "and so on");
+}
 
-    if (line == NULL) { 
-        printf("The file was empty\n");
-        exit(1); 
-    }       
+Network LoadNetwork(char *filepath) {
 
-    double* numbers = get_numbers(line);
-    if ( sizeof(numbers) < 2)
-    {
-        printf ("there was no size or depth for the network\n"); 
-        exit(1);
+  FILE *file = fopen(filepath, "r");
+
+  if (file == NULL) {
+    printf("Error this file does not exist or can't be opened\n");
+    exit(1);
+  }
+  char buff[200];
+  if (fgets(buff, 200, file) == NULL) {
+    printf("The file was empty\n");
+    exit(1);
+  }
+  int size = 0;
+  double *numbers = get_numbers(buff, &size);
+  if (size != 2) {
+    printf("There was not enough parameters for the depth and input, or "
+           "way too much for the network\n");
+    printformat();
+    exit(1);
+  }
+  size_t input_size = numbers[0];
+  size_t depth_layer = numbers[1];
+  Layer *layers = (Layer *)malloc(sizeof(Layer) * depth_layer);
+
+  size_t previous_layer_size = input_size;
+  for (size_t i = 0; i < depth_layer; i++) {
+    if (fgets(buff, 200, file) == NULL) {
+      printf("failed to read layer index %ld\n", i);
+      exit(1);
     }
-    
-    int input_size = numbers[0];
-    int depth_layer= numbers[1]; 
-    // D fois 
-    // layer size L
-    // node l fois
-    //remember to free(numbers) every single time
-    // -1?? beacuse the input layer isn't a proper layer  
-    Layer *layers = malloc(sizeof(Layer) * numbers[depth_layer]); // the array needs to be created before
-    
-    size_t D = numbers[1];
-    l++;
-    while ( D>0 && fgets(line, l, file)!= NULL)
-    {
-        numbers = get_numbers(line);
-        // new layer put layer size L 
-        size_t layer_size = numbers[0];
-        int i=0;
-        l++;
-        //create the new layer with layer size then put all the nods inside
-        Node* nods = malloc ( sizeof (Node) * layer_size);
-        while (layer_size>0 && fgets(line, l, file)!= NULL)
-        {   
-            int n=0;
-            if (line != NULL)
-            {
-                numbers=get_numbers(line);
-                int node_weight= (int)numbers[0];
-                double node_bias= numbers[1];
-                l++;
-                double* weight = malloc(sizeof(double) * node_weight);
-                if ( fgets(line, l , file)!= NULL)
-                {
-                    numbers= get_numbers(line);
-                    for (int i=0; i<node_weight; i++)
-                    {
-                        weight[i]=numbers[i];
-                    }
-                }
-                nods[n]=new_node(node_weight, weight, node_bias);
-                n++;
-                layer_size--;
-                l++;
-                
-            }
-
-            layers[i]=new_layer( nods, layer_size);
-            i++;
-        }
-        
-
-        if (layer_size!=0)
-        {
-            printf ("the file did not have all the nod's info, stoped at %ld node, %ld layer\n", layer_size, D);
-            exit(1);
-        }
-        D--;
-        l++;
+    // int layer_index = get_numbers(line, &size)[0];
+    if (fgets(buff, 200, file) == NULL) {
+      printf("failed to read layer size (layer no.%ld)\n", i);
+      exit(1);
     }
-    if (D!=0)
-    {
-        printf( "the file did not have all the Layers, stoped at %ld layer\n",D); 
-        exit(1);
-    }
-    
-    Network network = { // this is the new Network declaration
-        .input_size = input_size, 
-        .depth = depth_layer,
-        .layers = layers
-    };  
-    return network;
-}*/
+    size_t layer_size = get_numbers(buff, &size)[0];
 
+    size_t weights_buff_size = (layer_size * previous_layer_size * 10 + 42);
+    char *weights_buff = malloc(sizeof(char) * weights_buff_size);
+
+    // buffer will be too small for big layers
+    if (fgets(weights_buff, weights_buff_size, file) == NULL) {
+      printf("failed to read weights (layer no.%ld)\n", i);
+      exit(1);
+    }
+
+    Matrix weights = array_to_matrix(get_numbers(weights_buff, &size),
+                                     previous_layer_size, layer_size);
+    free(weights_buff);
+
+    size_t biases_buff_size = (layer_size * 10 + 42);
+    char *biases_buff = malloc(sizeof(char) * biases_buff_size);
+
+    // buffer will be too small for big layers
+    if (fgets(biases_buff, biases_buff_size, file) == NULL) {
+      printf("failed to read biases (layer no.%ld)\n", i);
+      exit(1);
+    }
+    Matrix biases =
+        array_to_matrix(get_numbers(biases_buff, &size), 1, layer_size);
+
+    free(biases_buff);
+    Layer layer = {.biases = biases, .weights = weights, .size = layer_size};
+
+    layers[i] = layer;
+    previous_layer_size = layer_size;
+  }
+  Network network = {// this is the new Network declaration
+                     .input_size = input_size,
+                     .depth = depth_layer,
+                     .layers = layers};
+  fflush(file);
+  fclose(file);
+  free(numbers);
+  return network;
+}
