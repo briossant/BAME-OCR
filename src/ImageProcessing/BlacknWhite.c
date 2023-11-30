@@ -92,7 +92,7 @@ void Balance(SDL_Surface *image) {
   */
 
   Uint8 threshold = ComputeSeuil(image_converted) / 4;
-  printf("%i\n", ComputeSeuil(image_converted) / 4);
+  // printf("%i\n", ComputeSeuil(image_converted) / 4);
   if (count_white >
       height * width - count_white) // Black caracter on white background
     invert = 1;

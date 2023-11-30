@@ -22,11 +22,10 @@ int void_square(SDL_Surface *image) {
   for (int x = 0; x < height * width; x++) {
     Uint8 r, g, b, a;
     SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
-    if (!r)
+    if (r < 128)
       accu++;
   }
-  accu = accu / (height * width);
-  return accu < 0.25;
+  return accu < height * width - 22;
 }
 
 SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2) {

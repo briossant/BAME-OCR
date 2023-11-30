@@ -67,7 +67,6 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-*/
 
 void overlaying_image(SDL_Surface *image, SDL_Surface *image2) {
 
@@ -95,4 +94,4 @@ void overlaying_image(SDL_Surface *image, SDL_Surface *image2) {
     }
   }
 >>>>>>> origin/NN-MATRICES
-}
+}*/

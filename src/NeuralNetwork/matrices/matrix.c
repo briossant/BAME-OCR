@@ -1,8 +1,4 @@
 #include "matrices.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_surface.h>
 
 Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char *label) {
   NNValue **list = malloc(sizeof(NNValue) * w);
@@ -132,15 +128,18 @@ Matrix array_to_matrix(double *array, size_t w, size_t h) {
 }
 
 Matrix image_to_matrix(SDL_Surface *image) {
-  Matrix matimg = MatInit(1, 784, 0, "img to matrx");
+  Matrix matimg = MatInit(1, image->w * image->h, 0, "img to matrx");
 
   const SDL_PixelFormat *format = image->format;
   Uint32 *pixtab = image->pixels;
   Uint8 r, g, b, a;
-
-  for (int i = 0; i < 784; ++i) {
-    SDL_GetRGBA(pixtab[i], format, &r, &g, &b, &a);
-    matimg.mat[0][i] = ((double)r / 255);
+  double val;
+  for (int x = 0; x < image->w; ++x) {
+    for (int y = 0; y < image->h; ++y) {
+      SDL_GetRGBA(pixtab[y * image->w + x], format, &r, &g, &b, &a);
+      val = r;
+      matimg.mat[0][y * image->w + x] = (val / 255);
+    }
   }
 
   return matimg;

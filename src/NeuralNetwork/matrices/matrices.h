@@ -2,6 +2,10 @@
 #define MATRICES_H
 #define _GNU_SOURCE
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_surface.h>
 #include <err.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -12,10 +16,10 @@
 #define LABEL_TRANSFORM 0
 
 typedef struct Matrix {
-    char *label;
-    size_t w;
-    size_t h;
-    NNValue **mat;
+  char *label;
+  size_t w;
+  size_t h;
+  NNValue **mat;
 } Matrix;
 
 typedef NNValue (*MatFct)(NNValue x);
@@ -25,6 +29,8 @@ Matrix MatInit(size_t w, size_t h, NNValue defaultValue, char *label);
 void MatPrint(Matrix mat);
 
 Matrix MatInitWithFct(size_t w, size_t h, NNValue (*fct)(), char *label);
+
+Matrix image_to_matrix(SDL_Surface *image);
 
 Matrix MatCopy(Matrix mat, char *label);
 
@@ -61,7 +67,7 @@ Matrix MatApplyFct(Matrix mat, MatFct matFct);
 // sum of all the terms
 NNValue MatSum(Matrix mat);
 
-//convert matrix 
+// convert matrix
 NNValue *matrix_to_array(Matrix mat);
-Matrix array_to_matrix (double *array, size_t w, size_t h);
+Matrix array_to_matrix(double *array, size_t w, size_t h);
 #endif
