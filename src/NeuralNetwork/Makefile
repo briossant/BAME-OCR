@@ -12,6 +12,8 @@ mnist: $(OBJ) mnist.o
 	$(CC) -o mnist.o -c mnist.c $(CFLAGS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
+ocr: $(OBJ) 
+
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
