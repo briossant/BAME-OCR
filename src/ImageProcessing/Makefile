@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-W -Wall -Wextra -O3 # -g
-LDFLAGS= -lSDL2 -lSDL2_image -lm 
+CFLAGS=-W -Wall -Wextra -O3 `pkg-config sdl2 --cflags`
+LDFLAGS= `pkg-config sdl2 --libs` -lSDL2_image -lm 
 EXEC=ImageProcess
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)

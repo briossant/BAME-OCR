@@ -8,499 +8,167 @@
 #include <math.h>
 #include <stdlib.h>
 
-typedef struct {
-    int val;
-    int next;
-    int prev;
-} corner;
+void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
+               Uint32 color) {
 
-void draw_line(SDL_Surface* image, int x1, int y1, int x2, int y2)
-{
+  int dx = abs(x2 - x1);
+  int dy = abs(y2 - y1);
+  int sx, sy;
 
-    Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+  if (x1 < x2)
+    sx = 1;
+  else
+    sx = -1;
 
-    int dx = abs(x2 - x1);
-    int dy = abs(y2 - y1);
-    int sx, sy;
+  if (y1 < y2)
+    sy = 1;
+  else
+    sy = -1;
 
-    if (x1 < x2) 
-        sx = 1;
-    else 
-        sx = -1;
+  int err = dx - dy;
+  int current_x = x1;
+  int current_y = y1;
 
-    if (y1 < y2) 
-        sy = 1;
-    else 
-        sy = -1;
+  while (current_x != x2 || current_y != y2) {
+    if (current_x >= 0 && current_x < image->w && current_y >= 0 &&
+        current_y < image->h) {
+      Uint8 *pixel =
+          (Uint8 *)image->pixels + current_y * image->pitch + current_x * 4;
 
-    int err = dx - dy;
-    int current_x = x1;
-    int current_y = y1;
-
-    while (current_x != x2 || current_y != y2) 
-    {
-        if (current_x >=0 && current_x < image->w 
-                && current_y >= 0 && current_y < image->h) 
-        {
-            Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch 
-                + current_x * 4;
-
-            *(Uint32 *)pixel = color;
-        }
-
-        int err2 = 2 * err;
-        if (err2 > -dy) 
-        {
-            err -= dy;
-            current_x += sx;
-        }
-        if (err2 < dx) 
-        {
-            err += dx;
-            current_y += sy;
-        }
+      *(Uint32 *)pixel = color;
     }
+
+    int err2 = 2 * err;
+    if (err2 > -dy) {
+      err -= dy;
+      current_x += sx;
+    }
+    if (err2 < dx) {
+      err += dx;
+      current_y += sy;
+    }
+  }
 }
 
-SDL_Surface* draw(SDL_Surface * image, corner* abs, corner* ord, int threshold)
-{
-    // Get the coordonates of the lines
-    for (int x = 0; x < image->w; x++)
-    {
-        if (abs[x].val > threshold)
-        {
-            draw_line(image, x, 0, x, image->h);
-        }
+void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
+  size_t size = 24200;
+  int *queue = malloc(sizeof(int) * size);
+  size_t i_current = 0;
+  size_t i_insert = 1;
+  queue[0] = coo;
+  int max_coo = coo;
+
+  // check for buffer overflow
+  while (i_current < i_insert) {
+    int x = queue[i_current] % w_acc;
+    int y = queue[i_current] / w_acc;
+    coo = queue[i_current];
+    ++i_current; // dequeue
+
+    if (x + 1 < w_acc) {
+      if (accumu[coo + 1] > threshold)
+        queue[i_insert++] = coo + 1;
+      if (accumu[coo + 1] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo + 1;
+      } else
+        accumu[coo + 1] = 0;
     }
 
-    for (int y = 0; y < image->h; y++)
-    {
-        if (ord[y].val > threshold)
-        {
-            draw_line(image, 0, y, image->w, y);
-        }
+    if (x - 1 >= 0) {
+      if (accumu[coo - 1] > threshold)
+        queue[i_insert++] = coo - 1;
+      if (accumu[coo - 1] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo - 1;
+      } else
+        accumu[coo - 1] = 0;
     }
 
-    return image;
+    if (y + w_acc < h_acc) {
+      if (accumu[coo + w_acc] > threshold)
+        queue[i_insert++] = coo + w_acc;
+      if (accumu[coo + w_acc] > accumu[max_coo]) {
+        accumu[max_coo] = 0;
+        max_coo = coo + w_acc;
+      } else
+        accumu[coo + w_acc] = 0;
+    }
+  }
+  accumu[max_coo] = -accumu[max_coo];
+  free(queue);
 }
 
-SDL_Surface* merge_lines(SDL_Surface* image, corner* abs, corner* ord, int tolerance)
-{
-    int moy = 0;
-    int not_ready = 1;
-    int tmp = 0;
+int *hough_transform(SDL_Surface *image, int *return_size) {
 
-    while (not_ready)
-    {
-        moy = 0;
-        not_ready = 0;
+  int height = image->h;
+  int width = image->w;
+  int h_acc = 2 * sqrt(height * height + width * width);
+  int w_acc = 180;
+  const SDL_PixelFormat *format = image->format;
 
-        // Compare the distance with the others corner
-        for (int x = 0; x < image->w; x++)
-        {
-            // if 2 corner à too close, merge them
-            if (abs[x].val != -1 && abs[x].next != x && abs[x].next - tolerance < x)
-            {
+  int *accumu = calloc(w_acc * h_acc, sizeof(size_t));
 
-                // printf("x = %d, next = %d\n", x, abs[x].next);
-                moy = (abs[x].next + x) / 2;
-                
-                tmp = abs[abs[x].next].next;
-                abs[abs[x].next].val = -1;
-                abs[abs[x].next].next = abs[x].next;
-                abs[abs[x].next].prev = abs[x].next;
+  Uint32 *pixtab = image->pixels;
 
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
 
-                abs[moy].val = abs[x].val;
-                abs[moy].prev = abs[x].prev;
-                if (tmp == abs[x].next)
-                    abs[moy].next = moy;
-                else
-                    abs[moy].next = tmp;
-                
-                if (x != moy)
-                {
-                    abs[x].val = -1;
-                    abs[x].next = x;
-                    abs[x].prev = x;
-                }
+      Uint8 r, g, b, a;
+      SDL_GetRGBA(pixtab[y * width + x], format, &r, &g, &b, &a);
+      if (r < 127)
+        continue;
 
-                not_ready = 1;                   
-            }
-        }
-
-        for (int y = 0; y < image->h; y++)
-        {
-            // if 2 corner à too close, merge them
-            if (ord[y].val != -1 && ord[y].next != y && ord[y].next - tolerance < y)
-            {
-                // printf("y = %d, next = %d, prev = %d\n", y, ord[y].next, ord[y].prev);
-                moy = (ord[y].next + y) / 2;
-                tmp = ord[ord[y].next].next;
-
-                ord[ord[y].next].val = -1;
-                ord[ord[y].next].next = ord[y].next;
-                ord[ord[y].next].prev = ord[y].next;
-
-                ord[moy].val = ord[y].val;
-                ord[moy].prev = ord[y].prev;
-                if (tmp == ord[y].next)
-                    ord[moy].next = moy;
-                else
-                    ord[moy].next = tmp;
-                
-                if (y != moy)
-                {
-                    ord[y].val = -1;
-                    ord[y].next = y;
-                    ord[y].prev = y;
-                }
-
-                not_ready = 1; 
-            }
-        }
+      for (double theta = 0; theta < w_acc; theta += 1) {
+        int raw = (double)x * cos((double)theta / w_acc * M_PI) +
+                  (double)y * sin((double)theta / w_acc * M_PI) +
+                  (double)h_acc / 2;
+        raw >>= 1;
+        size_t coo = theta + raw * w_acc;
+        accumu[coo]++;
+      }
     }
-    return image;
+  }
+
+  int max = accumu[0];
+  for (int y = 0; y < h_acc * w_acc; y++) {
+    if (accumu[y] > max) {
+      max = accumu[y];
+    }
+  }
+  int threshold = max / 4.5;
+  printf("Hough threshold = %i ; max = %i\n", threshold, max);
+
+  size_t nb_droite = 0;
+  for (int y = 0; y < h_acc * w_acc; y++) {
+    if (accumu[y] > threshold) {
+      // LocalMaximum(accumu, h_acc, w_acc, y, threshold);
+      ++nb_droite;
+    }
+  }
+
+  int *matrix = calloc(nb_droite * 4, sizeof(int));
+  size_t i = 0;
+  for (int y = 0; y < h_acc; y++) {
+    for (int x = 0; x < w_acc; x++) {
+      if (accumu[y * w_acc + x] > threshold) {
+        // if (accumu[y * w_acc + x] < -threshold) {
+        double rho = y * 2 - (double)h_acc / 2,
+               theta = (double)x * M_PI / w_acc;
+        double A = cos(theta), B = sin(theta);
+        double x0 = A * rho, y0 = B * rho;
+        matrix[i++] = (x0 + h_acc * (-B));
+        matrix[i++] = (y0 + h_acc * (A));
+        matrix[i++] = (x0 - h_acc * (-B));
+        matrix[i++] = (y0 - h_acc * (A));
+
+        Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+        draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
+                  matrix[i - 1], color);
+        // test of Grid Detection
+      }
+    }
+  }
+  *return_size = nb_droite;
+  return matrix;
 }
-
-int averagePos(SDL_Surface* image, corner* abs, corner* ord, int threshold)
-{
-    int count = 0;
-    int sum = 0;
-
-    // Count the number of corners
-    for (int x = 0; x < image->w; x++)
-    {
-        if (abs[x].val > threshold && abs[x].next != 0)
-        {
-            sum += abs[x].next - x;
-            count++;
-        }
-    }
-
-    for (int y = 0; y < image->h; y++)
-    {
-        if (ord[y].val > threshold && ord[y].next != 0)
-        {
-            sum += ord[y].next - y;
-            count++;
-        }
-    }
-    // printf("Average: %d\n", sum / (count));
-    return sum / (count);
-}
-
-void excludeLine(SDL_Surface* image, corner* abs, corner* ord, int tolerance, int threshold)
-{
-    int average = averagePos(image, abs, ord, threshold);
-
-    for (int x = 0; x < image->w; x++)
-    {
-        // if (abs[x].val > threshold)
-        // {
-        //     printf("x = %d had to be exclude : %d\n", x, (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance) 
-        //     || (x - abs[x].prev > average + tolerance || x - abs[x].prev < average - tolerance));
-        //     printf("x = %d, x.next = %d\n", x, abs[x].next);
-        //     printf("x = %d, x.prev = %d\n", x, abs[x].prev);
-        // }
-
-        if (abs[x].val > threshold 
-            && (abs[x].next - x > average + tolerance || abs[x].next - x < average - tolerance) 
-            && (x - abs[x].prev > average + tolerance || x - abs[x].prev < average - tolerance))
-        {
-            abs[x].val = -2;
-        
-            if (abs[x].prev != x && abs[x].next != x)
-            {
-                abs[abs[x].prev].next = abs[x].next;
-                abs[abs[x].next].prev = abs[x].prev;
-            }   
-        }
-    }
-
-    for (int y = 0; y < image->h; y++)
-    {
-        if (ord[y].val > threshold 
-            && (ord[y].next - y > average + tolerance || ord[y].next - y < average - tolerance)
-            && (y - ord[y].prev > average + tolerance || y - ord[y].prev < average - tolerance))
-        {
-            ord[y].val = -2;
-
-            if (ord[y].prev != y && ord[y].next != y)
-            {
-                ord[ord[y].prev].next = ord[y].next;
-                ord[ord[y].next].prev = ord[y].prev;
-            }
-        }
-    }
-
-    // int last = 0;
-    // while (last < image->w && abs[last].val < threshold)
-    //     last++;
-
-    // for (int x = last; x < image->w; x++)
-    // {
-
-    //     if (abs[x].val > threshold
-    //         && (x - last > average + tolerance || x - last < average - tolerance))
-    //     {
-    //         abs[x].val = -2;
-    //         last = x;
-        
-    //         // if (abs[x].prev != x && abs[x].next != x)
-    //         // {
-    //         //     abs[abs[x].prev].next = abs[x].next;
-    //         //     abs[abs[x].next].prev = abs[x].prev;
-    //         // }   
-    //     }
-    // }
-
-    // last = 0;
-    // while (last < image-> h && ord[last].val < threshold)
-    //     last++;
-
-    // for (int y = last; y < image->h; y++)
-    // {
-    //     if (ord[y].val > threshold 
-    //         && (y - last > average + tolerance || y - last < average - tolerance))
-    //     {
-    //         ord[y].val = -2;
-    //         last = y;
-
-    //         // if (ord[y].prev != y && ord[y].next != y)
-    //         // {
-    //         //     ord[ord[y].prev].next = ord[y].next;
-    //         //     ord[ord[y].next].prev = ord[y].prev;
-    //         // }
-    //     }
-    // }
-}
-
-void gridDetection(SDL_Surface* image, corner* abs, corner* ord, int threshold)
-{
-    // int countX = 0;
-    // int sequenceStarted = -1;
-
-    // for (int x = 0; x < image->w; x++)
-    // {
-    //     // if the line is ok
-    //     if (abs[x].val > threshold 
-    //             && abs[x].next - x < average + tolerance && abs[x].next - x > average - tolerance
-    //             && x - abs[x].prev < average + tolerance && x - abs[x].prev > average - tolerance)
-    //     {
-             
-    //     }
-    // }
-
-    // for (int y = 0; y < image->h; y++)
-    // {
-    //     // if the line is ok
-    //     if (ord[y].val > threshold 
-    //         && ord[y].next - y < average + tolerance && ord[y].next - y > average - tolerance
-    //         && y - ord[y].prev < average + tolerance && y - ord[y].prev > average - tolerance)
-    //     {
-
-    //     }
-    // }
-
-    int i = 2;
-    for (int x = 0; x < image->w; x++)
-    {
-        if (abs[x].val > threshold)
-        {
-            abs[x].val = -2;
-            i--;
-        }
-        if (i == 0)
-            break;
-    }
-
-    i = 2;
-    for (int x = image->w; x > 0 ; x--)
-    {
-        if (abs[x].val > threshold)
-        {
-            abs[x].val = -2;
-            i--;
-        }
-        if (i == 0)
-            break;
-    }
-
-    if (ord[0].val > threshold)
-    {
-
-    }
-
-
-}
-
-SDL_Surface* hough_transform(SDL_Surface * image, int threshold, int state)
-{
-    // Init tab
-    corner* abs = (corner*)malloc(image->w * sizeof(corner));
-    corner* ord = (corner*)malloc(image->h * sizeof(corner));
-
-    int x = 0;
-    int y = 0;
-    while (x < image->w || y < image->h)
-    {
-        if (x < image->w)
-        {
-            abs[x].val = 0;
-            abs[x].next = x;
-            abs[x].prev = x;
-            x++;
-        }
-        if (y < image->h)
-        {
-            ord[y].val = 0;
-            ord[y].next = y;
-            ord[y].prev = y;
-            y++;
-        }
-    }
-
-    // Init SDL var
-    Uint8 r,g,b,a;
-    Uint32* pixtab = image->pixels;
-    const SDL_PixelFormat* format = image->format;
-
-    // Get the lines
-    for (int x = 0; x < image->w; x++)
-    {
-        for (int y = 0; y < image->h; y++)
-        {
-            SDL_GetRGBA(pixtab[y*image->w + x], format, &r, &g, &b, &a);
-
-            if (r > 200)
-            {
-                abs[x].val += 1;
-                ord[y].val += 1;
-            }
-        }
-    }
-
-    // Remove value under threshold
-    // If a value is above threshold : set next and prev
-    // Prop:    the fisrt value prev = itself
-    //          the last value next = itself
-
-    int last_index = 0;
-    for (int x = 0; x < image->w; x++)
-    {
-        if (abs[x].val > threshold)
-        {
-            if (last_index == 0)
-                abs[x].prev = x;
-            else
-            {
-                abs[x].prev = last_index;
-                abs[last_index].next = x;
-            }
-            last_index = x;
-        }
-        else
-            abs[x].val = -1;
-    }
-    abs[last_index].next = last_index;
-
-    last_index = 0;
-
-    for (int y = 0; y < image->h; y++)
-    {
-        if (ord[y].val > threshold)
-        {
-            if (last_index == 0)
-                ord[y].prev = y;
-            else
-            {
-                ord[y].prev = last_index;
-                ord[last_index].next = y;
-            }
-            last_index = y;
-        }
-        else
-            ord[y].val = -1;
-    }
-    ord[last_index].next = last_index;
-
-    int tolerance = threshold/20;
-
-    
-    if (state > 1)
-    {
-        merge_lines(image, abs, ord, tolerance);
-    }
-    if (state > 2)
-    {
-        excludeLine(image, abs, ord, tolerance, threshold);
-    }
-    if (state > 3)
-    {
-        gridDetection(image, abs, ord, threshold);
-    }
-    if (state > 4)
-    {
-        int tabX[10];
-        int i = 0;
-        for (int x = 0; x < image->w; x++)
-        {
-            if (abs[x].val > threshold)
-            {
-                tabX[i] = x;
-                i++;
-                if (i == 11)
-                    break;
-            }
-        }
-
-        int tabY[10];
-        i = 0;
-        for (int y = 0; y < image->h; y++)
-        {
-            if (ord[y].val > threshold)
-            {
-                tabY[i] = y;
-                i++;
-                if (i == 11)
-                    break;
-            }
-        }
-
-        // Crop(image, 130,0,130,image->w,0,90,image->h,90,"crop.png");
-
-        for (i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                Crop(image, tabX[i], tabY[j], tabX[i+1], tabY[j], tabX[i], tabY[j+1], tabX[i+1], tabY[j+1], strcat("Crop"+('0'+ i + 10*j), ".png"));
-                // Crop(image, tabX[i], 0, tabX[i], image->h, 0, tabY[j], image->w, tabY[j], strcat("Crop"+('0'+ i + 10*j), ".png"));
-            }  
-        }
-    }
-
-    // printf("tabX = [\n");
-    // for (int i = 0; i < image->w; i++)
-    // {
-    //     if (abs[i].val != -1)
-    //         printf("%d:\t(val = %d, next = %d, prev = %d),\n",i , abs[i].val, abs[i].next, abs[i].prev);
-    // }
-    // printf("]\n\n");
-
-    // printf("tabY = [\n");
-    // for (int i = 0; i < image->h; i++)
-    // {
-    //     if (ord[i].val != -1)
-    //         printf("%d:\t(val = %d, next = %d, prev = %d),\n",i , ord[i].val, ord[i].next, ord[i].prev);
-    // }
-    // printf("]\n\n");
-  
-    image = draw(image, abs, ord, threshold);
-
-    free(abs);
-    free(ord);
-
-    return image;
-}
-
