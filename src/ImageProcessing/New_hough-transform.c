@@ -12,63 +12,56 @@ Number of try to write Hough : 3
 #include <math.h>
 #include <stdlib.h>
 
-
-int void_square(SDL_Surface *image)
-{
+int void_square(SDL_Surface *image) {
   int accu = 0;
   int height = image->h;
   int width = image->w;
-  const SDL_PixelFormat* format = image->format;
-  Uint32* pixtab = image->pixels;
+  const SDL_PixelFormat *format = image->format;
+  Uint32 *pixtab = image->pixels;
 
-  for (int x = 0; x < height*width; x++)
-  {
+  for (int x = 0; x < height * width; x++) {
     Uint8 r, g, b, a;
-    SDL_GetRGBA(pixtab[x],format, &r, &g, &b, &a);
+    SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
     if (!r)
       accu++;
-
   }
-  accu = accu/(height*width);
+  accu = accu / (height * width);
   return accu < 0.25;
 }
 
-SDL_Surface* Resize_crop(SDL_Surface* image, int x1, int y1, int x2, int y2)
-{
+SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2) {
 
   int height = image->h;
   int width = image->w;
 
-  if(x2>width || x1>width){
-    err(0,"Cordinates of x1 or x2 must be in bounds");
+  if (x2 > width || x1 > width) {
+    err(0, "Cordinates of x1 or x2 must be in bounds");
   }
-  if(y2>height || y1>height){
-    err(0,"Cordinates of y1 or y2 must be in bounds");
+  if (y2 > height || y1 > height) {
+    err(0, "Cordinates of y1 or y2 must be in bounds");
   }
 
-  const SDL_PixelFormat* format = image->format;
+  const SDL_PixelFormat *format = image->format;
 
-  SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(0, 32
-            , 32, 32, format->format);  
-  
-  const SDL_Rect src = {.x=x1,.y=y1,.w=x2-x1,.h=y2-y1};
+  SDL_Surface *image_converted =
+      SDL_CreateRGBSurfaceWithFormat(0, 32, 32, 32, format->format);
 
-  int er = SDL_BlitScaled(image, &src, image_converted,NULL);
+  const SDL_Rect src = {.x = x1, .y = y1, .w = x2 - x1, .h = y2 - y1};
+
+  int er = SDL_BlitScaled(image, &src, image_converted, NULL);
   if (er == -1)
-    err(0,NULL);
+    err(0, NULL);
 
+  SDL_Surface *image_converted2 =
+      SDL_CreateRGBSurfaceWithFormat(0, 28, 28, 32, format->format);
 
+  const SDL_Rect src2 = {.x = 2, .y = 2, .w = 28, .h = 28};
 
-  SDL_Surface *image_converted2 = SDL_CreateRGBSurfaceWithFormat(0, 28
-            , 28, 32, format->format);  
-  
-  const SDL_Rect src2 = {.x=2,.y=2,.w=28,.h=28};
-
-  er = SDL_BlitScaled(image_converted, &src2, image_converted2,NULL);
+  er = SDL_BlitScaled(image_converted, &src2, image_converted2, NULL);
   if (er == -1)
-    err(0,NULL);
+    err(0, NULL);
 
-  SDL_FreeSurface(image_converted);  
+  SDL_FreeSurface(image_converted);
 
   // printf("Is empty? = %i\n",void_square(image_converted));
   return image_converted2;
@@ -157,13 +150,12 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
   free(queue);
 }
 
-int *new_hough_transform(SDL_Surface *image, int delta, int threshold,
-                         int *return_size) {
+int *new_hough_transform(SDL_Surface *image, int *return_size) {
 
   int height = image->h;
   int width = image->w;
   int h_acc = 2 * sqrt(height * height + width * width);
-  int w_acc = 180 + delta;
+  int w_acc = 180;
   const SDL_PixelFormat *format = image->format;
 
   int *accumu = calloc(w_acc * h_acc, sizeof(size_t));
@@ -195,12 +187,13 @@ int *new_hough_transform(SDL_Surface *image, int delta, int threshold,
       max = accumu[y];
     }
   }
-  threshold = max / 3.5;
+  int threshold = max / 4;
+  printf("Hough threshold = %i ; max = %i\n", threshold, max);
 
   size_t nb_droite = 0;
   for (int y = 0; y < h_acc * w_acc; y++) {
     if (accumu[y] > threshold) {
-      LocalMaximum(accumu, h_acc, w_acc, y, threshold);
+      // LocalMaximum(accumu, h_acc, w_acc, y, threshold);
       ++nb_droite;
     }
   }
@@ -209,17 +202,20 @@ int *new_hough_transform(SDL_Surface *image, int delta, int threshold,
   size_t i = 0;
   for (int y = 0; y < h_acc; y++) {
     for (int x = 0; x < w_acc; x++) {
-      if (accumu[y * w_acc + x] < -threshold) {
+      if (accumu[y * w_acc + x] > threshold) {
+        // if (accumu[y * w_acc + x] < -threshold) {
         double rho = y * 2 - (double)h_acc / 2,
                theta = (double)x * M_PI / w_acc;
         double A = cos(theta), B = sin(theta);
         double x0 = A * rho, y0 = B * rho;
-        matrix[i++] = (x0 + 10000 * (-B));
-        matrix[i++] = (y0 + 10000 * (A));
-        matrix[i++] = (x0 - 10000 * (-B));
-        matrix[i++] = (y0 - 10000 * (A));
+        matrix[i++] = (x0 + h_acc * (-B));
+        matrix[i++] = (y0 + h_acc * (A));
+        matrix[i++] = (x0 - h_acc * (-B));
+        matrix[i++] = (y0 - h_acc * (A));
+
+        Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
         draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
-                  matrix[i - 1]);
+                  matrix[i - 1], color);
         // test of Grid Detection
       }
     }

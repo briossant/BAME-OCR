@@ -215,33 +215,9 @@ uplet sort_argv(char *argv0, char *input, int argc) {
                strcmp(arg, "griddetection") == 0) // Grid Detection
     {
       res.argv[i] = 9;
-      arg = strtok(NULL, " ");
-      if (arg == NULL) {
-        res.stop = -2;
-        break;
-      }
-      res.threshold = atoi(arg);
-      arg = strtok(NULL, " ");
-      if (arg == NULL) {
-        res.stop = -2;
-        break;
-      }
-      res.state = atoi(arg);
     } else if (strcmp(arg, "ho") == 0 || strcmp(arg, "hough") == 0) // Hough
     {
       res.argv[i] = 10;
-      arg = strtok(NULL, " ");
-      if (arg == NULL) {
-        res.stop = -2;
-        break;
-      }
-      res.threshold = atoi(arg);
-      arg = strtok(NULL, " ");
-      if (arg == NULL) {
-        res.stop = -2;
-        break;
-      }
-      res.state = atoi(arg);
     } else if (strcmp(arg, "ar") == 0 ||
                strcmp(arg, "autorotate") == 0) // Auto_Rotate
     {
@@ -293,6 +269,8 @@ int ImageProcess(uplet argv) {
   if (image_converted == NULL)
     return 1;
 
+  int ho_matrix_size = -1;
+  int *ho_matrix = NULL;
   for (int i = 0; i < argv.argc; i++) {
     // printf("%d\n", argv.argv[i]);
     if (argv.argv[i] == 2) // GreyScale
@@ -326,15 +304,15 @@ int ImageProcess(uplet argv) {
       Auto_Rotate(image_converted);
     } else if (argv.argv[i] == 9) // GridDetection
     {
-      image_converted =
-          hough_transform(image_converted, argv.threshold, argv.state);
+      if (ho_matrix_size == -1)
+        errx(1, "grid detection need hough to be run before");
+      int *grid = GridDetection(ho_matrix, ho_matrix_size);
+
+      Uint32 color = SDL_MapRGBA(image_converted->format, 0, 255, 0, 255);
+      draw_line(image_converted, grid[0], grid[1], grid[2], grid[3], color);
     } else if (argv.argv[i] == 10) // Hough
     {
-      int matrix_size;
-      int *matrix = new_hough_transform(image_converted, argv.state,
-                                        argv.threshold, &matrix_size);
-      int *grid = GridDetection(matrix, matrix_size);
-      draw_line(image_converted, grid[0], grid[1], grid[2], grid[3]);
+      ho_matrix = new_hough_transform(image_converted, &ho_matrix_size);
 
     } else if (argv.argv[i] == 11) // Crop
     {
