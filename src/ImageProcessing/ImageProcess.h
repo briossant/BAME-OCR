@@ -3,10 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct
-{
-    int x;
-    int y;
+typedef struct {
+  int x;
+  int y;
 } pair;
 
 void BlacknWhite(SDL_Surface *image);
@@ -39,16 +38,21 @@ void Thresholdhysteresis(SDL_Surface *image);
 
 Uint8 ComputeSeuil(SDL_Surface *image);
 
-SDL_Surface *hough_transform(SDL_Surface *image, int threshold, int state);
+int *hough_transform(SDL_Surface *image, int *return_size);
 
-SDL_Surface *new_hough_transform(SDL_Surface *image, int delta, int threshold);
-
-void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2);
-
-void draw_hough_line(SDL_Surface *image, SDL_Surface *hough_pic, int seuil);
+void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
+               Uint32 color);
 
 void Auto_Rotate(SDL_Surface *image);
 
-SDL_Surface* Crop(SDL_Surface* image, pair p1, pair p2);
+SDL_Surface *Crop(SDL_Surface *image, pair p1, pair p2);
 
-void Crop_grid(SDL_Surface* image, int* lx, int* ly);
+void Crop_grid(SDL_Surface *image, int *lx, int *ly);
+
+SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2);
+
+void InvertColor(SDL_Surface *image);
+
+void Balance(SDL_Surface *image);
+
+int *GridDetection(int *lines, int nbr_of_lines);
