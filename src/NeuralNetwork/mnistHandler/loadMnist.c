@@ -6,9 +6,9 @@
 #define NBR_HEADERS_IMAGES 4
 #define NBR_HEADERS_LABELS 2
 
-#define TRAINING_IMAGES_PATH "dataset/nbr60k.img"
+#define TRAINING_IMAGES_PATH "dataset/cool-dataset.img"
+#define TRAINING_LABELS_PATH "dataset/cool-dataset.label"
 #define TESTING_IMAGES_PATH "dataset/nbr10k.img"
-#define TRAINING_LABELS_PATH "dataset/nbr60k.label"
 #define TESTING_LABELS_PATH "dataset/nbr10k.label"
 
 #define CHARS_IN_INT32 sizeof(int32_t) / sizeof(char)

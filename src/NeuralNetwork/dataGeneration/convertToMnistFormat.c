@@ -8,6 +8,8 @@
 #define IMAGE_H 28
 #define MAGIC 42
 
+#define CHARS_IN_INT32 sizeof(int32_t) / sizeof(char)
+
 void writeImg(FILE *file, char *img_path) {
     SDL_Surface *img = SDL_Start(img_path);
 
@@ -20,7 +22,7 @@ void writeImg(FILE *file, char *img_path) {
     const SDL_PixelFormat *format = img->format;
     Uint32 *pixtab = img->pixels;
     Uint8 r, g, b, a;
-    for (int x = 0; x < img_size; ++x) {
+    for (size_t x = 0; x < img_size; ++x) {
         SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
         buffer[x] = r;
     }
@@ -32,14 +34,31 @@ void writeImg(FILE *file, char *img_path) {
     free(buffer);
 }
 
-void WriteImages(char *path, uint32_t magic, uint32_t qtt, char **files_name) {
+void WriteInt32(FILE *file, int32_t *to_write, size_t len) {
+    size_t buff_len = len * CHARS_IN_INT32;
+    unsigned char *buffer = malloc(buff_len * sizeof(char));
+
+    for (size_t i = 0; i < len; i++) {
+        for (size_t j = 0; j < CHARS_IN_INT32; j++) {
+            buffer[i * CHARS_IN_INT32 + CHARS_IN_INT32 - j - 1] = to_write[i];
+            to_write[i] >>= 8;
+        }
+    }
+
+    if (fwrite(buffer, sizeof(char), buff_len, file) != buff_len)
+        errx(1, "error writing headers");
+
+    free(buffer);
+}
+
+void WriteImages(char *path, int32_t magic, int32_t qtt, char **files_name) {
     FILE *file = fopen(path, "w");
     if (file == NULL) {
         errx(1, "error opening file %s", path);
     }
 
     // 0: magic number ; 1: number of images ; 2: image height ; 3: image width
-    uint32_t *headers = malloc(4 * sizeof(uint32_t));
+    int32_t *headers = malloc(4 * sizeof(int32_t));
     headers[0] = magic;
     headers[1] = qtt;
     headers[2] = IMAGE_H;
@@ -47,42 +66,39 @@ void WriteImages(char *path, uint32_t magic, uint32_t qtt, char **files_name) {
 
     printf("Writting images (magic: %d) -> qtt: %d  h: %d  w: %d\n", headers[0],
            headers[1], headers[2], headers[3]);
-    if (fwrite(headers, sizeof(uint32_t), 4, file) != 4)
-        errx(1, "error writing images headers");
-
+    WriteInt32(file, headers, 4);
     free(headers);
 
-    for (uint32_t i = 0; i < qtt; ++i)
+    for (int32_t i = 0; i < qtt; ++i)
         writeImg(file, files_name[i]);
 
     fclose(file);
 }
 
-void WriteLabels(char *path, uint32_t magic, uint32_t qtt, char *labels) {
+void WriteLabels(char *path, int32_t magic, int32_t qtt, char *labels) {
     FILE *file = fopen(path, "w");
     if (file == NULL) {
         errx(1, "error opening file %s", path);
     }
 
     // 0: magic number ; 1: number of labels
-    uint32_t *headers = malloc(2 * sizeof(uint32_t));
+    int32_t *headers = malloc(2 * sizeof(int32_t));
     headers[0] = magic;
     headers[1] = qtt;
     printf("Writting labels (magic: %d) -> qtt: %d\n", headers[0], headers[1]);
-    if (fwrite(headers, sizeof(uint32_t), 2, file) != 2)
-        errx(1, "error writing labels headers");
+    WriteInt32(file, headers, 2);
 
     free(headers);
 
-    if (fwrite(labels, sizeof(unsigned char), qtt, file) != qtt)
+    if (fwrite(labels, sizeof(unsigned char), qtt, file) != (size_t)qtt)
         errx(1, "error writing labels");
 
     fclose(file);
 }
 
-uint32_t numberOfFiles(DIR *dp) {
+int32_t numberOfFiles(DIR *dp) {
     struct dirent *ep;
-    uint32_t count = 0;
+    int32_t count = 0;
     while ((ep = readdir(dp)) != NULL) {
         if (strcmp(".", ep->d_name) == 0 || strcmp("..", ep->d_name) == 0)
             continue;
@@ -99,9 +115,7 @@ int main(int argc, char **argv) {
     DIR *dp;
     struct dirent *ep;
     char *dirpath;
-    uint32_t qtt = 0;
-
-    
+    int32_t qtt = 0;
 
     for (int i = 0; i <= 9; ++i) {
         asprintf(&dirpath, "%s%d/", argv[1], i);
@@ -128,7 +142,7 @@ int main(int argc, char **argv) {
         while ((ep = readdir(dp)) != NULL) {
             if (strcmp(".", ep->d_name) == 0 || strcmp("..", ep->d_name) == 0)
                 continue;
-            asprintf(files_name+j, "%s%s", dirpath, ep->d_name);
+            asprintf(files_name + j, "%s%s", dirpath, ep->d_name);
             labels[j] = i;
             ++j;
         }
