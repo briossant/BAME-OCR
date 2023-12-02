@@ -93,15 +93,18 @@ uint32_t numberOfFiles(DIR *dp) {
 
 int main(int argc, char **argv) {
     if (argc < 3) {
-        printf("Usage: %s <dirpath> <new file name>\n", argv[0]);
+        printf("Usage: %s <dirpath/> <new file name>\n", argv[0]);
         return 1;
     }
     DIR *dp;
     struct dirent *ep;
     char *dirpath;
     uint32_t qtt = 0;
+
+    
+
     for (int i = 0; i <= 9; ++i) {
-        asprintf(&dirpath, "%s/%d", argv[1], i);
+        asprintf(&dirpath, "%s%d/", argv[1], i);
         dp = opendir(dirpath);
         if (dp == NULL)
             errx(1, "couldn't open this directory or directory missing the "
@@ -117,17 +120,17 @@ int main(int argc, char **argv) {
 
     int j = 0;
     for (int i = 0; i <= 9; ++i) {
-        asprintf(&dirpath, "%s/%d", argv[1], i);
+        asprintf(&dirpath, "%s%d/", argv[1], i);
         dp = opendir(dirpath);
         if (dp == NULL)
             errx(1, "error reopening directory");
 
         while ((ep = readdir(dp)) != NULL) {
-            ++j;
             if (strcmp(".", ep->d_name) == 0 || strcmp("..", ep->d_name) == 0)
                 continue;
-            files_name[j] = ep->d_name;
+            asprintf(files_name+j, "%s%s", dirpath, ep->d_name);
             labels[j] = i;
+            ++j;
         }
 
         (void)closedir(dp);
