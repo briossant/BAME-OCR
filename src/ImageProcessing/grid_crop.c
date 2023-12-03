@@ -12,7 +12,7 @@ Number of try to write Hough : 3
 #include <math.h>
 #include <stdlib.h>
 
-#define FIRST_CROP_SIZE 16
+#define FIRST_CROP_SIZE 36
 #define SECOND_CROP_SIZE 28 // mnist size
 
 int void_square(SDL_Surface *image) {
@@ -77,7 +77,7 @@ SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2) {
     SDL_Surface *image_converted2 = SDL_CreateRGBSurfaceWithFormat(
         0, SECOND_CROP_SIZE, SECOND_CROP_SIZE, 32, format->format);
 
-    GaussianBlur(image_converted);
+    // GaussianBlur(image_converted);
 
     int center = mostBrightPixel(image_converted);
 
@@ -85,13 +85,13 @@ SDL_Surface *Resize_crop(SDL_Surface *image, int x1, int y1, int x2, int y2) {
            center % FIRST_CROP_SIZE);
 
     // find the right offset to isolate number
-    int offset = 2;
-    const SDL_Rect src2 = {.x = x1 + offset,
-                           .y = y2 + offset,
-                           .w = x2 - x1 - offset * 2,
-                           .h = y2 - y1 - offset * 2};
+    int offset = 11;
+    const SDL_Rect src2 = {.x = offset + 2,
+                           .y = offset + 2,
+                           .w = FIRST_CROP_SIZE - offset * 2,
+                           .h = FIRST_CROP_SIZE - offset * 2 + 3};
 
-    er = SDL_BlitScaled(image, &src2, image_converted2, NULL);
+    er = SDL_BlitScaled(image_converted, &src2, image_converted2, NULL);
     if (er == -1)
         err(0, NULL);
 
