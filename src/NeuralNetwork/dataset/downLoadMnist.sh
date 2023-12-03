@@ -1,3 +1,3 @@
-curl -O https://briossant.com/downloads/mnist.zip
-unzip mnist.zip
-rm mnist.zip
+curl -O https://briossant.com/downloads/dataset.tar
+tar -xf dataset.tar
+rm dataset.tar
