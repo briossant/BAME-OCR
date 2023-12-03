@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.0"/>
+  <object class="GtkBuilder" id="builder">
+    <property name="can_focus">False</property>
+    <property name="can-default">False</property>
+    <property name="translation-domain">example</property>
+    <property name="objects">
+      <property name="window_main">window_main</property>
+      <property name="button_click">button_click</property>
+      <property name="dialog_message">dialog_message</property>
+    </property>
+  </object>
+  <object class="GtkWindow" id="window_main">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Main Window</property>
+    <property name="window_position">center</property>
+    <property name="default_width">400</property>
+    <property name="default_height">300</property>
+    <property name="visible">True</property>
+    <property name="has_resize_grip">True</property>
+    <property name="receives_default">True</property>
+    <property name="deletable">False</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <child>
+      <object class="GtkButton" id="button_click">
+        <property name="can_focus">True</property>
+        <property name="receives_default">True</property>
+        <property name="label" translatable="yes">Click Me!</property>
+        <property name="visible">True</property>
+        <property name="can_default">True</property>
+        <property name="margin_left">12</property>
+        <property name="margin_right">12</property>
+        <property name="margin_start">12</property>
+        <property name="margin_end">12</property>
+        <property name="margin_top">12</property>
+        <property name="margin_bottom">12</property>
+        <signal name="clicked" handler="on_button_clicked" swapped="no"/>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="dialog_message">
+    <property name="can_focus">False</property>
+    <property name="type">info</property>
+    <property name="buttons">close</property>
+    <property name="message_type">info</property>
+    <property name="text" translatable="yes">Message Dialog</property>
+    <property name="visible">True</property>
+    <signal name="response" handler="on_dialog_response" swapped="no"/>
+  </object>
+</interface>
