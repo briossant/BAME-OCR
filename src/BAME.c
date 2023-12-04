@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
                 sdk_grid[y][x] = 0;
                 continue;
             }
+            box_img = CenterNumber(box_img);
             asprintf(&kokok, "tmp/full-%d-%d.png", x, y);
             IMG_SavePNG(box_img, kokok);
 

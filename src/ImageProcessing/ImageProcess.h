@@ -8,8 +8,8 @@
 #include <string.h>
 
 typedef struct {
-  int x;
-  int y;
+    int x;
+    int y;
 } pair;
 
 void BlacknWhite(SDL_Surface *image);
@@ -66,3 +66,5 @@ void InvertColor(SDL_Surface *image);
 int void_square(SDL_Surface *image);
 
 int *GridDetection(int *lines, int nbr_of_lines);
+
+SDL_Surface *CenterNumber(SDL_Surface *image);
