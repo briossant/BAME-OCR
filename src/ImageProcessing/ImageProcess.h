@@ -66,3 +66,5 @@ void InvertColor(SDL_Surface *image);
 int void_square(SDL_Surface *image);
 
 int *GridDetection(int *lines, int nbr_of_lines);
+
+void get_green_number(  SDL_Surface *image, int number,int start, int end);

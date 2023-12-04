@@ -217,7 +217,12 @@ uplet sort_argv(char *argv0, char *input, int argc) {
         break;
       }
       res.p2.y = atoi(arg);
-    } else {
+    }else if (strcmp(arg, "gn") == 0 ||
+               strcmp(arg, "greennumber") == 0) // Green Number Overlay
+    {
+      res.argv[i] = 12;
+    }
+    else {
       print_error(argv0, arg);
       res.stop = 1;
       break;
@@ -289,6 +294,9 @@ int ImageProcess(uplet argv) {
                                     argv.p2.x, argv.p2.y);
 
       // Balance(image_converted);
+    } else if (argv.argv[i] == 12) // Contrast
+    {
+      get_green_number(image_converted, 1, 0, image_converted->h*image_converted->w-1);
     }
   }
 
