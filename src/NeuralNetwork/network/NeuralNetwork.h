@@ -75,7 +75,7 @@ void freeNetwork(Network network);
 void LoadMnist(Matrix *images, Matrix *labels, char *path);
 // don't forget to init rand() with srand(time(NULL));
 void MnistTraining(TrainingSettings settings, Network network,
-                   char *dataset_path);
+                   char **datasets_path, size_t nbr_of_dataset);
 
 void MnistTesting(Network network, char *dataset_path);
 

@@ -70,7 +70,6 @@ void CreateNetwork(Network *network, size_t argc) {
 }
 
 void callTraining(Network *network, size_t argc) {
-    (void)argc;
 
     TrainingSettings sett = {.nbr_of_inputs = 42}; // 42 is dummy value (will be
                                                    // change by MnistTraining)
@@ -78,8 +77,12 @@ void callTraining(Network *network, size_t argc) {
     sett.epochs = atoi(strtok(NULL, " "));
     sett.inertia_strength = strtod(strtok(NULL, " "), NULL);
     sett.batch_size = atoi(strtok(NULL, " "));
+    char **datasets = malloc(sizeof(char *) * (argc - 4));
+    for (size_t i = 0; i < argc - 4; ++i) {
+        datasets[i] = strtok(NULL, " ");
+    }
 
-    MnistTraining(sett, *network, strtok(NULL, " "));
+    MnistTraining(sett, *network, datasets, argc - 4);
 }
 
 void callTesting(Network *network, size_t argc) {
