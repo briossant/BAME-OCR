@@ -15,9 +15,11 @@ void PrintUsage(Network *network, size_t argc) {
     printf("〉help : show this message\n");
     printf("〉quit : exit program\n");
     printf("〉new [hidden layer size] ... : create a new network\n");
-    printf("〉train [learning rate] [epochs] [inertia strength] [batch size] : "
+    printf("〉train [learning rate] [epochs] [inertia strength] [batch size] "
+           "[dataset] : "
            "train the network\n");
-    printf("〉test : test network performance on the test database\n");
+    printf(
+        "〉test [dataset] : test network performance on the test database\n");
     printf("〉save [filename] : save the network\n");
     printf("〉load [filename] : load the network\n");
     printf(
@@ -77,13 +79,13 @@ void callTraining(Network *network, size_t argc) {
     sett.inertia_strength = strtod(strtok(NULL, " "), NULL);
     sett.batch_size = atoi(strtok(NULL, " "));
 
-    MnistTraining(sett, *network);
+    MnistTraining(sett, *network, strtok(NULL, " "));
 }
 
 void callTesting(Network *network, size_t argc) {
     (void)argc;
 
-    MnistTesting(*network);
+    MnistTesting(*network, strtok(NULL, " "));
 }
 
 void testOnImage(Network *network, size_t argc) {
@@ -105,7 +107,7 @@ struct parseEl {
 // don't forget to update CMD_COUNT when adding command
 struct parseEl parseList[] = {
     {"help", 0, PrintUsage},    {"new", 0, CreateNetwork},
-    {"train", 4, callTraining}, {"test", 0, callTesting},
+    {"train", 5, callTraining}, {"test", 1, callTesting},
     {"save", 1, callSave},      {"load", 1, callLoad},
     {"img", 1, testOnImage}};
 

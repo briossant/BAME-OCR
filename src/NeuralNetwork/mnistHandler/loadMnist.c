@@ -6,11 +6,6 @@
 #define NBR_HEADERS_IMAGES 4
 #define NBR_HEADERS_LABELS 2
 
-#define TRAINING_IMAGES_PATH "dataset/cool-dataset.img"
-#define TRAINING_LABELS_PATH "dataset/cool-dataset.label"
-#define TESTING_IMAGES_PATH "dataset/nbr10k.img"
-#define TESTING_LABELS_PATH "dataset/nbr10k.label"
-
 #define CHARS_IN_INT32 sizeof(int32_t) / sizeof(char)
 #define NBR_OF_DIFFERENT_LABELS 10
 
@@ -102,11 +97,12 @@ Matrix LoadMnistLabels(char *path) {
     return labels;
 }
 
-void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining) {
+void LoadMnist(Matrix *images, Matrix *labels, char *path) {
     printf("|||||||||||||||||| Loading Mnist ||||||||||||||||||||||\n");
-    *images = LoadMnistImages(isForTraining ? TRAINING_IMAGES_PATH
-                                            : TESTING_IMAGES_PATH);
-    *labels = LoadMnistLabels(isForTraining ? TRAINING_LABELS_PATH
-                                            : TESTING_LABELS_PATH);
+    char *path_with_ext;
+    asprintf(&path_with_ext, "%s.img", path);
+    *images = LoadMnistImages(path_with_ext);
+    asprintf(&path_with_ext, "%s.label", path);
+    *labels = LoadMnistLabels(path_with_ext);
     printf("|||||||||||||||||| Mnist Loaded |||||||||||||||||||||||\n\n");
 }

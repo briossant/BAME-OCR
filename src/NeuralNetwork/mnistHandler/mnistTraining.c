@@ -4,11 +4,11 @@
 #define INPUT_SIZE 28 * 28
 #define OUTPUT_SIZE 10
 
-void MnistTesting(Network network) {
+void MnistTesting(Network network, char *dataset_path) {
 
     Matrix inputs;
     Matrix outputs;
-    LoadMnist(&inputs, &outputs, False);
+    LoadMnist(&inputs, &outputs, dataset_path);
 
     NNValue final_value = TestPropagation(inputs, outputs, network);
 
@@ -19,7 +19,8 @@ void MnistTesting(Network network) {
     printf("*** 🔴 Success rate: %f %% ***\n\n", final_value);
 }
 
-void MnistTraining(TrainingSettings settings, Network network) {
+void MnistTraining(TrainingSettings settings, Network network,
+                   char *dataset_path) {
     printf("|||||||||||||||||| MNIST Training |||||||||||||||||||||\n\n");
 
     printNetwork(network);
@@ -27,7 +28,7 @@ void MnistTraining(TrainingSettings settings, Network network) {
 
     Matrix inputs;
     Matrix outputs;
-    LoadMnist(&inputs, &outputs, True);
+    LoadMnist(&inputs, &outputs, dataset_path);
     settings.nbr_of_inputs = inputs.w;
 
     TrainNetwork(network, inputs, outputs, settings);

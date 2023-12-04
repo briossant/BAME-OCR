@@ -15,30 +15,30 @@
 // Struct
 
 typedef struct InputBatch {
-  size_t size;
-  Matrix inputs;
-  Matrix outputs;
+    size_t size;
+    Matrix inputs;
+    Matrix outputs;
 } InputBatch;
 
 typedef struct TrainingSettings {
-  size_t nbr_of_inputs;
-  NNValue training_rate;
-  NNValue inertia_strength; // between 0.0 and 1.0
-  size_t epochs;
-  size_t batch_size;
+    size_t nbr_of_inputs;
+    NNValue training_rate;
+    NNValue inertia_strength; // between 0.0 and 1.0
+    size_t epochs;
+    size_t batch_size;
 } TrainingSettings;
 
 typedef struct Layer {
-  size_t size; // number of nodes
-  Matrix biases;
-  Matrix weights;
+    size_t size; // number of nodes
+    Matrix biases;
+    Matrix weights;
 } Layer;
 
 typedef struct Network {
-  size_t input_size; // number of input nodes
-  size_t depth; // number of layers (hidden layers+output layer) i.e Size of
-                // layers[]
-  Layer *layers;
+    size_t input_size; // number of input nodes
+    size_t depth; // number of layers (hidden layers+output layer) i.e Size of
+                  // layers[]
+    Layer *layers;
 } Network;
 
 ////////////////////////////////////
@@ -72,11 +72,12 @@ void freeNetwork(Network network);
 // load mnist data into Matrix *images and Matrix *labels
 // Bool isForTraining select between the 2 2 differents path define in
 // loadMnist.c
-void LoadMnist(Matrix *images, Matrix *labels, Bool isForTraining);
+void LoadMnist(Matrix *images, Matrix *labels, char *path);
 // don't forget to init rand() with srand(time(NULL));
-void MnistTraining(TrainingSettings settings, Network network);
+void MnistTraining(TrainingSettings settings, Network network,
+                   char *dataset_path);
 
-void MnistTesting(Network network);
+void MnistTesting(Network network, char *dataset_path);
 
 ////////////////////////////////////
 // Propagation
