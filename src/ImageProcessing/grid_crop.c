@@ -16,7 +16,7 @@ Number of try to write Hough : 3
 #define FIRST_CROP_SIZE 64
 #define SECOND_CROP_SIZE 28 // mnist size
 #define TRESHOLD_EON 1
-#define OFFSET_CENTER_NB 0
+#define OFFSET_CENTER_NB 2
 #define OFFSET_CROP 6
 
 int void_square(SDL_Surface *image) {
@@ -144,18 +144,20 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
             pixtab[y * width + x] = convolution(image, x, y, kernel, 7);
         }
     }
-    IMG_SavePNG(image_blured, "test_image_blured.png");
 
     int nb_center = mostBrightPixel(image_blured);
 
     int N = End_of_Number(image_blured, nb_center, 0, -1) / width;
     int S = End_of_Number(image_blured, nb_center, 0, 1) / width;
-    // int W = End_of_Number(image_blured, nb_center, -1, 0);
-    // int E = End_of_Number(image_blured, nb_center, 1, 0);
+    int W = End_of_Number(image_blured, nb_center, -1, 0) % width;
+    int E = End_of_Number(image_blured, nb_center, 1, 0) % width;
+
+    int d2 = E - W;
+    int dW = nb_center % width - W;
 
     int d = S - N;
-    int y = N - OFFSET_CENTER_NB;
-    int x = nb_center % width - d / 2 - OFFSET_CENTER_NB;
+    int y = N;
+    int x = (nb_center % width) - (dW * d) / d2;
 
     printf("N= %i, S= %i, d= %i, y= %i, x= %i\n", N, S, d, y, x);
 
@@ -165,7 +167,10 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(
         0, SECOND_CROP_SIZE, SECOND_CROP_SIZE, 32, format->format);
 
-    const SDL_Rect src = {.x = x, .y = y, .w = d, .h = d};
+    const SDL_Rect src = {.x = x - OFFSET_CENTER_NB,
+                          .y = y - OFFSET_CENTER_NB,
+                          .w = d + OFFSET_CENTER_NB * 2,
+                          .h = d + OFFSET_CENTER_NB * 2};
 
     int er = SDL_BlitScaled(image, &src, image_converted, NULL);
     if (er == -1)
