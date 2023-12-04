@@ -13,11 +13,11 @@ Number of try to write Hough : 3
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FIRST_CROP_SIZE 64
+#define FIRST_CROP_SIZE 42
 #define SECOND_CROP_SIZE 28 // mnist size
 #define TRESHOLD_EON 1
 #define OFFSET_CENTER_NB 2
-#define OFFSET_CROP 6
+#define OFFSET_CROP 0
 
 int void_square(SDL_Surface *image) {
     int accu = 0;

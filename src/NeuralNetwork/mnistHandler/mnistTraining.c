@@ -34,7 +34,7 @@ void MnistTraining(TrainingSettings settings, Network network,
         Matrix inputs_tmp;
         Matrix outputs_tmp;
         LoadMnist(&inputs_tmp, &outputs_tmp, datasets_path[i]);
-        settings.nbr_of_inputs += inputs.w;
+        settings.nbr_of_inputs += inputs_tmp.w;
         inputs.mat =
             realloc(inputs.mat, settings.nbr_of_inputs * sizeof(NNValue *));
         outputs.mat =
