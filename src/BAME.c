@@ -2,15 +2,19 @@
 #include "NeuralNetwork/network/NeuralNetwork.h"
 #include "SudokuSolver/Sudoku_Solver.h"
 
-#define NN_FILENAME "sudoku.nn"
+#define DEFAULT_NN "sudoku.nn"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Usage: ./ocr <image path>\n");
+        printf("Usage: ./ocr <image path> <network path (optional)>\n");
         return 1;
     }
+    char *nn_path = DEFAULT_NN;
+    if (argc >= 3) {
+        nn_path = argv[2];
+    }
 
-    Network network = LoadNetwork(NN_FILENAME);
+    Network network = LoadNetwork(nn_path);
 
     SDL_Surface *image = SDL_Start(argv[1]);
 
