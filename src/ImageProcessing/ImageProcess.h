@@ -68,3 +68,5 @@ int void_square(SDL_Surface *image);
 int *GridDetection(int *lines, int nbr_of_lines);
 
 SDL_Surface *CenterNumber(SDL_Surface *image);
+
+void get_green_number(  SDL_Surface *image, int number,int start, int end);
