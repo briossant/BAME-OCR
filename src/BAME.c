@@ -25,15 +25,17 @@ int main(int argc, char *argv[]) {
 
     image = Canny(image);
     int ho_mat_size = -1;
-    int *ho_mat = hough_transform(image, &ho_mat_size);
+    double *ho_mat = hough_transform(image, &ho_mat_size);
     SDL_FreeSurface(image);
 
-    double angle_to_rotate = GetImageAngle(ho_mat, ho_mat_size);
+    double angle_to_rotate =
+        GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
     printf("angle_rotated: %lf\n", angle_to_rotate);
     image_copy = Rotate(image_copy, angle_to_rotate);
     IMG_SavePNG(image_copy, "hough-before-rotadet.png");
 
-    int *grid_corner = GridDetection(ho_mat, ho_mat_size);
+    int *ho_points = TransformHoughPolarToPoints(ho_mat, ho_mat_size);
+    int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
     int sdk_grid[9][9]; // risky shit malloc may be better
     int grid_coo[9][9]; // risky shit malloc may be better
