@@ -12,24 +12,12 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <child>
-          <!-- n-columns=1 n-rows=3 -->
+          <!-- n-columns=1 n-rows=4 -->
           <object class="GtkGrid">
             <property name="width-request">150</property>
             <property name="height-request">360</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <child>
-              <object class="GtkButton" id="Upload Image">
-                <property name="label" translatable="yes">Upload Image</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkCheckButton" id="Step By Step">
                 <property name="label" translatable="yes">Show Step By Step</property>
@@ -48,6 +36,31 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="stock">gtk-missing-image</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="Rotation Check">
+                <property name="label" translatable="yes">Automatic Rotation</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="draw-indicator">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="Upload Sudoku">
+                <property name="label" translatable="yes">Upload Sudoku</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
