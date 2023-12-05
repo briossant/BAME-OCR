@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 SDL_Surface *Rotate(SDL_Surface *image, double angle) {
@@ -57,26 +58,43 @@ SDL_Surface *Rotate(SDL_Surface *image, double angle) {
     return new_image;
 }
 
-double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len) {
+double GetImageAngle(int *matrix_hough, size_t len) {
     double *angle_matrix = malloc(sizeof(double) * len);
 
     int angle_matrix_i = 0;
 
-    double angle;
-    for (int i = 1; i < len * 2; i += 2) {
-        angle = matrix_hough[i];
+    double angle, dx, dy;
+    for (int i = 0; i < len * 4; i += 4) {
+        dx = matrix_hough[i + 2] - matrix_hough[i];
+        dy = matrix_hough[i + 3] - matrix_hough[i + 1];
+
+        if (dx == 0) {
+            angle = M_PI_2;
+            if (dy < 0)
+                angle *= -1;
+        } else
+            angle = atan(dy / dx);
+
         // edge case /!\ will break if grid is at perfect PI/2 angle
-        if (angle >= -M_PI_2 && angle < M_PI_2)
+        if (angle <= -M_PI_4 || angle > M_PI_4) {
+            if (angle < 0)
+                angle += M_PI_2;
             angle_matrix[angle_matrix_i++] = angle;
+        }
     }
-
     SortList(angle_matrix, angle_matrix_i);
-    angle = angle_matrix[angle_matrix_i / 2];
 
+    return angle_matrix[angle_matrix_i / 2];
+}
+
+double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len) {
+
+    int *MatrixPoints = TransformHoughPolarToPoints(matrix_hough, len);
+
+    double angle = GetImageAngle(MatrixPoints, len);
     for (int i = 1; i < len; i += 2) {
         matrix_hough[i] += angle;
     }
 
-    free(angle_matrix);
-    return (M_PI_2 - angle) * 180 / M_PI;
+    return angle * 180 / M_PI;
 }
