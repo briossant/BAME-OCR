@@ -8,9 +8,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define THRESHOLD 0.12
+
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
-               Uint32 color)
-{
+               Uint32 color) {
 
     int dx = abs(x2 - x1);
     int dy = abs(y2 - y1);
@@ -30,33 +31,28 @@ void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
     int current_x = x1;
     int current_y = y1;
 
-    while (current_x != x2 || current_y != y2)
-    {
+    while (current_x != x2 || current_y != y2) {
         if (current_x >= 0 && current_x < image->w && current_y >= 0 &&
-            current_y < image->h)
-        {
-            Uint8 *pixel =
-                (Uint8 *)image->pixels + current_y * image->pitch + current_x * 4;
+            current_y < image->h) {
+            Uint8 *pixel = (Uint8 *)image->pixels + current_y * image->pitch +
+                           current_x * 4;
 
             *(Uint32 *)pixel = color;
         }
 
         int err2 = 2 * err;
-        if (err2 > -dy)
-        {
+        if (err2 > -dy) {
             err -= dy;
             current_x += sx;
         }
-        if (err2 < dx)
-        {
+        if (err2 < dx) {
             err += dx;
             current_y += sy;
         }
     }
 }
 
-void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold)
-{
+void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
     size_t size = 24200;
     int *queue = malloc(sizeof(int) * size);
     size_t i_current = 0;
@@ -65,49 +61,39 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold)
     int max_coo = coo;
 
     // check for buffer overflow
-    while (i_current < i_insert)
-    {
+    while (i_current < i_insert) {
         int x = queue[i_current] % w_acc;
         int y = queue[i_current] / w_acc;
         coo = queue[i_current];
         ++i_current; // dequeue
 
-        if (x + 1 < w_acc)
-        {
+        if (x + 1 < w_acc) {
             if (accumu[coo + 1] > threshold)
                 queue[i_insert++] = coo + 1;
-            if (accumu[coo + 1] > accumu[max_coo])
-            {
+            if (accumu[coo + 1] > accumu[max_coo]) {
                 accumu[max_coo] = 0;
                 max_coo = coo + 1;
-            }
-            else
+            } else
                 accumu[coo + 1] = 0;
         }
 
-        if (x - 1 >= 0)
-        {
+        if (x - 1 >= 0) {
             if (accumu[coo - 1] > threshold)
                 queue[i_insert++] = coo - 1;
-            if (accumu[coo - 1] > accumu[max_coo])
-            {
+            if (accumu[coo - 1] > accumu[max_coo]) {
                 accumu[max_coo] = 0;
                 max_coo = coo - 1;
-            }
-            else
+            } else
                 accumu[coo - 1] = 0;
         }
 
-        if (y + w_acc < h_acc)
-        {
+        if (y + w_acc < h_acc) {
             if (accumu[coo + w_acc] > threshold)
                 queue[i_insert++] = coo + w_acc;
-            if (accumu[coo + w_acc] > accumu[max_coo])
-            {
+            if (accumu[coo + w_acc] > accumu[max_coo]) {
                 accumu[max_coo] = 0;
                 max_coo = coo + w_acc;
-            }
-            else
+            } else
                 accumu[coo + w_acc] = 0;
         }
     }
@@ -115,8 +101,7 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold)
     free(queue);
 }
 
-int *hough_transform(SDL_Surface *image, int *return_size)
-{
+int *hough_transform(SDL_Surface *image, int *return_size) {
 
     int height = image->h;
     int width = image->w;
@@ -128,18 +113,15 @@ int *hough_transform(SDL_Surface *image, int *return_size)
 
     Uint32 *pixtab = image->pixels;
 
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
 
             Uint8 r, g, b, a;
             SDL_GetRGBA(pixtab[y * width + x], format, &r, &g, &b, &a);
             if (r < 127)
                 continue;
 
-            for (double theta = 0; theta < w_acc; theta += 1)
-            {
+            for (double theta = 0; theta < w_acc; theta += 1) {
                 int raw = (double)x * cos((double)theta / w_acc * M_PI) +
                           (double)y * sin((double)theta / w_acc * M_PI) +
                           (double)h_acc / 2;
@@ -151,21 +133,17 @@ int *hough_transform(SDL_Surface *image, int *return_size)
     }
 
     int max = accumu[0];
-    for (int y = 0; y < h_acc * w_acc; y++)
-    {
-        if (accumu[y] > max)
-        {
+    for (int y = 0; y < h_acc * w_acc; y++) {
+        if (accumu[y] > max) {
             max = accumu[y];
         }
     }
-    int threshold = max / 4.5;
+    int threshold = max * THRESHOLD;
     printf("Hough threshold = %i ; max = %i\n", threshold, max);
 
     size_t nb_droite = 0;
-    for (int y = 0; y < h_acc * w_acc; y++)
-    {
-        if (accumu[y] > threshold)
-        {
+    for (int y = 0; y < h_acc * w_acc; y++) {
+        if (accumu[y] > threshold) {
             // LocalMaximum(accumu, h_acc, w_acc, y, threshold);
             ++nb_droite;
         }
@@ -173,12 +151,9 @@ int *hough_transform(SDL_Surface *image, int *return_size)
 
     int *matrix = calloc(nb_droite * 4, sizeof(int));
     size_t i = 0;
-    for (int y = 0; y < h_acc; y++)
-    {
-        for (int x = 0; x < w_acc; x++)
-        {
-            if (accumu[y * w_acc + x] > threshold)
-            {
+    for (int y = 0; y < h_acc; y++) {
+        for (int x = 0; x < w_acc; x++) {
+            if (accumu[y * w_acc + x] > threshold) {
                 // if (accumu[y * w_acc + x] < -threshold) {
                 double rho = y * 2 - (double)h_acc / 2,
                        theta = (double)x * M_PI / w_acc;

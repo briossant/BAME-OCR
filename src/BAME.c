@@ -2,8 +2,27 @@
 #include "NeuralNetwork/network/NeuralNetwork.h"
 #include "SudokuSolver/Sudoku_Solver.h"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_surface.h>
 
 #define DEFAULT_NN "sudoku.nn"
+#define IMAGE_SIZE 2800
+
+SDL_Surface *StandardizeImage(SDL_Surface *image) {
+
+    SDL_Surface *new_image = SDL_CreateRGBSurfaceWithFormat(
+        0, IMAGE_SIZE, IMAGE_SIZE, 32, image->format->format);
+
+    int dy = IMAGE_SIZE * image->h / (image->w);
+    SDL_Rect dest = {
+        .x = 0,
+        .y = IMAGE_SIZE / 2 - dy / 2,
+        .w = IMAGE_SIZE,
+        .h = dy,
+    };
+
+    SDL_BlitScaled(image, NULL, new_image, &dest);
+    return new_image;
+}
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -18,6 +37,7 @@ int main(int argc, char *argv[]) {
     Network network = LoadNetwork(nn_path);
 
     SDL_Surface *image = SDL_Start(argv[1]);
+    image = StandardizeImage(image);
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
@@ -25,6 +45,7 @@ int main(int argc, char *argv[]) {
     image = Canny(image);
     int ho_mat_size = -1;
     int *ho_mat = hough_transform(image, &ho_mat_size);
+    IMG_SavePNG(image, "normalized.png");
     int *grid_corner = GridDetection(ho_mat, ho_mat_size);
 
     int sdk_grid[9][9]; // risky shit malloc may be better
