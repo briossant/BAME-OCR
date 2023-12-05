@@ -1,0 +1,38 @@
+# Build-up all arg
+- +B&W
+
+# Options order
+> input
+0. Bright
+1. Contrast
+2. Greyscale
+3. BlackWhite
+4. GaussianBlur
+5. arroundgaussianblur
+6. canny
+7. rotate
+8. Auto_Rotate
+9. griddetection
+10.hough
+11.Crop
+12.GreenNumbers
+> ouput
+
+# Errors
+- command incomplete
+- input incomplete
+- output incomplete
+
+# Man
+- Finish parser
+- Remove exe
+- Optimal picture to test during exam
+- valgrind
+
+# Image PRocess
+- grid detection
+- image cutting
+
+# Edges
+- 916x1150
+- 2200x2580
