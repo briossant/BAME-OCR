@@ -12,6 +12,10 @@ typedef struct {
     int y;
 } pair;
 
+void SortList(double *list, size_t len);
+
+double GetImageAngle(int *matrix_hough, size_t len);
+
 void BlacknWhite(SDL_Surface *image);
 
 void GreyScale(SDL_Surface *image);
