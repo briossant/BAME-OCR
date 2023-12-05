@@ -17,7 +17,7 @@ Number of try to write Hough : 3
 #define SECOND_CROP_SIZE 28 // mnist size
 #define TRESHOLD_EON 1
 #define OFFSET_CENTER_NB 2
-#define OFFSET_CROP 0
+#define OFFSET_CROP 4
 
 int void_square(SDL_Surface *image) {
     int accu = 0;
@@ -157,9 +157,17 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
 
     int d = S - N;
     int y = N;
+
+    // printf("x_center = %i, y_center = %i\n", nb_center % width,
+    //       nb_center / width);
+
+    if (d2 == 0)
+        err(0, "d2 must not be equal to 0");
     int x = (nb_center % width) - (dW * d) / d2;
 
-    printf("N= %i, S= %i, d= %i, y= %i, x= %i\n", N, S, d, y, x);
+    // printf("N= %i, S= %i, E= %i, W= %i, d= %i, y= %i, x= %i\n", N, S,
+    // E, W, d,
+    //        y, x);
 
     if (x < 0 || x >= width)
         err(0, "x out of bounds in End_of_Number\n");
