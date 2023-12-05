@@ -17,6 +17,17 @@ int main(int argc, char *argv[])
     // Initialize GTK
     gtk_init(&argc, &argv);
 
+    // Loads the UI description and builds the UI.
+    // (Exits if an error occurs.)
+    GtkBuilder* builder = gtk_builder_new();
+    GError* error = NULL;
+    if (gtk_builder_add_from_file(builder, "Interface.glade", &error) == 0)
+    {
+        g_printerr("Error loading file: %s\n", error->message);
+        g_clear_error(&error);
+        return 1;
+    }
+
     // Create the main window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "--- Sudoku Solver --");
