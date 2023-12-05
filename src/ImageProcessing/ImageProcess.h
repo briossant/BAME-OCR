@@ -32,9 +32,10 @@ int SDL_Output(SDL_Surface *image_converted, char *file);
 
 SDL_Surface *Rotate(SDL_Surface *image, double angle);
 
-SDL_Surface *Canny(SDL_Surface *image);
+SDL_Surface *Canny(SDL_Surface *image, int old_width, int old_height);
 
-SDL_Surface *Intensity_Gradian(SDL_Surface *image);
+SDL_Surface *Intensity_Gradian(SDL_Surface *image, int old_width,
+                               int old_height);
 
 SDL_Surface *Orientation_Gradian(SDL_Surface *image);
 

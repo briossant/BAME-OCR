@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-SDL_Surface *Canny(SDL_Surface *image) {
+SDL_Surface *Canny(SDL_Surface *image, int old_width, int old_height) {
     GreyScale(image);
     GaussianBlur(image);
 
@@ -16,7 +16,7 @@ SDL_Surface *Canny(SDL_Surface *image) {
     SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
-    image_converted = Intensity_Gradian(image_converted);
+    image_converted = Intensity_Gradian(image_converted, old_width, old_height);
     image_converted1 = Orientation_Gradian(image_converted);
     image_converted = Supp_Maxima(image_converted, image_converted1);
     Thresholdhysteresis(image_converted);
@@ -54,7 +54,8 @@ int convolution_grayscale(SDL_Surface *image, int x, int y, int *kernel,
     return sum_r;
 }
 
-SDL_Surface *Intensity_Gradian(SDL_Surface *image) {
+SDL_Surface *Intensity_Gradian(SDL_Surface *image, int old_width,
+                               int old_height) {
     int height = image->h;
     int width = image->w;
     const SDL_PixelFormat *format = image->format;
@@ -74,8 +75,8 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image) {
 
     // limit can be ajust for more or less precision
 
-    for (int y = 2; y < height - 2; y++) {
-        for (int x = 2; x < width - 2; x++) {
+    for (int y = 2; y < old_height - 2; y++) {
+        for (int x = 2; x < old_width - 2; x++) {
             grad_x = convolution_grayscale(image, x, y, grad_x_kernel, 3) / 4;
             grad_y = convolution_grayscale(image, x, y, grad_y_kernel, 3) / 4;
 

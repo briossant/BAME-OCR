@@ -9,6 +9,8 @@
 
 SDL_Surface *StandardizeImage(SDL_Surface *image) {
 
+    // TODO portrait
+
     SDL_Surface *new_image = SDL_CreateRGBSurfaceWithFormat(
         0, IMAGE_SIZE, IMAGE_SIZE, 32, image->format->format);
 
@@ -37,15 +39,19 @@ int main(int argc, char *argv[]) {
     Network network = LoadNetwork(nn_path);
 
     SDL_Surface *image = SDL_Start(argv[1]);
+
+    int old_width = image->w;
+    int old_height = image->h;
+
     image = StandardizeImage(image);
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
 
-    image = Canny(image);
+    image = Canny(image, old_width, old_height);
+    IMG_SavePNG(image, "normalized.png");
     int ho_mat_size = -1;
     int *ho_mat = hough_transform(image, &ho_mat_size);
-    IMG_SavePNG(image, "normalized.png");
     int *grid_corner = GridDetection(ho_mat, ho_mat_size);
 
     int sdk_grid[9][9]; // risky shit malloc may be better
