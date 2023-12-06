@@ -17,7 +17,7 @@ Number of try to write Hough : 3
 #define SECOND_CROP_SIZE 28 // mnist size
 #define TRESHOLD_EON 24
 #define OFFSET_CENTER_NB 2
-#define OFFSET_CROP 4
+#define OFFSET_CROP 8
 
 int void_square(SDL_Surface *image) {
     int accu = 0;

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define THRESHOLD 0.22
+#define THRESHOLD 0.34
 
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
                Uint32 color) {
@@ -160,17 +160,16 @@ double *hough_transform(SDL_Surface *image, int *return_size) {
                        theta = (double)x * M_PI / w_acc;
                 matrix[i++] = rho;
                 matrix[i++] = theta;
-                /*
-                 double A = cos(theta), B = sin(theta);
-                 double x0 = A * rho, y0 = B * rho;
-                 matrix[i++] = (x0 + h_acc * (-B));
-                 matrix[i++] = (y0 + h_acc * (A));
-                 matrix[i++] = (x0 - h_acc * (-B));
-                 matrix[i++] = (y0 - h_acc * (A));
- */
-                // Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
-                // draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
-                //           matrix[i - 1], color);
+
+                double A = cos(theta), B = sin(theta);
+                double x0 = A * rho, y0 = B * rho;
+                int x1 = (x0 + h_acc * (-B));
+                int y1 = (y0 + h_acc * (A));
+                int x2 = (x0 - h_acc * (-B));
+                int y2 = (y0 - h_acc * (A));
+
+                Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+                draw_line(image, x1, y1, x2, y2, color);
                 //  test of Grid Detection
             }
         }

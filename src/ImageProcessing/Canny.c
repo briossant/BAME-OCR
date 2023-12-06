@@ -13,14 +13,14 @@ SDL_Surface *Canny(SDL_Surface *image, int old_width, int old_height) {
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
-    SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
+    // SDL_Surface *image_converted1 = SDL_ConvertSurface(image, format, 0);
     SDL_FreeSurface(image);
 
     image_converted = Intensity_Gradian(image_converted, old_width, old_height);
-    image_converted1 = Orientation_Gradian(image_converted);
-    image_converted = Supp_Maxima(image_converted, image_converted1);
+    // image_converted1 = Orientation_Gradian(image_converted);
+    //  image_converted = Supp_Maxima(image_converted, image_converted1);
     Thresholdhysteresis(image_converted);
-    SDL_FreeSurface(image_converted1);
+    // SDL_FreeSurface(image_converted1);
 
     return image_converted;
 }

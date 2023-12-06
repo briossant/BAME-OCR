@@ -17,10 +17,11 @@ SDL_Surface *Rotate(SDL_Surface *image, double angle) {
     double c = cos(angle / 180 * pi);
     double s = sin(angle / 180 * pi);
 
-    int max = sqrt(height * height + width * width);
+    // int max = sqrt(height * height + width * width);
+    int max = IMAGE_SIZE;
 
-    double CenterX = max / 2.0;
-    double CenterY = max / 2.0;
+    double CenterX = width / 2.0;
+    double CenterY = height / 2.0;
 
     // SDL_Rect rect = {0,0,max,max};
     // printf("CenterX: %f, CenterY: %f, Cos: %f, Sin: %f\n", CenterX, CenterY,
@@ -50,7 +51,7 @@ SDL_Surface *Rotate(SDL_Surface *image, double angle) {
                     SDL_MapRGBA(new_image->format, r, g, b, a);
             } else {
                 new_pixtab[y * max + x] =
-                    SDL_MapRGBA(new_image->format, 255, 255, 255, 255);
+                    SDL_MapRGBA(new_image->format, 0, 0, 0, 255);
             }
         }
     }
@@ -78,13 +79,13 @@ double GetImageAngle(int *matrix_hough, size_t len) {
         // edge case /!\ will break if grid is at perfect PI/2 angle
         if (angle <= -M_PI_4 || angle > M_PI_4) {
             if (angle < 0)
-                angle += M_PI_2;
+                angle += M_PI;
             angle_matrix[angle_matrix_i++] = angle;
         }
     }
     SortList(angle_matrix, angle_matrix_i);
 
-    return angle_matrix[angle_matrix_i / 2];
+    return angle_matrix[angle_matrix_i / 2] - M_PI_2;
 }
 
 double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len) {
