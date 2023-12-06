@@ -3,6 +3,7 @@
 #include "SudokuSolver/Sudoku_Solver.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_surface.h>
+#include <stdio.h>
 
 #define DEFAULT_NN "sudoku.nn"
 
@@ -30,9 +31,17 @@ int main(int argc, char *argv[]) {
 
     image = Canny(image, old_width, old_height);
     int ho_mat_size = -1;
-    int *ho_mat = hough_transform(image, &ho_mat_size);
-    IMG_SavePNG(image, "normalized.png");
-    int *grid_corner = GridDetection(ho_mat, ho_mat_size);
+    double *ho_mat = hough_transform(image, &ho_mat_size);
+    SDL_FreeSurface(image);
+
+    double angle_to_rotate =
+        GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
+    printf("angle_rotated: %lf\n", angle_to_rotate);
+    image_copy = Rotate(image_copy, angle_to_rotate);
+    IMG_SavePNG(image_copy, "hough-before-rotadet.png");
+
+    int *ho_points = TransformHoughPolarToPoints(ho_mat, ho_mat_size);
+    int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
     int sdk_grid[9][9]; // risky shit malloc may be better
     int grid_coo[9][9]; // risky shit malloc may be better
@@ -48,8 +57,8 @@ int main(int argc, char *argv[]) {
             SDL_Surface *box_img =
                 Resize_crop(image_copy, image_x, image_y, image_x + box_size_x,
                             image_y + box_size_y);
-            grid_coo[y][x] =
-                image_y * image->w + image_x; // grid of coordinates of each box
+            grid_coo[y][x] = image_y * image_copy->w +
+                             image_x; // grid of coordinates of each box
 
             char *kokok;
             Balance(box_img);

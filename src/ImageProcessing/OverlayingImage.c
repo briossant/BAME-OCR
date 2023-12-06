@@ -39,7 +39,7 @@ void overlaying_image(SDL_Surface *image, SDL_Surface *green_nb, int start,
         }
     }
 
-    free(resize_nbG);
+    SDL_FreeSurface(resize_nbG);
 }
 
 void get_green_number(SDL_Surface *image, int number, int start, int end,
@@ -53,5 +53,5 @@ void get_green_number(SDL_Surface *image, int number, int start, int end,
     asprintf(&path_to_nb, "%sGreen_Images/%d.png", path, number);
     SDL_Surface *green_nb = SDL_Start(path_to_nb);
     overlaying_image(image, green_nb, start, end);
-    free(green_nb);
+    SDL_FreeSurface(green_nb);
 }

@@ -14,6 +14,10 @@ typedef struct {
     int y;
 } pair;
 
+void SortList(double *list, size_t len);
+
+double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len);
+
 void BlacknWhite(SDL_Surface *image);
 
 void GreyScale(SDL_Surface *image);
@@ -55,7 +59,9 @@ void Thresholdhysteresis(SDL_Surface *image);
 
 Uint8 ComputeSeuil(SDL_Surface *image);
 
-int *hough_transform(SDL_Surface *image, int *return_size);
+double *hough_transform(SDL_Surface *image, int *return_size);
+
+int *TransformHoughPolarToPoints(double *hough_matrix, size_t len);
 
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
                Uint32 color);

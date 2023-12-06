@@ -6,6 +6,7 @@
 #include <SDL2/SDL_surface.h>
 #include <err.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 #define THRESHOLD 0.22
@@ -101,7 +102,7 @@ void LocalMaximum(int *accumu, int h_acc, int w_acc, int coo, int threshold) {
     free(queue);
 }
 
-int *hough_transform(SDL_Surface *image, int *return_size) {
+double *hough_transform(SDL_Surface *image, int *return_size) {
 
     int height = image->h;
     int width = image->w;
@@ -149,7 +150,7 @@ int *hough_transform(SDL_Surface *image, int *return_size) {
         }
     }
 
-    int *matrix = calloc(nb_droite * 4, sizeof(int));
+    double *matrix = calloc(nb_droite * 2, sizeof(double));
     size_t i = 0;
     for (int y = 0; y < h_acc; y++) {
         for (int x = 0; x < w_acc; x++) {
@@ -157,20 +158,44 @@ int *hough_transform(SDL_Surface *image, int *return_size) {
                 // if (accumu[y * w_acc + x] < -threshold) {
                 double rho = y * 2 - (double)h_acc / 2,
                        theta = (double)x * M_PI / w_acc;
-                double A = cos(theta), B = sin(theta);
-                double x0 = A * rho, y0 = B * rho;
-                matrix[i++] = (x0 + h_acc * (-B));
-                matrix[i++] = (y0 + h_acc * (A));
-                matrix[i++] = (x0 - h_acc * (-B));
-                matrix[i++] = (y0 - h_acc * (A));
-
-                Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
-                draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
-                          matrix[i - 1], color);
-                // test of Grid Detection
+                matrix[i++] = rho;
+                matrix[i++] = theta;
+                /*
+                 double A = cos(theta), B = sin(theta);
+                 double x0 = A * rho, y0 = B * rho;
+                 matrix[i++] = (x0 + h_acc * (-B));
+                 matrix[i++] = (y0 + h_acc * (A));
+                 matrix[i++] = (x0 - h_acc * (-B));
+                 matrix[i++] = (y0 - h_acc * (A));
+ */
+                // Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+                // draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
+                //           matrix[i - 1], color);
+                //  test of Grid Detection
             }
         }
     }
     *return_size = nb_droite;
+    return matrix;
+}
+
+int *TransformHoughPolarToPoints(double *hough_matrix, size_t len) {
+
+    int *matrix = calloc(len * 4, sizeof(int));
+    int i = 0;
+    for (int y = 0; y < len * 2; y += 2) {
+        double rho = hough_matrix[y], theta = hough_matrix[y + 1];
+        double A = cos(theta), B = sin(theta);
+        double x0 = A * rho, y0 = B * rho;
+        matrix[i++] = (x0 + 1000 * (-B));
+        matrix[i++] = (y0 + 1000 * (A));
+        matrix[i++] = (x0 - 1000 * (-B));
+        matrix[i++] = (y0 - 1000 * (A));
+        // Uint32 color = SDL_MapRGBA(image->format, 255, 0, 0, 255);
+        // draw_line(image, matrix[i - 4], matrix[i - 3], matrix[i - 2],
+        //           matrix[i - 1], color);
+        //  test of Grid Detection
+    }
+
     return matrix;
 }

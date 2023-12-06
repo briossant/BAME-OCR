@@ -2,116 +2,99 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 SDL_Surface *Rotate(SDL_Surface *image, double angle) {
-  int height = image->h;
-  int width = image->w;
+    if (fabs(angle) < 0.01)
+        return image;
+    int height = image->h;
+    int width = image->w;
 
-  double pi = 3.141592;
+    double pi = 3.141592;
 
-  double c = cos(angle / 180 * pi);
-  double s = sin(angle / 180 * pi);
+    double c = cos(angle / 180 * pi);
+    double s = sin(angle / 180 * pi);
 
-  int max = sqrt(height * height + width * width);
+    int max = sqrt(height * height + width * width);
 
-  double CenterX = max / 2.0;
-  double CenterY = max / 2.0;
+    double CenterX = max / 2.0;
+    double CenterY = max / 2.0;
 
-  // SDL_Rect rect = {0,0,max,max};
-  // printf("CenterX: %f, CenterY: %f, Cos: %f, Sin: %f\n", CenterX, CenterY, c,
-  // s);
+    // SDL_Rect rect = {0,0,max,max};
+    // printf("CenterX: %f, CenterY: %f, Cos: %f, Sin: %f\n", CenterX, CenterY,
+    // c, s);
 
-  SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
-  // SDL_Surface *new_image = SDL_ConvertSurface(image, format, 0);
-  SDL_Surface *new_image = SDL_CreateRGBSurface(
-      0, max, max, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
+    // SDL_Surface *new_image = SDL_ConvertSurface(image, format, 0);
+    SDL_Surface *new_image = SDL_CreateRGBSurface(
+        0, max, max, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
-  for (int y = 0; y < max; y++) {
-    double tmp1 = (y - CenterY) * s;
-    double tmp2 = (y - CenterY) * c;
+    for (int y = 0; y < max; y++) {
+        double tmp1 = (y - CenterY) * s;
+        double tmp2 = (y - CenterY) * c;
 
-    for (int x = 0; x < max; x++) {
-      // printf("y=%d x=%d pixel=%d\n",y,x,y*image->w+x);
-      Uint32 *pixtab = image->pixels;
-      Uint32 *new_pixtab = new_image->pixels;
+        for (int x = 0; x < max; x++) {
+            // printf("y=%d x=%d pixel=%d\n",y,x,y*image->w+x);
+            Uint32 *pixtab = image->pixels;
+            Uint32 *new_pixtab = new_image->pixels;
 
-      int i = (x - CenterX) * c - tmp1 + CenterX;
-      int j = (x - CenterX) * s + tmp2 + CenterY;
+            int i = (x - CenterX) * c - tmp1 + CenterX;
+            int j = (x - CenterX) * s + tmp2 + CenterY;
 
-      if (i >= 0 && i < width && j >= 0 && j < height) {
-        Uint8 r, g, b, a;
-        SDL_GetRGBA(pixtab[j * width + i], format, &r, &g, &b, &a);
-        new_pixtab[y * max + x] = SDL_MapRGBA(new_image->format, r, g, b, a);
-      } else {
-        new_pixtab[y * max + x] =
-            SDL_MapRGBA(new_image->format, 255, 255, 255, 255);
-      }
+            if (i >= 0 && i < width && j >= 0 && j < height) {
+                Uint8 r, g, b, a;
+                SDL_GetRGBA(pixtab[j * width + i], format, &r, &g, &b, &a);
+                new_pixtab[y * max + x] =
+                    SDL_MapRGBA(new_image->format, r, g, b, a);
+            } else {
+                new_pixtab[y * max + x] =
+                    SDL_MapRGBA(new_image->format, 255, 255, 255, 255);
+            }
+        }
     }
-  }
 
-  return new_image;
+    return new_image;
 }
 
-void Auto_Rotate(SDL_Surface *image) {
-  int R = sqrt(image->h * image->h + image->w * image->w);
+double GetImageAngle(int *matrix_hough, size_t len) {
+    double *angle_matrix = malloc(sizeof(double) * len);
 
-  SDL_Surface *matrice =
-      SDL_CreateRGBSurfaceWithFormat(0, R, 180, 32, image->format->format);
+    int angle_matrix_i = 0;
 
-  Uint32 *mat = matrice->pixels;
+    double angle, dx, dy;
+    for (int i = 0; i < len * 4; i += 4) {
+        dx = matrix_hough[i + 2] - matrix_hough[i];
+        dy = matrix_hough[i + 3] - matrix_hough[i + 1];
 
-  for (int y = 0; y < matrice->h; ++y) {
-    for (int x = 0; x < matrice->w; ++x) {
-      mat[y * matrice->w + x] = SDL_MapRGBA(image->format, 0, 0, 0, 255);
-    }
-  }
+        if (dx == 0) {
+            angle = M_PI_2;
+            if (dy < 0)
+                angle *= -1;
+        } else
+            angle = atan(dy / dx);
 
-  Uint32 *pixtab = image->pixels;
-
-  const SDL_PixelFormat *format = image->format;
-
-  Uint8 r, g, b, a;
-
-  Uint8 r1, g1, b1, a1;
-
-  int rho = 0;
-
-  // float rad = (M_PI/180);
-
-  for (int y = 0; y < image->h; ++y) {
-    for (int x = 0; x < image->w; ++x) {
-      SDL_GetRGBA(pixtab[y * image->w + x], format, &r, &g, &b, &a);
-
-      if (r != 0) {
-        for (int theta = 0; theta < 180; theta++) {
-          rho = x * cosf((float)theta) + y * sinf((float)theta);
-
-          SDL_GetRGBA(mat[theta * matrice->w + rho], format, &r1, &g1, &b1,
-                      &a1);
-
-          mat[theta * matrice->w + rho] =
-              SDL_MapRGBA(format, r1 + 1, g1 + 1, b1 + 1, 255);
+        // edge case /!\ will break if grid is at perfect PI/2 angle
+        if (angle <= -M_PI_4 || angle > M_PI_4) {
+            if (angle < 0)
+                angle += M_PI_2;
+            angle_matrix[angle_matrix_i++] = angle;
         }
-      }
     }
-  }
+    SortList(angle_matrix, angle_matrix_i);
 
-  Uint32 color = SDL_MapRGBA(matrice->format, 255, 0, 0, 255);
-  for (int theta = 0; theta < matrice->h; ++theta) {
-    for (int rho = 0; rho < matrice->w; ++rho) {
-      SDL_GetRGBA(mat[theta * matrice->w + rho], format, &r, &g, &b, &a);
+    return angle_matrix[angle_matrix_i / 2];
+}
 
-      if (r > 200) {
+double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len) {
 
-        int x1 = rho * cos(theta) - R * sin(theta);
-        int y1 = rho * sin(theta) + R * cos(theta);
-        int x2 = rho * cos(theta) + R * sin(theta);
-        int y2 = rho * sin(theta) - R * cos(theta);
+    int *MatrixPoints = TransformHoughPolarToPoints(matrix_hough, len);
 
-        // printf("x1= %d  y1= %d  x2= %d  y2= %d\n",x1,y1,x2,y2);
-
-        draw_line(image, x1, y1, x2, y2, color);
-      }
+    double angle = GetImageAngle(MatrixPoints, len);
+    for (int i = 1; i < len; i += 2) {
+        matrix_hough[i] += angle;
     }
-  }
+
+    return angle * 180 / M_PI;
 }
