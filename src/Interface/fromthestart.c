@@ -61,6 +61,32 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
     // Destroy the dialog
     gtk_widget_destroy(dialog);
 }
+void show_warning(GtkWidget *widget, gpointer window) {
+    
+  GtkWidget *dialog;
+  dialog = gtk_message_dialog_new(GTK_WINDOW(window),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_WARNING,
+            GTK_BUTTONS_OK,
+            "Grid not detected -- retake the picture or manually rotate it to be straight");
+  gtk_window_set_title(GTK_WINDOW(dialog), "Warning");
+  gtk_dialog_run(GTK_DIALOG(dialog));
+  gtk_widget_destroy(dialog);
+}
+
+void show_error(GtkWidget *widget, gpointer window) {
+
+  GtkWidget *dialog;
+  dialog = gtk_message_dialog_new(GTK_WINDOW(window),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR,
+            GTK_BUTTONS_OK,
+            "Error loading file");
+  gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+  gtk_dialog_run(GTK_DIALOG(dialog));
+  gtk_widget_destroy(dialog);
+}
+
 static void help_button_clicked(GtkWidget* widget, gpointer user_data )
 {
   GtkWindow *window = GTK_WINDOW(user_data);
@@ -77,8 +103,8 @@ static void help_button_clicked(GtkWidget* widget, gpointer user_data )
 
        gtk_dialog_run(GTK_DIALOG(dialog));
        gtk_widget_destroy(dialog);
-
-
+        show_error(widget, window);
+        show_warning(widget, window);
   
 }
 gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
