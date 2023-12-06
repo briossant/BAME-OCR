@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define IMAGE_SIZE 2800
+
 typedef struct {
     int x;
     int y;
@@ -15,6 +17,10 @@ typedef struct {
 void BlacknWhite(SDL_Surface *image);
 
 void GreyScale(SDL_Surface *image);
+
+SDL_Surface *StandardizeImage(SDL_Surface *image);
+
+void ComputeStardizeLens(int width, int height, int *dx, int *dy);
 
 void Contrast(SDL_Surface *image);
 

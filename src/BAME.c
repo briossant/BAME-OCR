@@ -5,26 +5,6 @@
 #include <SDL2/SDL_surface.h>
 
 #define DEFAULT_NN "sudoku.nn"
-#define IMAGE_SIZE 2800
-
-SDL_Surface *StandardizeImage(SDL_Surface *image) {
-
-    // TODO portrait
-
-    SDL_Surface *new_image = SDL_CreateRGBSurfaceWithFormat(
-        0, IMAGE_SIZE, IMAGE_SIZE, 32, image->format->format);
-
-    int dy = IMAGE_SIZE * image->h / (image->w);
-    SDL_Rect dest = {
-        .x = 0,
-        .y = IMAGE_SIZE / 2 - dy / 2,
-        .w = IMAGE_SIZE,
-        .h = dy,
-    };
-
-    SDL_BlitScaled(image, NULL, new_image, &dest);
-    return new_image;
-}
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
