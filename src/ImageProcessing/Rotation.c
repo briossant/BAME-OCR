@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 SDL_Surface *Rotate(SDL_Surface *image, double angle) {
-    if (abs(angle) < 0.01)
+    if (fabs(angle) < 0.01)
         return image;
     int height = image->h;
     int width = image->w;
