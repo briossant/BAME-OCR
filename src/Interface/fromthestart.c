@@ -130,15 +130,18 @@ void update_image(GtkWidget* container , GtkImage* image ) {
     const GdkPixbuf *piximg = gtk_image_get_pixbuf(image);
     int width_img = gdk_pixbuf_get_width(piximg);
     int height_img = gdk_pixbuf_get_height(piximg);
+    
 
+    int window_width, window_height;
+    gtk_window_get_size(GTK_WINDOW(window), &window_width, &window_height);
 
-    g_print("with %d, height %d", width_img,height_img);
+    //g_print("with %d, height %d", width_img,height_img);
     // Calculer les nouvelles dimensions
     int new_width, new_height;
 
      
-    new_width = gtk_widget_get_allocated_width(GTK_WIDGET(container));
-    new_height = gtk_widget_get_allocated_height(GTK_WIDGET(container));
+    new_width = window_width/2;//gtk_widget_get_allocated_width(GTK_WIDGET(container));
+    new_height = window_height/2;//gtk_widget_get_allocated_height(GTK_WIDGET(container));
 
     double scale_x = (double)new_width/(double)width_img;
     double scale_y = (double)new_height/(double)height_img;
@@ -205,8 +208,8 @@ int main()
                    .baseContainer= box_solved,
      };
     
-    //update_image(box_base, image_base);
-    //update_image(box_solved, image_solved);
+    update_image(box_base, image_base);
+    update_image(box_solved, image_solved);
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
