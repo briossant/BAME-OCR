@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define THRESHOLD 0.12
+#define THRESHOLD 0.22
 
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
                Uint32 color) {

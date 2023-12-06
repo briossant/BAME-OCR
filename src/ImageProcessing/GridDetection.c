@@ -10,7 +10,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define TRESHOLD 8.42
+#define TRESHOLD 42.42
 #define MIN_DIST 32 // set min from image size
 #define diagonal_killer 4
 

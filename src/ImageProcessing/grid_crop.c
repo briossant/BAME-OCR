@@ -13,9 +13,9 @@ Number of try to write Hough : 3
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FIRST_CROP_SIZE 42
+#define FIRST_CROP_SIZE 58
 #define SECOND_CROP_SIZE 28 // mnist size
-#define TRESHOLD_EON 1
+#define TRESHOLD_EON 24
 #define OFFSET_CENTER_NB 2
 #define OFFSET_CROP 4
 
@@ -104,18 +104,21 @@ int End_of_Number(SDL_Surface *image_blured, int coo, int dir_x, int dir_y) {
 
     int x = coo % width;
     int y = coo / width;
+    int res_x = x;
+    int res_y = y;
 
     Uint8 r, g, b, a;
 
     while (x < width - 1 && x > 0 && y < height - 1 && y > 0) {
         SDL_GetRGBA(pixtab[y * width + x], format, &r, &g, &b, &a);
-        if (r < TRESHOLD_EON)
-            break;
-
         x += dir_x;
         y += dir_y;
+        if (r > TRESHOLD_EON) {
+            res_x = x;
+            res_y = y;
+        }
     }
-    return y * width + x;
+    return res_y * width + res_x;
 }
 
 SDL_Surface *CenterNumber(SDL_Surface *image) {
@@ -129,19 +132,25 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
     Uint32 *pixtab = image_blured->pixels;
 
     int kernel[] = {
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
-        5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //
+        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5  //
     };
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
 
-            pixtab[y * width + x] = convolution(image, x, y, kernel, 7);
+            pixtab[y * width + x] = convolution(image, x, y, kernel, 13);
         }
     }
 
@@ -158,19 +167,20 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
     int d = S - N;
     int y = N;
 
-    // printf("x_center = %i, y_center = %i\n", nb_center % width,
-    //       nb_center / width);
+    printf("x_center = %i, y_center = %i\n", nb_center % width,
+           nb_center / width);
 
     if (d2 == 0)
         err(0, "d2 must not be equal to 0");
     int x = (nb_center % width) - (dW * d) / d2;
 
-    // printf("N= %i, S= %i, E= %i, W= %i, d= %i, y= %i, x= %i\n", N, S,
-    // E, W, d,
-    //        y, x);
+    printf("N= %i, S= %i, E= %i, W= %i, d= %i, y= %i, x= %i\n", N, S, E, W, d,
+           y, x);
 
-    if (x < 0 || x >= width)
-        err(0, "x out of bounds in End_of_Number\n");
+    if (x < 0)
+        x = 0;
+    if (x >= width)
+        x = width - 1;
 
     SDL_Surface *image_converted = SDL_CreateRGBSurfaceWithFormat(
         0, SECOND_CROP_SIZE, SECOND_CROP_SIZE, 32, format->format);

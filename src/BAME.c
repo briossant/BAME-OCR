@@ -29,9 +29,9 @@ int main(int argc, char *argv[]) {
     SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
 
     image = Canny(image, old_width, old_height);
-    IMG_SavePNG(image, "normalized.png");
     int ho_mat_size = -1;
     int *ho_mat = hough_transform(image, &ho_mat_size);
+    IMG_SavePNG(image, "normalized.png");
     int *grid_corner = GridDetection(ho_mat, ho_mat_size);
 
     int sdk_grid[9][9]; // risky shit malloc may be better
