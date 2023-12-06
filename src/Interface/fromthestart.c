@@ -1,3 +1,4 @@
+#include <complex.h>
 #include <gtk/gtk.h>
 #include <err.h>
 typedef struct UserInterface
@@ -96,41 +97,36 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
-void update_image(UserInterface* interface) {
-    GtkImage* image = interface->baseImage;
-    GtkContainer* box = interface->baseContainer;
-    const GdkPixbuf *piximg = gtk_image_get_pixbuf(GTK_IMAGE(image));
+void update_image(UserInterface* interface, GtkImage* image) {
+    
+
+    //    GtkContainer* box = interface->baseContainer;
+    
+    const GdkPixbuf *piximg = gtk_image_get_pixbuf(image);
     int width_img = gdk_pixbuf_get_width(piximg);
     int height_img = gdk_pixbuf_get_height(piximg);
 
-    const GdkPixbuf *pixgrid = gtk_image_get_pixbuf(GTK_IMAGE(box));
-    int width_grid = gdk_pixbuf_get_width(pixgrid);
-    int height_grid = gdk_pixbuf_get_height(pixgrid);
 
+    g_print("with %d, height %d", width_img,height_img);
     // Calculer les nouvelles dimensions
     int new_width, new_height;
 
-    new_width = width_grid;
-    new_height = height_grid;
+    new_width = 300;
+    new_height = 300;
 
-    // if (width_img > height_img) {
-    //     // L'image est plus large que haute
-    //     new_width = width_grid;
-    //     new_height = (int)((double)height_grid * (double)height_img / (double)width_img);
-    // } else {
-    //     // L'image est plus haute que large ou a les mêmes dimensions
-    //     new_height = height_grid;
-    //     new_width = (int)((double)width_grid * (double)width_img / (double)height_img);
-    // }
-
+    double scale_x = (double)new_width/(double)width_img;
+    double scale_y = (double)new_height/(double)height_img;
+    g_print("Nwith %d, NHeight %d", new_width,new_height);
+    int bits_sample =gdk_pixbuf_get_bits_per_sample (piximg);
+    GdkPixbuf* new_image = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, bits_sample, new_width, new_height);
     // Redimensionner l'image
-    GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(piximg, new_width, new_height, GDK_INTERP_BILINEAR);
+    gdk_pixbuf_scale(piximg,new_image, 0, 0,new_width, new_height, 0,0,scale_x,scale_y,GDK_INTERP_BILINEAR);
 
     // Mettre à jour l'image avec la nouvelle taille
-    gtk_image_set_from_pixbuf(GTK_IMAGE(image), scaled_pixbuf);
+    gtk_image_set_from_pixbuf(image, new_image);
 
     // Libérer la mémoire utilisée par le pixbuf redimensionné
-    g_object_unref(scaled_pixbuf);
+    //g_object_unref(scaled_pixbuf);
 }
 int main()
 {
@@ -162,7 +158,7 @@ int main()
     // image.set_from_file("/home/your_username/path/to/your/image.png")
 
     GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "Base Image"));
-    gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
+   // gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
 
     GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
@@ -176,11 +172,12 @@ int main()
                    .help_button =help_button,
                    .Rotate = rotate_check,
                    .Step_by_step= step_check,
-                   .baseImage=NULL,
+                   .baseImage=image_solved,
                    .baseContainer= box_solved,
      };
-    update_image(&Intrerface);
-    update_image(&Intrerface);
+    
+    //update_image(&Intrerface, image_base);
+    update_image(&Intrerface, image_solved);
     // /* -->does not work
     //     //ADD color
     //     GdkRGBA color;
