@@ -73,10 +73,13 @@ SDL_Surface *Intensity_Gradian(SDL_Surface *image, int old_width,
 
     int grad_y_kernel[] = {-1, -2, -1, 0, 0, 0, 1, 2, 1};
 
+    // TODO bourinage a corriger
+    int dy = (2800 * old_height / old_width);
+
     // limit can be ajust for more or less precision
 
-    for (int y = 2; y < old_height - 2; y++) {
-        for (int x = 2; x < old_width - 2; x++) {
+    for (int y = (2800 / 2 - dy / 2) + 2; y < dy - 2; y++) {
+        for (int x = 2; x < width - 2; x++) {
             grad_x = convolution_grayscale(image, x, y, grad_x_kernel, 3) / 4;
             grad_y = convolution_grayscale(image, x, y, grad_y_kernel, 3) / 4;
 
