@@ -97,10 +97,9 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
-void update_image(UserInterface* interface, GtkImage* image) {
+void update_image(GtkWidget* container , GtkImage* image ) {
     
 
-    //    GtkContainer* box = interface->baseContainer;
     
     const GdkPixbuf *piximg = gtk_image_get_pixbuf(image);
     int width_img = gdk_pixbuf_get_width(piximg);
@@ -111,8 +110,9 @@ void update_image(UserInterface* interface, GtkImage* image) {
     // Calculer les nouvelles dimensions
     int new_width, new_height;
 
-    new_width = 300;
-    new_height = 300;
+     
+    new_width = gtk_widget_get_allocated_width(GTK_WIDGET(container));
+    new_height = gtk_widget_get_allocated_height(GTK_WIDGET(container));
 
     double scale_x = (double)new_width/(double)width_img;
     double scale_y = (double)new_height/(double)height_img;
@@ -154,17 +154,15 @@ int main()
     GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
     GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "upload_button"));
     GtkButton *solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
-    // GtkWidget *image_base = Image();
-    // image.set_from_file("/home/your_username/path/to/your/image.png")
 
     GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "Base Image"));
-   // gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
+    gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
 
     GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
 
-    GtkContainer * box_base =GTK_CONTAINER(gtk_builder_get_object(builder, "left_grid"));
-    GtkContainer* box_solved =GTK_CONTAINER(gtk_builder_get_object(builder, "grid_solved_img"));
+    GtkWidget * box_base =GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
+    GtkWidget* box_solved =GTK_WIDGET(gtk_builder_get_object(builder, "grid_solved_img"));
 
     UserInterface Intrerface ={
                    .window = window,
@@ -176,8 +174,8 @@ int main()
                    .baseContainer= box_solved,
      };
     
-    //update_image(&Intrerface, image_base);
-    update_image(&Intrerface, image_solved);
+    update_image(box_base, image_base);
+    update_image(box_solved, image_solved);
     // /* -->does not work
     //     //ADD color
     //     GdkRGBA color;
