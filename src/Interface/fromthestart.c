@@ -9,7 +9,7 @@ typedef struct UserInterface
     GtkCheckButton* Step_by_step; // Step by step
     GtkCheckButton* Rotate;
     GtkImage* baseImage;
-    GtkContainer *baseContainer;
+    GtkWidget *baseContainer;
 
  } UserInterface;
 // Function to handle button click event
@@ -128,6 +128,10 @@ void update_image(GtkWidget* container , GtkImage* image ) {
     // Libérer la mémoire utilisée par le pixbuf redimensionné
     //g_object_unref(scaled_pixbuf);
 }
+
+
+
+
 int main()
 {
     // Initializes GTK.
@@ -137,7 +141,7 @@ int main()
     // (Exits if an error occurs.)
     GtkBuilder *builder = gtk_builder_new();
     GError *error = NULL;
-    if (gtk_builder_add_from_file(builder, "fromthestart.glade", &error) == 0)
+    if (gtk_builder_add_from_file(builder, "fromthestart2.glade", &error) == 0)
     {
         g_printerr("Error loading file: %s\n", error->message);
         g_clear_error(&error);
@@ -154,15 +158,16 @@ int main()
     GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
     GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "upload_button"));
     GtkButton *solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
-
+   
+    
     GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "Base Image"));
     gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
+    GtkWidget * box_base =GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
 
     GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
-
-    GtkWidget * box_base =GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
-    GtkWidget* box_solved =GTK_WIDGET(gtk_builder_get_object(builder, "grid_solved_img"));
+    GtkWidget* box_solved =GTK_WIDGET(gtk_builder_get_object(builder, "box_solved"));
+    
 
     UserInterface Intrerface ={
                    .window = window,
@@ -174,22 +179,19 @@ int main()
                    .baseContainer= box_solved,
      };
     
-    update_image(box_base, image_base);
-    update_image(box_solved, image_solved);
-    // /* -->does not work
-    //     //ADD color
-    //     GdkRGBA color;
-    //     gdk_rgba_parse(&color, "blue");  // Set color to blue
-    //     gtk_widget_override_background_color(button, GTK_STATE_NORMAL, &color);
-    // */
-    //     // Check box with "Step by Step" label
+    //update_image(box_base, image_base);
+    //update_image(box_solved, image_solved);
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
     g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), window);
     g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), NULL);
-    gtk_widget_show_all(window);
+	
+//	g_signal_connect(image_solved, "expose-event", G_CALLBACK(resize_image), (gpointer)window);
+//	g_signal_connect(image_base, "expose-event", G_CALLBACK(resize_image), (gpointer)window);
+//	gtk_container_add(GTK_CONTAINER(window), image_base);
 
+	gtk_widget_show_all(GTK_WIDGET(window));
     // Start the GTK main loop
     gtk_main();
 
