@@ -1,13 +1,15 @@
-#include <complex.h>
 #include <gtk/gtk.h>
-
+#include <err.h>
 typedef struct UserInterface
 {
     GtkWindow* window;              // Main window
     GtkButton* help_button;        // Start button
     GtkButton* upload_button;         // Stop button
     GtkCheckButton* Step_by_step; // Step by step
-    GtkCheckButton* Rotate;       // 
+    GtkCheckButton* Rotate;
+    GtkImage* baseImage;
+    GtkContainer *baseContainer;
+
  } UserInterface;
 // Function to handle button click event
 static void solve_button_clicked(GtkWidget *widget, gpointer data)
@@ -15,6 +17,49 @@ static void solve_button_clicked(GtkWidget *widget, gpointer data)
     g_print("Solving OCR...\n");
 }
 
+static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
+{
+    UserInterface *interface = (UserInterface *)user_data;
+    g_print("Uploading Image ...\n");
+    GtkWindow *window = GTK_WINDOW(user_data);
+    GtkWidget *dialog = gtk_file_chooser_dialog_new("Open Image",
+                                                   GTK_WINDOW(interface->window),
+                                                   GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                   "Cancel", GTK_RESPONSE_CANCEL,
+                                                   "Open", GTK_RESPONSE_ACCEPT,
+                                                   NULL);
+
+    // Set the dialog to select only image files
+    GtkFileFilter *filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "Image Files");
+    gtk_file_filter_add_mime_type(filter, "image/*");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
+    // Run the dialog and get the response
+    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+
+    if (response == GTK_RESPONSE_ACCEPT) {
+        // Get the selected file
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        GtkWidget *image_widget = gtk_image_new_from_file(filename);
+        if (image_widget == NULL) {
+        g_printerr("Error loading image: %s\n", filename);
+        errx(1, "Could not get the image from file path");
+        }
+
+        // NEXT LINE IS THE ERROR 
+        interface->baseImage = GTK_IMAGE(image_widget);
+        //gtk_container_add(GTK_CONTAINER(interface->baseContainer), image_widget);
+        // Process the selected file (you can replace this with your own logic)
+        g_print("Selected file: %s\n", filename);
+
+        // Free the filename string
+        g_free(filename);
+    }
+
+    // Destroy the dialog
+    gtk_widget_destroy(dialog);
+}
 static void help_button_clicked(GtkWidget* widget, gpointer user_data )
 {
   GtkWindow *window = GTK_WINDOW(user_data);
@@ -24,7 +69,7 @@ static void help_button_clicked(GtkWidget* widget, gpointer user_data )
                GTK_DIALOG_DESTROY_WITH_PARENT,
                GTK_MESSAGE_INFO,
                GTK_BUTTONS_CLOSE,
-               "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight ither auto rotate it or select the angle\n - Upload: Select the picture of the sudoku you want to solve from your computer\n" );
+               "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight ither auto rotate it or select the angle\n - Upload: Select the picture of the sudoku you want to solve from your computer\n- Solve: button accessible once image is uploaded it will solve the grid with the current parameters till the end\n" );
      gtk_window_set_title(GTK_WINDOW(dialog), "Help");                                                                      
      //gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog),
      //      "Texte 2 si necessaire  printf fromat ", );
@@ -51,7 +96,9 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
-void update_image(GtkWidget *image, GtkWidget *box) {
+void update_image(UserInterface* interface) {
+    GtkImage* image = interface->baseImage;
+    GtkContainer* box = interface->baseContainer;
     const GdkPixbuf *piximg = gtk_image_get_pixbuf(GTK_IMAGE(image));
     int width_img = gdk_pixbuf_get_width(piximg);
     int height_img = gdk_pixbuf_get_height(piximg);
@@ -85,7 +132,7 @@ void update_image(GtkWidget *image, GtkWidget *box) {
     // Libérer la mémoire utilisée par le pixbuf redimensionné
     g_object_unref(scaled_pixbuf);
 }
-int main(int argc, char *argv[])
+int main()
 {
     // Initializes GTK.
     gtk_init(NULL, NULL);
@@ -106,31 +153,34 @@ int main(int argc, char *argv[])
     //     gtk_window_set_title(GTK_WINDOW(window), "--- Sudoku Solver --");
     //     gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
 
-    GtkButton *help_button = GTK_BUTTON(gtk_builder_get_object(builder, "Help")); // TODO: rename labels
+    GtkButton *help_button = GTK_BUTTON(gtk_builder_get_object(builder, "help_button")); // TODO: rename labels
     GtkCheckButton *step_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
     GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
-    GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "start_button"));
+    GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "upload_button"));
+    GtkButton *solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
     // GtkWidget *image_base = Image();
     // image.set_from_file("/home/your_username/path/to/your/image.png")
 
-    GtkWidget *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "Base Image"));
+    GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "Base Image"));
     gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
 
-    GtkWidget *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "Solved Image"));
+    GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
 
-    GtkWidget* box_base =( gtk_builder_get_object(builder, "left_grid"));
-    GtkWidget* box_solved = (gtk_builder_get_object(builder, "Grid Solved Image"));
+    GtkContainer * box_base =GTK_CONTAINER(gtk_builder_get_object(builder, "left_grid"));
+    GtkContainer* box_solved =GTK_CONTAINER(gtk_builder_get_object(builder, "grid_solved_img"));
 
-    update_image(image_base, box_base);
-    update_image(image_solved, box_solved);
     UserInterface Intrerface ={
                    .window = window,
                    .upload_button = upload_button,
                    .help_button =help_button,
                    .Rotate = rotate_check,
                    .Step_by_step= step_check,
+                   .baseImage=NULL,
+                   .baseContainer= box_solved,
      };
+    update_image(&Intrerface);
+    update_image(&Intrerface);
     // /* -->does not work
     //     //ADD color
     //     GdkRGBA color;
@@ -141,9 +191,8 @@ int main(int argc, char *argv[])
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
-
-    g_signal_connect(upload_button, "clicked", G_CALLBACK(solve_button_clicked), window);
-    // Show all elements
+    g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), window);
+    g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), NULL);
     gtk_widget_show_all(window);
 
     // Start the GTK main loop
