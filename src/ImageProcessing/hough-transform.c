@@ -9,8 +9,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define THRESHOLD 0.34
-
 void draw_line(SDL_Surface *image, int x1, int y1, int x2, int y2,
                Uint32 color) {
 
@@ -139,7 +137,7 @@ double *hough_transform(SDL_Surface *image, int *return_size) {
       max = accumu[y];
     }
   }
-  int threshold = max * THRESHOLD;
+  int threshold = max * HOUGH_THRESHOLD;
   printf("Hough threshold = %i ; max = %i\n", threshold, max);
 
   size_t nb_droite = 0;

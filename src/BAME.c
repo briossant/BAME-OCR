@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
           image_y * image_copy->w + image_x; // grid of coordinates of each box
 
       char *kokok;
-      Balance(box_img);
+      Balance(box_img); // A retravailler -> marche pas bien pour les 9, 6, 8, 4
       if (!void_square(box_img)) {
         asprintf(&kokok, "tmp/empty-%d-%d.png", x, y);
         IMG_SavePNG(box_img, kokok);

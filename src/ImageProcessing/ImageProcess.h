@@ -13,7 +13,25 @@
 #include <string.h>
 #pragma GCC diagnostic pop
 
+//////// DEFINES /////////
+// global
 #define IMAGE_SIZE 2800
+
+// grid detection
+#define GD_TRESHOLD 42.42
+#define GD_MIN_DIST 52 // set min from image size
+#define GD_diagonal_killer 6
+
+// hough transform
+#define HOUGH_THRESHOLD 0.34
+
+// Crop and number centering
+#define FIRST_CROP_SIZE 58
+#define NN_IMAGE_SIZE 28 // mnist size
+#define TRESHOLD_NUMBER_DETECTION 24
+#define OFFSET_CENTER_NUMBER 2
+#define OFFSET_FIRST_CROP 8
+//////// DEFINES END //////
 
 typedef struct {
   int x;

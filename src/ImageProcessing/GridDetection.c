@@ -10,21 +10,17 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define TRESHOLD 42.42
-#define MIN_DIST 52 // set min from image size
-#define diagonal_killer 6
-
 // recursive function
 int CheckIfDistIsValid(double *points, size_t len, double dist, int i,
                        int count, double *err_max) {
   // printf("pt: %d -- ", points[i]);
   if (count == 10)
     return i;
-  double min_err = TRESHOLD * 42;
+  double min_err = GD_TRESHOLD * 42;
   double err;
   int min_j = -1;
   for (size_t j = i + 1; j < len; ++j) {
-    if ((err = fabs(fabs(points[j] - points[i]) - dist)) <= TRESHOLD)
+    if ((err = fabs(fabs(points[j] - points[i]) - dist)) <= GD_TRESHOLD)
       if (err < min_err) {
         min_err = err;
         min_j = j;
@@ -53,13 +49,13 @@ double *GridDetectionAux(double *points, size_t len) {
   SortList(points, len);
 
   double *res = calloc(3, sizeof(double));
-  res[2] = TRESHOLD * 42;
+  res[2] = GD_TRESHOLD * 42;
   int founded_alignments = 0;
   for (size_t i = 0; i < len; i++) {
     for (size_t j = i + 1; j < len; j++) {
       double dist = fabs(points[j] - points[i]);
       // printf("\ndist: %d\n", dist);
-      if (dist < MIN_DIST) {
+      if (dist < GD_MIN_DIST) {
         continue;
       }
       int k;
@@ -90,11 +86,11 @@ int *GridDetection(int *lines, int nbr_of_lines) {
   for (int i = 0; i < nbr_of_lines * 4; i += 4) {
     // Todo: Check if lines are not very straight (diagonal case)
     if (abs(lines[i] - lines[i + 2]) >
-        abs(lines[i + 1] - lines[i + 3]) * diagonal_killer) {
+        abs(lines[i + 1] - lines[i + 3]) * GD_diagonal_killer) {
       // Horizontal
       horizontal[h_i++] = ((double)lines[i + 1] + (double)lines[i + 3]) / 2;
       // printf("h: %d \n", horizontal[h_i - 1]);
-    } else if (abs(lines[i] - lines[i + 2]) * diagonal_killer <
+    } else if (abs(lines[i] - lines[i + 2]) * GD_diagonal_killer <
                abs(lines[i + 1] - lines[i + 3])) {
 
       // Vertical
