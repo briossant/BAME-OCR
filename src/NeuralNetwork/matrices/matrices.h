@@ -1,7 +1,11 @@
 #ifndef MATRICES_H
 #define MATRICES_H
+
 #define _GNU_SOURCE
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_stdinc.h>
@@ -10,6 +14,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#pragma GCC diagnostic pop
 
 #include "../network/precision.h"
 

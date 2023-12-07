@@ -1,12 +1,18 @@
 #ifndef NEURAL_NETWORK
 #define NEURAL_NETWORK
 
+#define _GNU_SOURCE
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #include <err.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#pragma GCC diagnostic pop
 
 #include "../matrices/matrices.h"
 #include "precision.h"
@@ -15,30 +21,30 @@
 // Struct
 
 typedef struct InputBatch {
-    size_t size;
-    Matrix inputs;
-    Matrix outputs;
+  size_t size;
+  Matrix inputs;
+  Matrix outputs;
 } InputBatch;
 
 typedef struct TrainingSettings {
-    size_t nbr_of_inputs;
-    NNValue training_rate;
-    NNValue inertia_strength; // between 0.0 and 1.0
-    size_t epochs;
-    size_t batch_size;
+  size_t nbr_of_inputs;
+  NNValue training_rate;
+  NNValue inertia_strength; // between 0.0 and 1.0
+  size_t epochs;
+  size_t batch_size;
 } TrainingSettings;
 
 typedef struct Layer {
-    size_t size; // number of nodes
-    Matrix biases;
-    Matrix weights;
+  size_t size; // number of nodes
+  Matrix biases;
+  Matrix weights;
 } Layer;
 
 typedef struct Network {
-    size_t input_size; // number of input nodes
-    size_t depth; // number of layers (hidden layers+output layer) i.e Size of
-                  // layers[]
-    Layer *layers;
+  size_t input_size; // number of input nodes
+  size_t depth; // number of layers (hidden layers+output layer) i.e Size of
+                // layers[]
+  Layer *layers;
 } Network;
 
 ////////////////////////////////////
