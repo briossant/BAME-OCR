@@ -22,6 +22,12 @@
 #define GD_MIN_DIST 52 // set min from image size
 #define GD_diagonal_killer 6
 
+// Balance
+#define THRESHOLD_BALANCE 3.5
+#define BALANCE_MIN_DIFF 20
+
+#define THRESHOLD_VOID_SQUARE 42
+
 // hough transform
 #define HOUGH_THRESHOLD 0.34
 
@@ -30,15 +36,19 @@
 #define NN_IMAGE_SIZE 28 // mnist size
 #define TRESHOLD_NUMBER_DETECTION 24
 #define OFFSET_CENTER_NUMBER 2
-#define OFFSET_FIRST_CROP 8
+#define OFFSET_FIRST_CROP 18
 //////// DEFINES END //////
 
 typedef struct {
-  int x;
-  int y;
+    int x;
+    int y;
 } pair;
 
 void SortList(double *list, size_t len);
+
+int mostBrightPixel(SDL_Surface *image);
+
+int lessBrightPixel(SDL_Surface *image);
 
 double GetImageAngleAndRotateHoughMatrix(double *matrix_hough, size_t len);
 
