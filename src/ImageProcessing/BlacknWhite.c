@@ -6,126 +6,103 @@
 #include <stdlib.h>
 
 void BlacknWhite(SDL_Surface *image) {
-  Uint8 biais = 127;
+    Uint8 biais = 127;
 
-  int height = image->h;
-  int width = image->w;
-  const SDL_PixelFormat *format = image->format;
-  Uint32 *pixtab = image->pixels;
-  Uint8 r, g, b, a;
+    int height = image->h;
+    int width = image->w;
+    const SDL_PixelFormat *format = image->format;
+    Uint32 *pixtab = image->pixels;
+    Uint8 r, g, b, a;
 
-  for (int x = 0; x < width * height; x++) {
-    SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+    for (int x = 0; x < width * height; x++) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
 
-    if ((r + g + b) / 3 > biais) {
-      r = 255;
-      g = 255;
-      b = 255;
-    } else {
-      r = 0;
-      g = 0;
-      b = 0;
+        if ((r + g + b) / 3 > biais) {
+            r = 255;
+            g = 255;
+            b = 255;
+        } else {
+            r = 0;
+            g = 0;
+            b = 0;
+        }
+
+        // Pixel Update
+        pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
     }
-
-    // Pixel Update
-    pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
-  }
 }
 
 void InvertColor(SDL_Surface *image) {
-  int height = image->h;
-  int width = image->w;
-  const SDL_PixelFormat *format = image->format;
-  Uint32 *pixtab = image->pixels;
-  Uint8 r, g, b, a;
+    int height = image->h;
+    int width = image->w;
+    const SDL_PixelFormat *format = image->format;
+    Uint32 *pixtab = image->pixels;
+    Uint8 r, g, b, a;
 
-  for (int x = 0; x < height * width; x++) {
-    SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+    for (int x = 0; x < height * width; x++) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
 
-    r = 255 - r;
-    g = 255 - g;
-    b = 255 - b;
+        r = 255 - r;
+        g = 255 - g;
+        b = 255 - b;
 
-    // Pixel Update
-    pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
-  }
+        // Pixel Update
+        pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
+    }
 }
 
 void Balance(SDL_Surface *image) {
-  // int min = 255;
-  // int max = 0;
-  // size_t count = 0;
+    // int min = 255;
+    // int max = 0;
+    // size_t count = 0;
 
-  int height = image->h;
-  int width = image->w;
-  const SDL_PixelFormat *format = image->format;
-  Uint32 *pixtab = image->pixels;
-  Uint8 r, g, b, a;
+    int height = image->h;
+    int width = image->w;
+    const SDL_PixelFormat *format = image->format;
+    Uint32 *pixtab = image->pixels;
+    Uint8 r, g, b, a;
+    GreyScale(image);
 
-  SDL_Surface *image_converted = SDL_ConvertSurface(image, format, 0);
-  Bright(image_converted);
-  GreyScale(image);
+    int count_white = 0;
 
-  int count_white = 0;
-  int invert = 0;
+    int max_coo = mostBrightPixel(image);
+    int min_coo = lessBrightPixel(image);
 
-  for (int x = 0; x < height * width; x++) {
-    SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
-    if (r > 50)
-      count_white++;
-  }
-  Uint8 threshold = ComputeSeuil(image_converted) / 4;
-  // printf("%i\n", ComputeSeuil(image_converted) / 4);
-  if (count_white >
-      height * width - count_white) // Black caracter on white background
-    invert = 1;
+    Uint8 max_pix;
+    Uint8 min_pix;
+    SDL_GetRGBA(pixtab[max_coo], format, &max_pix, &g, &b, &a);
+    SDL_GetRGBA(pixtab[min_coo], format, &min_pix, &g, &b, &a);
 
-  size_t size = 800;
-  int *queue = malloc(sizeof(int) * size);
-  size_t i_current = 0;
-  size_t i_insert = 1;
-  queue[0] = 0;
-  int coo = 0;
-
-  while (i_current < i_insert) {
-    if (i_insert >= size) {
-      size *= 2;
-      queue = realloc(queue, size * sizeof(int));
+    Uint8 mid_pix = (max_pix - min_pix) / 2 + min_pix;
+    for (int x = 0; x < height * width; x++) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+        if (r > mid_pix)
+            count_white++;
     }
-    int x = queue[i_current] % width;
-    int y = queue[i_current] / width;
-    coo = queue[i_current];
-    ++i_current; // dequeue
-    Uint8 r, g, b, a, r2, g2, b2, a2;
-    SDL_GetRGBA(pixtab[coo], format, &r, &g, &b, &a);
+    if (count_white > height * width - count_white) {
+        InvertColor(image);
 
-    if (x + 1 < width) {
-      SDL_GetRGBA(pixtab[coo + 1], format, &r2, &g2, &b2, &a2);
-      if (r - r2 <= threshold && a2 != 254) {
-        queue[i_insert++] = coo + 1;
-        pixtab[coo + 1] = SDL_MapRGBA(format, r2, g2, b2, 254);
-      }
+        SDL_GetRGBA(pixtab[min_coo], format, &max_pix, &g, &b, &a);
+        SDL_GetRGBA(pixtab[max_coo], format, &min_pix, &g, &b, &a);
+        mid_pix = (double)(max_pix - min_pix) / THRESHOLD_BALANCE + min_pix;
     }
+    if (max_pix - min_pix < BALANCE_MIN_DIFF)
+        mid_pix = 255;
 
-    if (x - 1 >= 0) {
-      SDL_GetRGBA(pixtab[coo - 1], format, &r2, &g2, &b2, &a2);
-      if (r - r2 <= threshold && a2 != 254) {
-        queue[i_insert++] = coo - 1;
-        pixtab[coo - 1] = SDL_MapRGBA(format, r2, g2, b2, 254);
-      }
+    if (max_pix == 0)
+        return;
+    double whiting_factor = 255. / max_pix;
+    printf("max %d - min %d - mid %d - factor %lf\n", max_pix, min_pix, mid_pix,
+           whiting_factor);
+    for (int x = 0; x < width * height; ++x) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+        if (r <= mid_pix) {
+            pixtab[x] = SDL_MapRGBA(format, 0, 0, 0, 255);
+        } else {
+            r = (double)r * whiting_factor;
+            if (r <= min_pix)
+                r = 255;
+            pixtab[x] = SDL_MapRGBA(format, r, r, r, 255);
+        }
     }
-
-    if (y + 1 < height) {
-      SDL_GetRGBA(pixtab[coo + width], format, &r2, &g2, &b2, &a2);
-      if (r - r2 <= threshold && a2 != 254) {
-        queue[i_insert++] = coo + width;
-        pixtab[coo + width] = SDL_MapRGBA(format, r2, g2, b2, 254);
-      }
-    }
-    pixtab[coo] = SDL_MapRGBA(format, 255, 255, 255, 254);
-  }
-  free(queue);
-
-  if (invert)
-    InvertColor(image);
 }
