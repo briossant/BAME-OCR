@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
   IMG_SavePNG(canny_copy, "hough2.png");
   int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
-  // Uint32 color = SDL_MapRGBA(image_copy->format, 0, 0, 255, 255);
-  //  draw_line(image_copy, grid_corner[0], grid_corner[1], grid_corner[2],
-  //           grid_corner[3], color);
-  IMG_SavePNG(image_copy, "grid-detection.png");
+  Uint32 color = SDL_MapRGBA(image_copy->format, 255, 0, 255, 255);
+  draw_line(canny_copy, grid_corner[0], grid_corner[1], grid_corner[2],
+            grid_corner[3], color);
+  IMG_SavePNG(canny_copy, "grid-detection.png");
 
   int sdk_grid[9][9]; // risky shit malloc may be better
   int grid_coo[9][9]; // risky shit malloc may be better
