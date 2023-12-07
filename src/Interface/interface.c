@@ -6,7 +6,8 @@ typedef struct UserInterface
     GtkBuilder *builder;
     GtkWindow *window;            // Main window
     GtkButton *help_button;       // Start button
-    GtkButton *upload_button;     // Stop button
+    GtkButton *upload_button; 
+    GtkButton* solve_button;// Stop button
     GtkCheckButton *Step_by_step; // Step by step
     GtkCheckButton *Rotate;
     GtkEntry *insert_angle;
@@ -16,48 +17,93 @@ typedef struct UserInterface
     guint window_size;
 
 } UserInterface;
-// Function to handle button click event
-static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
-{
-    g_print("Solving OCR...\n");
-    UserInterface *interface = user_data;
-    const gchar *text = gtk_entry_get_text(interface->insert_angle);
-}
 
-gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
+void show_warning(char* message, GtkWidget *widget, gpointer window)
 {
-    UserInterface *interface = user_data;
-    gtk_widget_set_sensitive(interface->insert_angle,
-                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
-    return TRUE;
-}
-
-void show_warning(GtkWidget *widget, gpointer window)
-{
+    if (message ==NULL)
+    {
+        message ="Grid not detected -- retake the picture or manually rotate it to be straight";
+    }
 
     GtkWidget *dialog;
     dialog = gtk_message_dialog_new(GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_MESSAGE_WARNING,
                                     GTK_BUTTONS_OK,
-                                    "Grid not detected -- retake the picture or manually rotate it to be straight");
+                                    message);
     gtk_window_set_title(GTK_WINDOW(dialog), "Warning");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
 
-void show_error(GtkWidget *widget, gpointer window)
+void show_error(char* message, GtkWidget *widget, gpointer window)
 {
     GtkWidget *dialog;
     dialog = gtk_message_dialog_new(GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_MESSAGE_ERROR,
                                     GTK_BUTTONS_OK,
-                                    "Error loading file");
+                                    message);
     gtk_window_set_title(GTK_WINDOW(dialog), "Error");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
+
+int isInteger(const char *text) {
+    char *endptr;
+    strtol(text, &endptr, 10);
+
+    // Check if conversion was successful and the entire string was consumed
+    return (*text != '\0' && *endptr == '\0');
+}
+// Function to handle button click event
+static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
+{
+    g_print("Solving OCR...\n");
+    UserInterface *interface = user_data;
+    const gchar *text = gtk_entry_get_text(interface->insert_angle);
+    char* def = "Default: Automatic";
+    int need_rotate=0;
+    int is_automatic =1;
+    int angle =0;
+
+    gboolean step_by_step=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Step_by_step));
+    
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Rotate))==TRUE)
+    {
+        need_rotate =1;
+        if (strcmp (def, text)!=0)
+        {
+            if (!isInteger(text) )
+            {
+                show_error("The angle must be an integer", widget, interface->window);
+                gtk_entry_set_text(interface->insert_angle,"Default: Automatic");
+                return;
+            }
+            else
+            {
+                angle = atoi( text);
+                is_automatic=0;
+            }
+        }
+    }
+
+
+}
+
+gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
+{
+    UserInterface *interface = user_data;
+
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)==FALSE))
+            {
+                gtk_entry_set_text(interface->insert_angle,"Default: Automatic");
+            }
+    gtk_widget_set_sensitive(interface->insert_angle,
+                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
+    return TRUE;
+}
+
 
 static void help_button_clicked(GtkWidget *widget, gpointer user_data)
 {
@@ -68,15 +114,13 @@ static void help_button_clicked(GtkWidget *widget, gpointer user_data)
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_CLOSE,
-                                    "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight ither auto rotate it or select the angle\n - Upload: Select the picture of the sudoku you want to solve from your computer\n- Solve: button accessible once image is uploaded it will solve the grid with the current parameters till the end\n");
+                                    "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight you can leave the autor rotate default text or insert the angle(must be an integer)\n - Upload: Select the picture of the sudoku you want to solve from your computer\n- Solve: button accessible once image is uploaded it will solve the grid with the current parameters till the end\n");
     gtk_window_set_title(GTK_WINDOW(dialog), "Help");
     // gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog),
     //       "Texte 2 si necessaire  printf fromat ", );
 
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
-    show_error(widget, window);
-    show_warning(widget, window);
 }
 gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
@@ -101,8 +145,6 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
     GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
     if (pixbuf != NULL)
     {
-        int img_width = gdk_pixbuf_get_width(pixbuf);
-        int img_height = gdk_pixbuf_get_height(pixbuf);
 
         gint wd_width, wd_height;
 
@@ -110,7 +152,7 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
 
         int new_width = (wd_width / 3);
         int new_height = (wd_width / 3);
-
+        
         GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
 
         gtk_image_set_from_pixbuf(interface->solvedImage, scaled_pixbuf);
@@ -121,9 +163,6 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
     GdkPixbuf *pixbuf2 = gtk_image_get_pixbuf(interface->baseImage);
     if (pixbuf2 != NULL)
     {
-        int img_width = gdk_pixbuf_get_width(pixbuf2);
-        int img_height = gdk_pixbuf_get_height(pixbuf2);
-
         gint wd_width, wd_height;
 
         gtk_window_get_size(GTK_WINDOW(window), &wd_width, &wd_height);
@@ -141,6 +180,41 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
+void fix_size( gpointer user_data)
+{
+    UserInterface *interface = user_data;
+
+    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
+    if (pixbuf != NULL)
+    {
+
+
+        int new_width = 300;
+        int new_height = 300;
+
+        GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
+
+        gtk_image_set_from_pixbuf(interface->solvedImage, scaled_pixbuf);
+
+        g_object_unref(scaled_pixbuf);
+    }
+
+    GdkPixbuf *pixbuf2 = gtk_image_get_pixbuf(interface->baseImage);
+    if (pixbuf2 != NULL)
+    {
+        
+        int new_width = 200;
+        int new_height = 200;
+
+        GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf2, new_width, new_height, GDK_INTERP_BILINEAR);
+
+        gtk_image_set_from_pixbuf(interface->baseImage, scaled_pixbuf);
+
+        g_object_unref(scaled_pixbuf);
+    }
+
+    return FALSE;
+}
 static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
 {
     UserInterface *interface = user_data;
@@ -167,23 +241,21 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
         // Get the selected file
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
         GtkWidget *image_widget = gtk_image_new_from_file(filename);
+        g_print( "%s", filename);
         if (image_widget == NULL)
         {
             g_printerr("Error loading image: %s\n", filename);
             errx(1, "Could not get the image from file path");
         }
 
-        // NEXT LINE IS THE ERROR
-        interface->baseImage = GTK_IMAGE(image_widget);
-        interface->solvedImage = GTK_IMAGE(image_widget);
 
         // set_image(window, "size-allocate", user_data);
         gtk_image_set_from_file(interface->baseImage, filename);
         gtk_image_set_from_file(interface->solvedImage, filename);
 
-        // gtk_container_add(GTK_CONTAINER(interface->baseContainer), image_widget);
-        //  Process the selected file (you can replace this with your own logic)
+        fix_size(user_data);
         g_print("Selected file: %s\n", filename);
+        gtk_widget_set_sensitive(interface->solve_button, TRUE);
 
         // Free the filename string
         g_free(filename);
@@ -235,6 +307,7 @@ int main()
         .window = window,
         .upload_button = upload_button,
         .help_button = help_button,
+        .solve_button= solve_button,
         .Rotate = rotate_check,
         .insert_angle = insert_angle,
         .Step_by_step = step_check,
@@ -246,7 +319,7 @@ int main()
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
     g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), &Interface);
-    g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), NULL);
+    g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), &Interface);
     g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), &Interface);
     g_signal_connect(rotate_check, "clicked", G_CALLBACK(rotate_check_clicked), &Interface);
 
