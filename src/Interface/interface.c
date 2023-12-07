@@ -62,6 +62,7 @@ int isInteger(const char *text)
 // Function to handle button click event
 static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
 {
+    (void)widget;
     UserInterface *interface = user_data;
     const gchar *text = gtk_entry_get_text(interface->insert_angle);
     char *def = "Default: Automatic";
@@ -99,16 +100,17 @@ gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
     {
         gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
     }
-    gtk_widget_set_sensitive(interface->insert_angle,
+    gtk_widget_set_sensitive(GTK_WIDGET(interface->insert_angle),
                              gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
     return TRUE;
 }
 
 static void help_button_clicked(GtkWidget *widget, gpointer user_data)
 {
-    GtkWindow *window = GTK_WINDOW(user_data);
-    GtkWidget *dialog;
-    dialog = gtk_message_dialog_new(GTK_WINDOW(window),
+    (void)widget;
+    UserInterface* interface = user_data;
+    GtkWindow *window = interface->window;
+    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_CLOSE,
@@ -120,6 +122,7 @@ static void help_button_clicked(GtkWidget *widget, gpointer user_data)
 }
 gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
+    (void)event;
     // TODO: resize images
 
     // Gets the rectangle.
@@ -136,6 +139,7 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
 gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
 {
+    (void)event;
     UserInterface *interface = user_data;
 
     GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
@@ -207,13 +211,11 @@ void fix_size(gpointer user_data)
 
         g_object_unref(scaled_pixbuf);
     }
-
-    return FALSE;
 }
 static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
 {
+    (void)widget;
     UserInterface *interface = user_data;
-    GtkWindow *window = interface->window;
     GtkWidget *dialog = gtk_file_chooser_dialog_new("Open Image",
                                                     GTK_WINDOW(interface->window),
                                                     GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -246,7 +248,7 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
         gtk_image_set_from_file(interface->solvedImage, filename);
 
         fix_size(user_data);
-        gtk_widget_set_sensitive(interface->solve_button, TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(interface->solve_button), TRUE);
 
         // Free the filename string
         g_free(filename);
@@ -280,12 +282,12 @@ int main()
     GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "rotation_check"));
     GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "upload_button"));
     GtkButton *solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
-    gtk_widget_set_sensitive(solve_button, FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(solve_button), FALSE);
     GtkEntry *insert_angle = GTK_ENTRY(gtk_builder_get_object(builder, "insert_angle"));
-    gtk_widget_set_sensitive(insert_angle, FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(insert_angle), FALSE);
     GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "base_image"));
     gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
-    GtkWidget *box_base = GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
+    // GtkWidget *box_base = GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
     GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
     GtkWidget *box_solved = GTK_WIDGET(gtk_builder_get_object(builder, "box_solved"));
@@ -305,7 +307,7 @@ int main()
     };
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
+    g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), &Interface);
     g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), &Interface);
     g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), &Interface);
     g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), &Interface);
