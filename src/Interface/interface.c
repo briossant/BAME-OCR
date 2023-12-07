@@ -9,6 +9,7 @@ typedef struct UserInterface
     GtkButton *upload_button;     // Stop button
     GtkCheckButton *Step_by_step; // Step by step
     GtkCheckButton *Rotate;
+    GtkEntry *insert_angle;
     GtkImage *baseImage;
     GtkWidget *baseContainer;
     GtkImage *solvedImage;
@@ -16,56 +17,21 @@ typedef struct UserInterface
 
 } UserInterface;
 // Function to handle button click event
-static void solve_button_clicked(GtkWidget *widget, gpointer data)
+static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
 {
     g_print("Solving OCR...\n");
+    UserInterface *interface = user_data;
+    const gchar *text = gtk_entry_get_text(interface->insert_angle);
 }
 
-static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
+gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
 {
-    UserInterface *interface = (UserInterface *)user_data;
-    g_print("Uploading Image ...\n");
-    GtkWindow *window = GTK_WINDOW(user_data);
-    GtkWidget *dialog = gtk_file_chooser_dialog_new("Open Image",
-                                                    GTK_WINDOW(interface->window),
-                                                    GTK_FILE_CHOOSER_ACTION_OPEN,
-                                                    "Cancel", GTK_RESPONSE_CANCEL,
-                                                    "Open", GTK_RESPONSE_ACCEPT,
-                                                    NULL);
-
-    // Set the dialog to select only image files
-    GtkFileFilter *filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, "Image Files");
-    gtk_file_filter_add_mime_type(filter, "image/*");
-    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-
-    // Run the dialog and get the response
-    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-
-    if (response == GTK_RESPONSE_ACCEPT)
-    {
-        // Get the selected file
-        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        GtkWidget *image_widget = gtk_image_new_from_file(filename);
-        if (image_widget == NULL)
-        {
-            g_printerr("Error loading image: %s\n", filename);
-            errx(1, "Could not get the image from file path");
-        }
-
-        // NEXT LINE IS THE ERROR
-        interface->baseImage = GTK_IMAGE(image_widget);
-        // gtk_container_add(GTK_CONTAINER(interface->baseContainer), image_widget);
-        //  Process the selected file (you can replace this with your own logic)
-        g_print("Selected file: %s\n", filename);
-
-        // Free the filename string
-        g_free(filename);
-    }
-
-    // Destroy the dialog
-    gtk_widget_destroy(dialog);
+    UserInterface *interface = user_data;
+    gtk_widget_set_sensitive(interface->insert_angle,
+                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
+    return TRUE;
 }
+
 void show_warning(GtkWidget *widget, gpointer window)
 {
 
@@ -128,26 +94,6 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
-// GtkWidget* copy_image(GtkWidget *original_image) {
-//     if (GTK_IS_IMAGE(original_image)) {
-//         // Récupérer la source du GtkImage original
-//         GdkPixbuf *source_pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(original_image));
-
-//         // Créer un nouveau GtkImage
-//         GtkWidget *new_image = gtk_image_new();
-
-//         // new_image = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
-//         // Copier la source du GtkImage original vers le nouveau GtkImage
-//         gtk_image_set_from_pixbuf(GTK_IMAGE(new_image), source_pixbuf);
-
-//         // Retourner la nouvelle instance de GtkImage
-//         return new_image;
-//     }
-
-//     // Retourner NULL si l'argument n'est pas un GtkImage
-//     return NULL;
-// }
-
 gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
 {
     UserInterface *interface = user_data;
@@ -195,37 +141,56 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
     return FALSE;
 }
 
-void update_image(GtkWidget *container, GtkImage *image, gpointer user_data)
+static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
 {
-    const GdkPixbuf *piximg = gtk_image_get_pixbuf(image);
-    int width_img = gdk_pixbuf_get_width(piximg);
-    int height_img = gdk_pixbuf_get_height(piximg);
+    UserInterface *interface = user_data;
+    g_print("Uploading Image ...\n");
+    GtkWindow *window = interface->window;
+    GtkWidget *dialog = gtk_file_chooser_dialog_new("Open Image",
+                                                    GTK_WINDOW(interface->window),
+                                                    GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                    "Cancel", GTK_RESPONSE_CANCEL,
+                                                    "Open", GTK_RESPONSE_ACCEPT,
+                                                    NULL);
 
-    GtkWindow *window = GTK_WINDOW(user_data);
-    int window_width, window_height;
-    gtk_window_get_size(GTK_WINDOW(window), &window_width, &window_height);
+    // Set the dialog to select only image files
+    GtkFileFilter *filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "Image Files");
+    gtk_file_filter_add_mime_type(filter, "image/*");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
-    // g_print("with %d, height %d", width_img,height_img);
-    //  Calculer les nouvelles dimensions
-    int new_width, new_height;
+    // Run the dialog and get the response
+    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
-    new_width = window_width / 2;   // gtk_widget_get_allocated_width(GTK_WIDGET(container));
-    new_height = window_height / 2; // gtk_widget_get_allocated_height(GTK_WIDGET(container));
+    if (response == GTK_RESPONSE_ACCEPT)
+    {
+        // Get the selected file
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        GtkWidget *image_widget = gtk_image_new_from_file(filename);
+        if (image_widget == NULL)
+        {
+            g_printerr("Error loading image: %s\n", filename);
+            errx(1, "Could not get the image from file path");
+        }
 
-    double scale_x = (double)new_width / (double)width_img;
-    double scale_y = (double)new_height / (double)height_img;
-    // g_print("Nwith %d, NHeight %d", new_width, new_height);
-    int bits_sample = gdk_pixbuf_get_bits_per_sample(piximg);
-    GdkPixbuf *new_image = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, bits_sample, new_width, new_height);
+        // NEXT LINE IS THE ERROR
+        interface->baseImage = GTK_IMAGE(image_widget);
+        interface->solvedImage = GTK_IMAGE(image_widget);
 
-    // Redimensionner l'image
-    gdk_pixbuf_scale(piximg, new_image, 0, 0, new_width, new_height, 0, 0, scale_x, scale_y, GDK_INTERP_BILINEAR);
+        // set_image(window, "size-allocate", user_data);
+        gtk_image_set_from_file(interface->baseImage, filename);
+        gtk_image_set_from_file(interface->solvedImage, filename);
 
-    // Mettre à jour l'image avec la nouvelle taille
-    gtk_image_set_from_pixbuf(image, new_image);
+        // gtk_container_add(GTK_CONTAINER(interface->baseContainer), image_widget);
+        //  Process the selected file (you can replace this with your own logic)
+        g_print("Selected file: %s\n", filename);
 
-    // Libérer la mémoire utilisée par le pixbuf2 redimensionné
-    // g_object_unref(scaled_pixbuf);
+        // Free the filename string
+        g_free(filename);
+    }
+
+    // Destroy the dialog
+    gtk_widget_destroy(dialog);
 }
 
 int main()
@@ -249,12 +214,14 @@ int main()
     //     gtk_window_set_title(GTK_WINDOW(window), "--- Sudoku Solver --");
     //     gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
 
-    GtkButton *help_button = GTK_BUTTON(gtk_builder_get_object(builder, "help_button")); // TODO: rename labels
-    GtkCheckButton *step_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
-    GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "training_cb"));
+    GtkButton *help_button = GTK_BUTTON(gtk_builder_get_object(builder, "help_button"));
+    GtkCheckButton *step_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "step_by_step"));
+    GtkCheckButton *rotate_check = GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "rotation_check"));
     GtkButton *upload_button = GTK_BUTTON(gtk_builder_get_object(builder, "upload_button"));
     GtkButton *solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
-
+    gtk_widget_set_sensitive(solve_button, FALSE);
+    GtkEntry *insert_angle = GTK_ENTRY(gtk_builder_get_object(builder, "insert_angle"));
+    gtk_widget_set_sensitive(insert_angle, FALSE);
     GtkImage *image_base = GTK_IMAGE(gtk_builder_get_object(builder, "base_image"));
     gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
     GtkWidget *box_base = GTK_WIDGET(gtk_builder_get_object(builder, "left_grid"));
@@ -269,32 +236,24 @@ int main()
         .upload_button = upload_button,
         .help_button = help_button,
         .Rotate = rotate_check,
+        .insert_angle = insert_angle,
         .Step_by_step = step_check,
         .baseImage = image_base,
         .baseContainer = box_solved,
         .solvedImage = image_solved,
     };
 
-    // update_image(box_base, image_base, window);
-    // update_image(box_solved, image_solved, window);
-
-    // set_image(image_base, box_base);
-    // set_image(&Interface);
-
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), window);
-    g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), window);
+    g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked), &Interface);
     g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), NULL);
-    // g_signal_connect(image_solved, "everytime", G_CALLBACK(resizing), &Interface);
-
     g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), &Interface);
+    g_signal_connect(rotate_check, "clicked", G_CALLBACK(rotate_check_clicked), &Interface);
 
-    //	g_signal_connect(image_solved, "expose-event", G_CALLBACK(resize_image), (gpointer)window);
-    //	g_signal_connect(image_base, "expose-event", G_CALLBACK(resize_image), (gpointer)window);
-    //	gtk_container_add(GTK_CONTAINER(window), image_base);
+    // G_OBJECT(check_button), "toggled", G_CALLBACK(on_check_button_toggled), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(window));
-    // Start the GTK main loop
+
     gtk_main();
 
     return 0;
