@@ -16,6 +16,7 @@ typedef struct UserInterface
     GtkWidget *baseContainer;
     GtkImage *solvedImage;
     guint window_size;
+    char* filename;
 
 } UserInterface;
 
@@ -236,6 +237,7 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
     {
         // Get the selected file
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        strcpy(interface->filename, filename);
         GtkWidget *image_widget = gtk_image_new_from_file(filename);
         if (image_widget == NULL)
         {
@@ -253,7 +255,7 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
         // Free the filename string
         g_free(filename);
     }
-
+    g_print("filename = %s\n", interface->filename);
     // Destroy the dialog
     gtk_widget_destroy(dialog);
 }
@@ -304,6 +306,7 @@ int main()
         .baseImage = image_base,
         .baseContainer = box_solved,
         .solvedImage = image_solved,
+        .filename = malloc(999*sizeof(char)), // TODO: tmp
     };
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
