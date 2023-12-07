@@ -14,6 +14,8 @@ void applyBilateralFilter(SDL_Surface *image, SDL_Surface *filteredImage, int x,
     double wP = 0;
     int neighbor_x = 0;
     int neighbor_y = 0;
+    int width = image->w;
+    int height = image->h;
     int half = diameter / 2;
     const SDL_PixelFormat *format = image->format;
     Uint32 *pixtab = image->pixels;
@@ -21,13 +23,17 @@ void applyBilateralFilter(SDL_Surface *image, SDL_Surface *filteredImage, int x,
     Uint8 r, g, b, a;
     Uint8 r2, g2, b2, a2;
 
-    SDL_GetRGBA(pixtab[y * image->w + x], format, &r2, &g2, &b2, &a2);
+    SDL_GetRGBA(pixtab[y * width + x], format, &r2, &g2, &b2, &a2);
     for (int i = 0; i < diameter; i++) {
         for (int j = 0; j < diameter; j++) {
+
             neighbor_x = x - (half - i);
             neighbor_y = y - (half - j);
-            SDL_GetRGBA(pixtab[neighbor_y * image->w + neighbor_x], format, &r,
-                        &g, &b, &a);
+            if (neighbor_x < 0 || neighbor_x >= width || neighbor_y < 0 ||
+                neighbor_y >= height)
+                continue;
+            SDL_GetRGBA(pixtab[neighbor_y * width + neighbor_x], format, &r, &g,
+                        &b, &a);
             double gi = gaussian(r - r2, sigmaI);
             double gs =
                 gaussian(distance(x, y, neighbor_x, neighbor_y), sigmaS);
@@ -37,7 +43,7 @@ void applyBilateralFilter(SDL_Surface *image, SDL_Surface *filteredImage, int x,
         }
     }
     iFiltered = iFiltered / wP;
-    fpixtab[y * filteredImage->w + x] =
+    fpixtab[y * width + x] =
         SDL_MapRGBA(format, iFiltered, iFiltered, iFiltered, 255);
 }
 
@@ -50,7 +56,7 @@ SDL_Surface *bilateralFilterOwn(SDL_Surface *image, int diameter, double sigmaI,
 
     for (int i = 2; i < height - 2; i++) {
         for (int j = 2; j < width - 2; j++) {
-            applyBilateralFilter(image, filteredImage, i, j, diameter, sigmaI,
+            applyBilateralFilter(image, filteredImage, j, i, diameter, sigmaI,
                                  sigmaS);
         }
     }
