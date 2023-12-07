@@ -24,7 +24,7 @@
 
 // Balance
 #define THRESHOLD_BALANCE 3.5
-#define BALANCE_MIN_DIFF 20
+#define BALANCE_MIN_DIFF 42
 
 #define THRESHOLD_VOID_SQUARE 42
 
@@ -36,7 +36,7 @@
 #define NN_IMAGE_SIZE 28 // mnist size
 #define TRESHOLD_NUMBER_DETECTION 24
 #define OFFSET_CENTER_NUMBER 2
-#define OFFSET_FIRST_CROP 18
+#define OFFSET_FIRST_CROP 28
 //////// DEFINES END //////
 
 typedef struct {
@@ -61,6 +61,9 @@ SDL_Surface *StandardizeImage(SDL_Surface *image);
 void ComputeStardizeLens(int width, int height, int *dx, int *dy);
 
 void Contrast(SDL_Surface *image);
+
+SDL_Surface *bilateralFilterOwn(SDL_Surface *image, int diameter, double sigmaI,
+                                double sigmaS);
 
 void GaussianBlur(SDL_Surface *image);
 

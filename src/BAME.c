@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
     int old_height = image->h;
 
     image = StandardizeImage(image);
+    image = bilateralFilterOwn(image, 15, 12, 16);
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
@@ -78,6 +79,8 @@ int main(int argc, char *argv[]) {
                 sdk_grid[y][x] = 0;
                 continue;
             }
+            asprintf(&kokok, "tmp/full-before-%d-%d.png", x, y);
+            IMG_SavePNG(box_img, kokok);
             box_img = CenterNumber(box_img);
             asprintf(&kokok, "tmp/full-%d-%d.png", x, y);
             IMG_SavePNG(box_img, kokok);
