@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkWindow" id="main_window">
@@ -14,7 +14,6 @@
         <property name="name">BIg_box</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="homogeneous">True</property>
         <child>
           <object class="GtkBox">
             <property name="name">left_box</property>
@@ -76,9 +75,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkImage">
+              <object class="GtkImage" id="base_image">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-top">20</property>
                 <property name="stock">gtk-missing-image</property>
               </object>
               <packing>
@@ -95,15 +95,27 @@
           </packing>
         </child>
         <child>
-          <object class="GtkImage" id="solved_image">
+          <object class="GtkBox" id="box_solved">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-top">20</property>
-            <property name="margin-bottom">20</property>
-            <property name="stock">gtk-missing-image</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkImage" id="solved_image">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <property name="stock">gtk-missing-image</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
