@@ -5,7 +5,7 @@
 typedef struct UserInterface
 {
     GtkBuilder *builder;
-    GtkWindow *window;    
+    GtkWindow *window;
     GtkButton *help_button;
     GtkButton *upload_button;
     GtkButton *solve_button;
@@ -16,7 +16,9 @@ typedef struct UserInterface
     GtkWidget *baseContainer;
     GtkImage *solvedImage;
     guint window_size;
-    char* filename;
+    char *filename;
+    char *filename_solved;
+    GtkButton *save_button;
 
 } UserInterface;
 
@@ -109,13 +111,13 @@ gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
 static void help_button_clicked(GtkWidget *widget, gpointer user_data)
 {
     (void)widget;
-    UserInterface* interface = user_data;
+    UserInterface *interface = user_data;
     GtkWindow *window = interface->window;
     GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_MESSAGE_INFO,
-                                    GTK_BUTTONS_CLOSE,
-                                    "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight you can leave the autor rotate default text or insert the angle(must be an integer)\n - Upload: Select the picture of the sudoku you want to solve from your computer\n- Solve: button accessible once image is uploaded it will solve the grid with the current parameters till the end\n");
+                                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                                               GTK_MESSAGE_INFO,
+                                               GTK_BUTTONS_CLOSE,
+                                               "- Step by step: show all the process that is done by the AI\n- Rotate: If your image is not straight you can leave the autor rotate default text or insert the angle(must be an integer)\n - Upload: Select the picture of the sudoku you want to solve from your computer\n- Solve: button accessible once image is uploaded it will solve the grid with the current parameters till the end\n");
     gtk_window_set_title(GTK_WINDOW(dialog), "Help");
 
     gtk_dialog_run(GTK_DIALOG(dialog));
@@ -237,7 +239,10 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
     {
         // Get the selected file
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        // realloc(interface->filename, 999*sizeof(char));
         strcpy(interface->filename, filename);
+        // realloc(interface->filename_solved, 999*sizeof(char));
+        strcpy(interface->filename_solved, filename);
         GtkWidget *image_widget = gtk_image_new_from_file(filename);
         if (image_widget == NULL)
         {
@@ -255,9 +260,57 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
         // Free the filename string
         g_free(filename);
     }
-    g_print("filename = %s\n", interface->filename);
     // Destroy the dialog
     gtk_widget_destroy(dialog);
+}
+
+gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+    (void)event;
+    // Récupérer l'objet GtkImage à partir des données utilisateur
+    UserInterface *interface = user_data;
+    GtkImage *image = interface->solvedImage;
+
+    // Récupérer le GdkPixbuf associé à l'image
+    // GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(interface->filename_solved, NULL);
+
+
+    if (pixbuf != NULL)
+    {
+        // Demander à l'utilisateur le nom du fichier de sauvegarde
+        GtkWidget *dialog = gtk_file_chooser_dialog_new("Save Image",
+                                                        NULL,
+                                                        GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                        "Cancel", GTK_RESPONSE_CANCEL,
+                                                        "Save", GTK_RESPONSE_ACCEPT,
+                                                        NULL);
+
+        // Ajouter un filtre d'extension pour les fichiers image
+        GtkFileFilter *filter = gtk_file_filter_new();
+        gtk_file_filter_set_name(filter, "Image Files");
+        gtk_file_filter_add_mime_type(filter, "image/*");
+        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
+        // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+
+        if (response == GTK_RESPONSE_ACCEPT)
+        {
+            // Obtenir le chemin du fichier sélectionné
+            char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+            // Sauvegarder le pixbuf dans le fichier
+            gdk_pixbuf_save(pixbuf, filename, "png", NULL, NULL);
+
+            // Libérer la mémoire du chemin du fichier
+            g_free(filename);
+        }
+
+        // Détruire la boîte de dialogue
+        gtk_widget_destroy(dialog);
+    }
+    return TRUE;
 }
 
 int main()
@@ -293,6 +346,7 @@ int main()
     GtkImage *image_solved = GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
     gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
     GtkWidget *box_solved = GTK_WIDGET(gtk_builder_get_object(builder, "box_solved"));
+    GtkButton *save_button = GTK_BUTTON(gtk_builder_get_object(builder, "save_button"));
 
     UserInterface Interface = {
         .builder = builder,
@@ -306,8 +360,13 @@ int main()
         .baseImage = image_base,
         .baseContainer = box_solved,
         .solvedImage = image_solved,
-        .filename = malloc(999*sizeof(char)), // TODO: tmp
+        .filename = malloc(999 * sizeof(char)),
+        .filename_solved = "Image-Defaults/Solved_Image.png",
+        .save_button = save_button,
     };
+
+    // Interface.filename_solved = "Image-Defaults/Solved_Image.png";
+    
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked), &Interface);
@@ -315,6 +374,7 @@ int main()
     g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked), &Interface);
     g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), &Interface);
     g_signal_connect(rotate_check, "clicked", G_CALLBACK(rotate_check_clicked), &Interface);
+    g_signal_connect(save_button, "clicked", G_CALLBACK(save_button_clicked), &Interface);
 
     gtk_widget_show_all(GTK_WIDGET(window));
 
