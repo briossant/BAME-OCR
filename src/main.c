@@ -8,18 +8,15 @@
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Usage: ./ocr <image path> <network path (optional)>\n");
+        printf("Usage: ./ocr <image path>\n");
         return 1;
-    }
-    char *nn_path = DEFAULT_NN;
-    if (argc >= 3) {
-        nn_path = argv[2];
     }
     ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
     parameters->angle = 0;
     parameters->auto_rotate = 1;
+    parameters->step_index = 42;
     parameters->filename = argv[1];
-    parameters->filename_resolved = "Nimp.png";
+    parameters->filename_resolved = "BANE.png";
     BAME(parameters);
     return 0;
 }
