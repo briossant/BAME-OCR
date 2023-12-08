@@ -65,7 +65,7 @@ void *BAME(void *data) {
     int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
     if (grid_corner[0] < 0 || grid_corner[1] < 0) {
-        printf("unabled to find a grid\n");
+        printf("Unable to find a grid\n");
         parameters->raise_error("unabled to find a grid\n");
     }
 
