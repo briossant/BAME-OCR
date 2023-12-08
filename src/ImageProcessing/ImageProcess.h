@@ -23,7 +23,7 @@
 #define GD_diagonal_killer 6
 
 // Balance
-#define THRESHOLD_BALANCE 2
+#define THRESHOLD_BALANCE 1.6
 #define BALANCE_MIN_DIFF 42
 
 #define THRESHOLD_VOID_SQUARE 42

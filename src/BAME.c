@@ -1,49 +1,48 @@
 #include "ImageProcessing/ImageProcess.h"
 #include "NeuralNetwork/network/NeuralNetwork.h"
 #include "SudokuSolver/Sudoku_Solver.h"
+#include "Interface/interface.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 
-#define DEFAULT_NN "sudoku.nn"
+void *BAME(void *data) {
+    ThreadParameters *parameters = data;
+    printf("filename = %s\n", parameters->filename);
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Usage: ./ocr <image path> <network path (optional)>\n");
-        return 1;
-    }
-    char *nn_path = DEFAULT_NN;
-    if (argc >= 3) {
-        nn_path = argv[2];
-    }
+    Network network = LoadNetwork(DEFAULT_NN);
 
-    Network network = LoadNetwork(nn_path);
-
-    SDL_Surface *image = SDL_Start(argv[1]);
+    SDL_Surface *image = SDL_Start(parameters->filename);
 
     int old_width = image->w;
     int old_height = image->h;
 
+    // step 1
     image = StandardizeImage(image);
-    image = bilateralFilterOwn(image, 10, 150, 250);
+    image = bilateralFilterOwn(image, 8, 100, 150);
     IMG_SavePNG(image, "filtered.png");
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
 
+    // step 2
     image = Canny(image, old_width, old_height);
     SDL_Surface *canny_copy = SDL_ConvertSurface(image, format, 0);
+
+    // step 3
     int ho_mat_size = -1;
     double *ho_mat = hough_transform(image, &ho_mat_size);
     IMG_SavePNG(image, "hough1.png");
     SDL_FreeSurface(image);
 
+    // step 4
     double angle_to_rotate =
         GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
     printf("angle_rotated: %lf\n", angle_to_rotate);
     image_copy = Rotate(image_copy, angle_to_rotate);
     canny_copy = Rotate(canny_copy, angle_to_rotate);
 
+    // step 5
     ho_mat = hough_transform(canny_copy, &ho_mat_size);
     int *ho_points = TransformHoughPolarToPoints(ho_mat, ho_mat_size);
     IMG_SavePNG(canny_copy, "hough2.png");
@@ -54,6 +53,7 @@ int main(int argc, char *argv[]) {
               grid_corner[3], color);
     IMG_SavePNG(canny_copy, "grid-detection.png");
 
+    // step 6
     int sdk_grid[9][9]; // risky shit malloc may be better
     int grid_coo[9][9]; // risky shit malloc may be better
 
@@ -90,12 +90,15 @@ int main(int argc, char *argv[]) {
             // MatPrint(inputs);
             int prediction = Predict(network, inputs);
             if (prediction == 0) {
-                printf("predicted 0 which should not happen, replacing by 0\n");
-                prediction = 0;
+                printf("predicted 0 which should not happen, replacing by 1\n");
+                prediction = 1;
             }
             sdk_grid[y][x] = prediction;
         }
     }
+
+    // step 7
+    // hack the grid modif
 
     printgrid(sdk_grid);
     int copy_grid[9][9];
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
                                  "ImageProcessing/");
             }
 
-    IMG_SavePNG(image_copy, "BAME-here's-your-sudoku!.png");
+    IMG_SavePNG(image_copy, parameters->filename_resolved);
     printf("Successful bb\n");
     printgrid(sdk_grid);
     return 0;
