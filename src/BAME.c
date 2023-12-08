@@ -1,32 +1,26 @@
 #include "ImageProcessing/ImageProcess.h"
 #include "NeuralNetwork/network/NeuralNetwork.h"
 #include "SudokuSolver/Sudoku_Solver.h"
+#include "Interface/interface.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 
-#define DEFAULT_NN "sudoku.nn"
+void* BAME(void* data)
+{
+  ThreadParameters* parameters = data;
+  printf("filename = %s\n", parameters->filename);
+  
+  Network network = LoadNetwork(DEFAULT_NN);
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    printf("Usage: ./ocr <image path> <network path (optional)>\n");
-    return 1;
-  }
-  char *nn_path = DEFAULT_NN;
-  if (argc >= 3) {
-    nn_path = argv[2];
-  }
-
-  Network network = LoadNetwork(nn_path);
-
-  SDL_Surface *image = SDL_Start(argv[1]);
+  SDL_Surface *image = SDL_Start(parameters->filename);
 
   int old_width = image->w;
   int old_height = image->h;
 
   // step 1
   image = StandardizeImage(image);
-  image = bilateralFilterOwn(image, 10, 100, 150);
+  image = bilateralFilterOwn(image, 8, 100, 150);
   IMG_SavePNG(image, "filtered.png");
 
   SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
@@ -67,8 +61,10 @@ int main(int argc, char *argv[]) {
   int box_size_x = (grid_corner[2] - grid_corner[0]) / 9;
   int box_size_y = (grid_corner[3] - grid_corner[1]) / 9;
 
-  for (int x = 0; x < 9; ++x) {
-    for (int y = 0; y < 9; ++y) {
+  for (int x = 0; x < 9; ++x)
+  {
+    for (int y = 0; y < 9; ++y)
+    {
       int image_x = grid_corner[0] + x * box_size_x;
       int image_y = grid_corner[1] + y * box_size_y;
       // remove offseting from Resize_crop and do it after void_square
@@ -81,7 +77,8 @@ int main(int argc, char *argv[]) {
       char *kokok;
       Balance(box_img); // A retravailler -> marche pas bien pour les 9,
                         // 6, 8, 4
-      if (!void_square(box_img)) {
+      if (!void_square(box_img))
+      {
         asprintf(&kokok, "tmp/empty-%d-%d.png", x, y);
         IMG_SavePNG(box_img, kokok);
         sdk_grid[y][x] = 0;
@@ -96,7 +93,8 @@ int main(int argc, char *argv[]) {
       Matrix inputs = image_to_matrix(box_img);
       // MatPrint(inputs);
       int prediction = Predict(network, inputs);
-      if (prediction == 0) {
+      if (prediction == 0)
+      {
         printf("predicted 0 which should not happen, replacing by 1\n");
         prediction = 1;
       }
@@ -114,21 +112,23 @@ int main(int argc, char *argv[]) {
     for (int y = 0; y < 9; ++y)
       copy_grid[y][x] = sdk_grid[y][x];
 
-  if (SSudo(sdk_grid, 0, 0) != 1) {
+  if (SSudo(sdk_grid, 0, 0) != 1)
+  {
     printf("No solution found\n");
     return 0;
   }
 
   for (int x = 0; x < 9; ++x)
     for (int y = 0; y < 9; ++y)
-      if (copy_grid[y][x] == 0) {
+      if (copy_grid[y][x] == 0)
+      {
         int start = grid_coo[y][x];
         int end = start + box_size_x + box_size_y * image_copy->w;
         get_green_number(image_copy, sdk_grid[y][x], start, end,
                          "ImageProcessing/");
       }
 
-  IMG_SavePNG(image_copy, "BAME-here's-your-sudoku!.png");
+  IMG_SavePNG(image_copy, parameters->filename_resolved);
   printf("Successful bb\n");
   printgrid(sdk_grid);
   return 0;

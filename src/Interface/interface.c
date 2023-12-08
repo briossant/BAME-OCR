@@ -1,6 +1,10 @@
-#include <complex.h>
+#include "../ImageProcessing/ImageProcess.h"
+#include "../NeuralNetwork/network/NeuralNetwork.h"
+#include "../SudokuSolver/Sudoku_Solver.h"
 #include <err.h>
 #include <gtk/gtk.h>
+#include "interface.h"
+#include <pthread.h>
 
 typedef struct UserInterface
 {
@@ -65,7 +69,7 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
   UserInterface *interface = user_data;
   const gchar *text = gtk_entry_get_text(interface->insert_angle);
   char *def = "Default: Automatic";
-  int need_rotate = 0;
+  // int need_rotate = 0;
   int is_automatic = 1;
   int angle = 0;
 
@@ -75,7 +79,7 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Rotate)) ==
       TRUE)
   {
-    need_rotate = 1;
+    // need_rotate = 1;
     if (strcmp(def, text) != 0)
     {
       if (!isInteger(text))
@@ -91,6 +95,40 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
       }
     }
   }
+
+  ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
+  parameters->angle = angle;
+  parameters->auto_rotate = is_automatic;
+  parameters->filename = interface->filename;
+  parameters->step_index = step_by_step ? 0 : 7;
+  parameters->filename_resolved = "Nimp.png";
+
+  g_print("filename: %s\n", parameters->filename);
+
+  pthread_t id;
+  int e = pthread_create(&id, NULL, BAME, parameters);
+  if (e != 0)
+  {
+    errno = e;
+    err(EXIT_FAILURE, NULL);
+  }
+
+  pthread_join(id, NULL);
+
+  interface->filename = parameters->filename_resolved;
+
+  GtkWidget *image_widget = gtk_image_new_from_file(interface->filename);
+  if (image_widget == NULL)
+  {
+    g_printerr("Error loading image: %s\n", interface->filename);
+    errx(1, "Could not get the image from file path");
+  }
+
+  gtk_image_set_from_file(interface->solvedImage, interface->filename);
+
+  update_image(interface->window, user_data);
+
+  gtk_widget_set_sensitive(interface->solve_button, FALSE);
 }
 
 gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
@@ -188,6 +226,30 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
   return FALSE;
 }
 
+void update_image(GtkWidget *window, gpointer user_data)
+{
+  UserInterface *interface = user_data;
+
+  GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
+  if (pixbuf != NULL)
+  {
+
+    gint wd_width, wd_height;
+
+    gtk_window_get_size(GTK_WINDOW(window), &wd_width, &wd_height);
+
+    int new_width = (wd_width / 3);
+    int new_height = (wd_width / 3);
+
+    GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(
+        pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
+
+    gtk_image_set_from_pixbuf(interface->solvedImage, scaled_pixbuf);
+
+    g_object_unref(scaled_pixbuf);
+  }
+}
+
 void fix_size(gpointer user_data)
 {
   UserInterface *interface = user_data;
@@ -263,9 +325,6 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
 
     fix_size(user_data);
     gtk_widget_set_sensitive(GTK_WIDGET(interface->solve_button), TRUE);
-
-    // Free the filename string
-    g_free(filename);
   }
   // Destroy the dialog
   gtk_widget_destroy(dialog);
@@ -327,7 +386,7 @@ int main()
   // (Exits if an error occurs.)
   GtkBuilder *builder = gtk_builder_new();
   GError *error = NULL;
-  if (gtk_builder_add_from_file(builder, "interface.glade", &error) == 0)
+  if (gtk_builder_add_from_file(builder, "Interface/interface.glade", &error) == 0)
   {
     g_printerr("Error loading file: %s\n", error->message);
     g_clear_error(&error);
@@ -365,36 +424,35 @@ int main()
   GtkButton *save_button =
       GTK_BUTTON(gtk_builder_get_object(builder, "save_button"));
 
-  UserInterface Interface = {
-      .builder = builder,
-      .window = window,
-      .upload_button = upload_button,
-      .help_button = help_button,
-      .solve_button = solve_button,
-      .Rotate = rotate_check,
-      .insert_angle = insert_angle,
-      .Step_by_step = step_check,
-      .baseImage = image_base,
-      .baseContainer = box_solved,
-      .solvedImage = image_solved,
-      .filename = NULL,
-      .save_button = save_button,
-  };
+  UserInterface *Interface = malloc(sizeof(UserInterface));
+  Interface->builder = builder;
+  Interface->window = window;
+  Interface->upload_button = upload_button;
+  Interface->help_button = help_button;
+  Interface->solve_button = solve_button;
+  Interface->Rotate = rotate_check;
+  Interface->insert_angle = insert_angle;
+  Interface->Step_by_step = step_check;
+  Interface->baseImage = image_base;
+  Interface->baseContainer = box_solved;
+  Interface->solvedImage = image_solved;
+  Interface->filename = NULL;
+  Interface->save_button = save_button;
 
   // Interface.filename_solved = "Image-Defaults/Solved_Image.png";
 
-  g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+      g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
   g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked),
-                   &Interface);
+                   Interface);
   g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked),
-                   &Interface);
+                   Interface);
   g_signal_connect(solve_button, "clicked", G_CALLBACK(solve_button_clicked),
-                   &Interface);
-  g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), &Interface);
+                   Interface);
+  g_signal_connect(window, "size-allocate", G_CALLBACK(set_image), Interface);
   g_signal_connect(rotate_check, "clicked", G_CALLBACK(rotate_check_clicked),
-                   &Interface);
+                   Interface);
   g_signal_connect(save_button, "clicked", G_CALLBACK(save_button_clicked),
-                   &Interface);
+                   Interface);
 
   gtk_widget_show_all(GTK_WIDGET(window));
 

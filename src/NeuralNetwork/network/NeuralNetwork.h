@@ -17,6 +17,8 @@
 #include "../matrices/matrices.h"
 #include "precision.h"
 
+#define DEFAULT_NN "sudoku.nn"
+
 //////////////////////////////////////
 // Struct
 
