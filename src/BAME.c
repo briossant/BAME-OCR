@@ -6,11 +6,11 @@
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 
-void* BAME(void* data)
+void *BAME(void *data)
 {
-  ThreadParameters* parameters = data;
+  ThreadParameters *parameters = data;
   printf("filename = %s\n", parameters->filename);
-  
+
   Network network = LoadNetwork(DEFAULT_NN);
 
   SDL_Surface *image = SDL_Start(parameters->filename);
@@ -37,9 +37,12 @@ void* BAME(void* data)
   SDL_FreeSurface(image);
 
   // step 4
-  double angle_to_rotate =
-      GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
-  printf("angle_rotated: %lf\n", angle_to_rotate);
+  double angle_to_rotate = parameters->angle;
+  if (parameters->auto_rotate)
+  {
+    angle_to_rotate = GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
+    printf("angle_rotated: %lf\n", angle_to_rotate);
+  }
   image_copy = Rotate(image_copy, angle_to_rotate);
   canny_copy = Rotate(canny_copy, angle_to_rotate);
 

@@ -53,7 +53,7 @@
               <object class="GtkEntry" id="insert_angle">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="text" translatable="yes">Default: Automatic</property>
+                <property name="placeholder-text" translatable="yes">Default: Automatic</property>
               </object>
               <packing>
                 <property name="expand">False</property>

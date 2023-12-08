@@ -62,82 +62,13 @@ int isInteger(const char *text)
   return (*text != '\0' && *endptr == '\0');
 }
 
-// Function to handle button click event
-static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
-{
-  (void)widget;
-  UserInterface *interface = user_data;
-  const gchar *text = gtk_entry_get_text(interface->insert_angle);
-  char *def = "Default: Automatic";
-  // int need_rotate = 0;
-  int is_automatic = 1;
-  int angle = 0;
-
-  gboolean step_by_step =
-      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Step_by_step));
-
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Rotate)) ==
-      TRUE)
-  {
-    // need_rotate = 1;
-    if (strcmp(def, text) != 0)
-    {
-      if (!isInteger(text))
-      {
-        show_error("The angle must be an integer", interface->window);
-        gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
-        return;
-      }
-      else
-      {
-        angle = atoi(text);
-        is_automatic = 0;
-      }
-    }
-  }
-
-  ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
-  parameters->angle = angle;
-  parameters->auto_rotate = is_automatic;
-  parameters->filename = interface->filename;
-  parameters->step_index = step_by_step ? 0 : 7;
-  parameters->filename_resolved = "Nimp.png";
-
-  g_print("filename: %s\n", parameters->filename);
-
-  pthread_t id;
-  int e = pthread_create(&id, NULL, BAME, parameters);
-  if (e != 0)
-  {
-    errno = e;
-    err(EXIT_FAILURE, NULL);
-  }
-
-  pthread_join(id, NULL);
-
-  interface->filename = parameters->filename_resolved;
-
-  GtkWidget *image_widget = gtk_image_new_from_file(interface->filename);
-  if (image_widget == NULL)
-  {
-    g_printerr("Error loading image: %s\n", interface->filename);
-    errx(1, "Could not get the image from file path");
-  }
-
-  gtk_image_set_from_file(interface->solvedImage, interface->filename);
-
-  update_image(interface->window, user_data);
-
-  gtk_widget_set_sensitive(interface->solve_button, FALSE);
-}
-
 gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
 {
   UserInterface *interface = user_data;
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) == FALSE)
   {
-    gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
+    gtk_entry_set_text(interface->insert_angle, "");
   }
   gtk_widget_set_sensitive(
       GTK_WIDGET(interface->insert_angle),
@@ -334,6 +265,7 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
                              gpointer user_data)
 {
   (void)event;
+  (void)widget;
   // Récupérer l'objet GtkImage à partir des données utilisateur
   UserInterface *interface = user_data;
   GtkImage *image = interface->solvedImage;
@@ -375,6 +307,75 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
     gtk_widget_destroy(dialog);
   }
   return TRUE;
+}
+
+// Function to handle button click event
+static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
+{
+  (void)widget;
+  UserInterface *interface = user_data;
+  const gchar *text = gtk_entry_get_text(interface->insert_angle);
+  char *def = "";
+  // int need_rotate = 0;
+  int is_automatic = 1;
+  int angle = 0;
+
+  gboolean step_by_step =
+      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Step_by_step));
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Rotate)) ==
+      TRUE)
+  {
+    // need_rotate = 1;
+    if (strcmp(def, text) != 0)
+    {
+      if (!isInteger(text))
+      {
+        show_error("The angle must be an integer", interface->window);
+        gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
+        return;
+      }
+      else
+      {
+        angle = atoi(text);
+        is_automatic = 0;
+      }
+    }
+  }
+
+  ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
+  parameters->angle = angle;
+  parameters->auto_rotate = is_automatic;
+  parameters->filename = interface->filename;
+  parameters->step_index = step_by_step ? 0 : 7;
+  parameters->filename_resolved = "Nimp.png";
+
+  g_print("filename: %s\n", parameters->filename);
+
+  pthread_t id;
+  int e = pthread_create(&id, NULL, BAME, parameters);
+  if (e != 0)
+  {
+    errno = e;
+    err(EXIT_FAILURE, NULL);
+  }
+
+  pthread_join(id, NULL);
+
+  interface->filename = parameters->filename_resolved;
+
+  GtkWidget *image_widget = gtk_image_new_from_file(interface->filename);
+  if (image_widget == NULL)
+  {
+    g_printerr("Error loading image: %s\n", interface->filename);
+    errx(1, "Could not get the image from file path");
+  }
+
+  gtk_image_set_from_file(interface->solvedImage, interface->filename);
+
+  update_image(GTK_WIDGET(interface->window), user_data);
+
+  gtk_widget_set_sensitive(GTK_WIDGET(interface->solve_button), FALSE);
 }
 
 int main()
