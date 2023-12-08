@@ -25,6 +25,8 @@ typedef struct UserInterface
 
 } UserInterface;
 
+UserInterface *Interface;
+
 void show_warning(char *message, gpointer window)
 {
   if (message == NULL)
@@ -157,17 +159,25 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
   return FALSE;
 }
 
-void update_image(GtkWidget *window, gpointer user_data)
+void update_image()
 {
-  UserInterface *interface = user_data;
+  GtkWidget *image_widget = gtk_image_new_from_file(Interface->filename);
+  if (image_widget == NULL)
+  {
+    g_printerr("Error loading image: %s\n", Interface->filename);
+    errx(1, "Could not get the image from file path");
+  }
 
-  GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
+  gtk_image_set_from_file(Interface->solvedImage, Interface->filename);
+
+  sleep(1);
+
+  GdkPixbuf *pixbuf = gtk_image_get_pixbuf(Interface->solvedImage);
   if (pixbuf != NULL)
   {
-
     gint wd_width, wd_height;
 
-    gtk_window_get_size(GTK_WINDOW(window), &wd_width, &wd_height);
+    gtk_window_get_size(GTK_WINDOW(Interface->window), &wd_width, &wd_height);
 
     int new_width = (wd_width / 3);
     int new_height = (wd_width / 3);
@@ -175,7 +185,7 @@ void update_image(GtkWidget *window, gpointer user_data)
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(
         pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
 
-    gtk_image_set_from_pixbuf(interface->solvedImage, scaled_pixbuf);
+    gtk_image_set_from_pixbuf(Interface->solvedImage, scaled_pixbuf);
 
     g_object_unref(scaled_pixbuf);
   }
@@ -346,11 +356,16 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
   ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
   parameters->angle = angle;
   parameters->auto_rotate = is_automatic;
-  parameters->filename = interface->filename;
+  char *tmp = malloc(strlen(interface->filename) * sizeof(char));
+  strcpy(tmp, interface->filename);
+  parameters->filename = tmp;
   parameters->step_index = step_by_step ? 0 : 7;
   parameters->filename_resolved = "Nimp.png";
+  parameters->func_ptr = update_image;
 
   g_print("filename: %s\n", parameters->filename);
+
+  interface->filename = parameters->filename_resolved;
 
   pthread_t id;
   int e = pthread_create(&id, NULL, BAME, parameters);
@@ -359,21 +374,6 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
     errno = e;
     err(EXIT_FAILURE, NULL);
   }
-
-  pthread_join(id, NULL);
-
-  interface->filename = parameters->filename_resolved;
-
-  GtkWidget *image_widget = gtk_image_new_from_file(interface->filename);
-  if (image_widget == NULL)
-  {
-    g_printerr("Error loading image: %s\n", interface->filename);
-    errx(1, "Could not get the image from file path");
-  }
-
-  gtk_image_set_from_file(interface->solvedImage, interface->filename);
-
-  update_image(GTK_WIDGET(interface->window), user_data);
 
   gtk_widget_set_sensitive(GTK_WIDGET(interface->solve_button), FALSE);
 }
@@ -414,18 +414,18 @@ int main()
   gtk_widget_set_sensitive(GTK_WIDGET(insert_angle), FALSE);
   GtkImage *image_base =
       GTK_IMAGE(gtk_builder_get_object(builder, "base_image"));
-  gtk_image_set_from_file(image_base, "Image-Defaults/BaseImage.png");
+  gtk_image_set_from_file(image_base, "Interface/Image-Defaults/BaseImage.png");
   // GtkWidget *box_base = GTK_WIDGET(gtk_builder_get_object(builder,
   // "left_grid"));
   GtkImage *image_solved =
       GTK_IMAGE(gtk_builder_get_object(builder, "solved_image"));
-  gtk_image_set_from_file(image_solved, "Image-Defaults/Solved_Image.png");
+  gtk_image_set_from_file(image_solved, "Interface/Image-Defaults/Solved_Image.png");
   GtkWidget *box_solved =
       GTK_WIDGET(gtk_builder_get_object(builder, "box_solved"));
   GtkButton *save_button =
       GTK_BUTTON(gtk_builder_get_object(builder, "save_button"));
 
-  UserInterface *Interface = malloc(sizeof(UserInterface));
+  Interface = malloc(sizeof(UserInterface));
   Interface->builder = builder;
   Interface->window = window;
   Interface->upload_button = upload_button;
@@ -442,7 +442,7 @@ int main()
 
   // Interface.filename_solved = "Image-Defaults/Solved_Image.png";
 
-      g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+  g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
   g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked),
                    Interface);
   g_signal_connect(upload_button, "clicked", G_CALLBACK(upload_button_clicked),

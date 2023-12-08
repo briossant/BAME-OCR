@@ -8,6 +8,7 @@ typedef struct ThreadParameters
   int step_index;
   double angle;
   char* filename_resolved;
+  void (*func_ptr)(void);
 } ThreadParameters;
 
 void* BAME(void* data);

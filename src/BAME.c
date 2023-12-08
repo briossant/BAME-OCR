@@ -21,20 +21,27 @@ void *BAME(void *data)
   // step 1
   image = StandardizeImage(image);
   image = bilateralFilterOwn(image, 8, 100, 150);
-  IMG_SavePNG(image, "filtered.png");
+  IMG_SavePNG(image, parameters->filename_resolved);
 
   SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
   SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
+
+  parameters->func_ptr();
 
   // step 2
   image = Canny(image, old_width, old_height);
   SDL_Surface *canny_copy = SDL_ConvertSurface(image, format, 0);
 
+  IMG_SavePNG(image, parameters->filename_resolved);
+  parameters->func_ptr();
+
   // step 3
   int ho_mat_size = -1;
   double *ho_mat = hough_transform(image, &ho_mat_size);
-  IMG_SavePNG(image, "hough1.png");
+  IMG_SavePNG(image, parameters->filename_resolved);
   SDL_FreeSurface(image);
+
+  parameters->func_ptr();
 
   // step 4
   double angle_to_rotate = parameters->angle;
@@ -46,16 +53,20 @@ void *BAME(void *data)
   image_copy = Rotate(image_copy, angle_to_rotate);
   canny_copy = Rotate(canny_copy, angle_to_rotate);
 
+  IMG_SavePNG(canny_copy, parameters->filename_resolved);
+  parameters->func_ptr();
+  
   // step 5
   ho_mat = hough_transform(canny_copy, &ho_mat_size);
   int *ho_points = TransformHoughPolarToPoints(ho_mat, ho_mat_size);
-  IMG_SavePNG(canny_copy, "hough2.png");
   int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
   Uint32 color = SDL_MapRGBA(image_copy->format, 255, 0, 255, 255);
   draw_line(canny_copy, grid_corner[0], grid_corner[1], grid_corner[2],
             grid_corner[3], color);
-  IMG_SavePNG(canny_copy, "grid-detection.png");
+  IMG_SavePNG(canny_copy, parameters->filename_resolved);
+  parameters->func_ptr();
+
 
   // step 6
   int sdk_grid[9][9]; // risky shit malloc may be better
@@ -106,7 +117,7 @@ void *BAME(void *data)
   }
 
   // step 7
-  // hack the grid modif
+  // TODO: hack the grid modif
 
   printgrid(sdk_grid);
   int copy_grid[9][9];
@@ -132,6 +143,7 @@ void *BAME(void *data)
       }
 
   IMG_SavePNG(image_copy, parameters->filename_resolved);
+  parameters->func_ptr();
   printf("Successful bb\n");
   printgrid(sdk_grid);
   return 0;
