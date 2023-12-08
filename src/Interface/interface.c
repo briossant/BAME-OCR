@@ -307,10 +307,11 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
       char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
       // Sauvegarder le pixbuf dans le fichier
+      GError* e;
       gdk_pixbuf_save(pixbuf, filename, "png", NULL, NULL);
 
       // Libérer la mémoire du chemin du fichier
-      g_free(filename);
+      // g_free(filename);
     }
 
     // Détruire la boîte de dialogue
