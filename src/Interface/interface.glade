@@ -63,10 +63,10 @@
             </child>
             <child>
               <object class="GtkButton" id="upload_button">
+                <property name="label" translatable="yes">Upload Sudoku</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="use-stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
