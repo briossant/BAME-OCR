@@ -27,7 +27,7 @@ typedef struct UserInterface
 
 UserInterface *Interface;
 
-void show_warning(char *message, gpointer window)
+void show_warning(char *message)
 {
   if (message == NULL)
   {
@@ -37,7 +37,7 @@ void show_warning(char *message, gpointer window)
 
   GtkWidget *dialog;
   dialog =
-      gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+      gtk_message_dialog_new(GTK_WINDOW(Interface->window), GTK_DIALOG_DESTROY_WITH_PARENT,
                              GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, message);
   gtk_window_set_title(GTK_WINDOW(dialog), "Warning");
   gtk_dialog_run(GTK_DIALOG(dialog));
@@ -361,7 +361,8 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
   parameters->filename = tmp;
   parameters->step_index = step_by_step ? 0 : 7;
   parameters->filename_resolved = "Nimp.png";
-  parameters->func_ptr = update_image;
+  parameters->show_img = update_image;
+  parameters->raise_error = show_warning;
 
   g_print("filename: %s\n", parameters->filename);
 

@@ -26,14 +26,14 @@ void *BAME(void *data)
   SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
   SDL_Surface *image_copy = SDL_ConvertSurface(image, format, 0);
 
-  parameters->func_ptr();
+  parameters->show_img();
 
   // step 2
   image = Canny(image, old_width, old_height);
   SDL_Surface *canny_copy = SDL_ConvertSurface(image, format, 0);
 
   IMG_SavePNG(image, parameters->filename_resolved);
-  parameters->func_ptr();
+  parameters->show_img();
 
   // step 3
   int ho_mat_size = -1;
@@ -41,7 +41,7 @@ void *BAME(void *data)
   IMG_SavePNG(image, parameters->filename_resolved);
   SDL_FreeSurface(image);
 
-  parameters->func_ptr();
+  parameters->show_img();
 
   // step 4
   double angle_to_rotate = parameters->angle;
@@ -54,7 +54,7 @@ void *BAME(void *data)
   canny_copy = Rotate(canny_copy, angle_to_rotate);
 
   IMG_SavePNG(canny_copy, parameters->filename_resolved);
-  parameters->func_ptr();
+  parameters->show_img();
   
   // step 5
   ho_mat = hough_transform(canny_copy, &ho_mat_size);
@@ -65,7 +65,7 @@ void *BAME(void *data)
   draw_line(canny_copy, grid_corner[0], grid_corner[1], grid_corner[2],
             grid_corner[3], color);
   IMG_SavePNG(canny_copy, parameters->filename_resolved);
-  parameters->func_ptr();
+  parameters->show_img();
 
 
   // step 6
@@ -129,6 +129,7 @@ void *BAME(void *data)
   if (SSudo(sdk_grid, 0, 0) != 1)
   {
     printf("No solution found\n");
+    parameters->raise_error("No solution found\n");
     return 0;
   }
 
@@ -143,7 +144,7 @@ void *BAME(void *data)
       }
 
   IMG_SavePNG(image_copy, parameters->filename_resolved);
-  parameters->func_ptr();
+  parameters->show_img();
   printf("Successful bb\n");
   printgrid(sdk_grid);
   return 0;
