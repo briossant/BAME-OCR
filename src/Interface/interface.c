@@ -399,6 +399,14 @@ int main()
   GtkWindow *window =
       GTK_WINDOW(gtk_builder_get_object(builder, "main_window"));
 
+  GdkRGBA color;
+  color.red = 10;
+  color.green = 10;
+  color.blue = 10;
+  color.alpha = 255;
+
+  gtk_widget_override_background_color(GTK_WIDGET(window), GTK_STATE_FLAG_NORMAL, &color);
+
   GtkButton *help_button =
       GTK_BUTTON(gtk_builder_get_object(builder, "help_button"));
   GtkCheckButton *step_check =
