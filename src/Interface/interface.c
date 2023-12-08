@@ -127,8 +127,8 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
 
     gtk_window_get_size(GTK_WINDOW(window), &wd_width, &wd_height);
 
-    int new_width = (wd_width / 3);
-    int new_height = (wd_width / 3);
+    int new_width = (wd_width / 2);
+    int new_height = (wd_width / 2);
 
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(
         pixbuf, new_width, new_height, GDK_INTERP_BILINEAR);
