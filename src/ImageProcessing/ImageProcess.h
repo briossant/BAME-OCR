@@ -18,18 +18,19 @@
 #define IMAGE_SIZE 2800
 
 // grid detection
-#define GD_TRESHOLD 42.42
+#define GD_TRESHOLD 142.42
 #define GD_MIN_DIST 52 // set min from image size
 #define GD_diagonal_killer 6
 
 // Balance
-#define THRESHOLD_BALANCE 3.5
+#define THRESHOLD_BALANCE 2
 #define BALANCE_MIN_DIFF 42
 
 #define THRESHOLD_VOID_SQUARE 42
+#define THRESHOLD_VOID_SQUARE_2 202
 
 // hough transform
-#define HOUGH_THRESHOLD 0.34
+#define HOUGH_THRESHOLD 0.42
 
 // Crop and number centering
 #define FIRST_CROP_SIZE 58

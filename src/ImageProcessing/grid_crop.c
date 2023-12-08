@@ -23,7 +23,7 @@ int void_square(SDL_Surface *image) {
     for (int x = 0; x < height * width; x++) {
         Uint8 r, g, b, a;
         SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
-        if (r < 128)
+        if (r < THRESHOLD_VOID_SQUARE_2)
             accu++;
     }
     return accu < height * width - THRESHOLD_VOID_SQUARE;

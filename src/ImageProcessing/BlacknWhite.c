@@ -51,6 +51,7 @@ void InvertColor(SDL_Surface *image) {
     }
 }
 
+// parcours largeur des pixels blanc du chiffre
 void Balance(SDL_Surface *image) {
     // int min = 255;
     // int max = 0;
