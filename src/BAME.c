@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     int old_height = image->h;
 
     image = StandardizeImage(image);
-    image = bilateralFilterOwn(image, 5, 4000, 6000);
+    image = bilateralFilterOwn(image, 10, 100, 150);
     IMG_SavePNG(image, "filtered.png");
 
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
