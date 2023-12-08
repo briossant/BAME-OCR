@@ -2,7 +2,8 @@
 #include <err.h>
 #include <gtk/gtk.h>
 
-typedef struct UserInterface {
+typedef struct UserInterface
+{
   GtkBuilder *builder;
   GtkWindow *window;
   GtkButton *help_button;
@@ -16,13 +17,14 @@ typedef struct UserInterface {
   GtkImage *solvedImage;
   guint window_size;
   char *filename;
-  char *filename_solved;
   GtkButton *save_button;
 
 } UserInterface;
 
-void show_warning(char *message, gpointer window) {
-  if (message == NULL) {
+void show_warning(char *message, gpointer window)
+{
+  if (message == NULL)
+  {
     message = "Grid not detected -- retake the picture or manually rotate it "
               "to be straight";
   }
@@ -36,7 +38,8 @@ void show_warning(char *message, gpointer window) {
   gtk_widget_destroy(dialog);
 }
 
-void show_error(char *message, gpointer window) {
+void show_error(char *message, gpointer window)
+{
   GtkWidget *dialog;
   dialog =
       gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -46,7 +49,8 @@ void show_error(char *message, gpointer window) {
   gtk_widget_destroy(dialog);
 }
 
-int isInteger(const char *text) {
+int isInteger(const char *text)
+{
   char *endptr;
   strtol(text, &endptr, 10);
 
@@ -55,7 +59,8 @@ int isInteger(const char *text) {
 }
 
 // Function to handle button click event
-static void solve_button_clicked(GtkWidget *widget, gpointer user_data) {
+static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
+{
   (void)widget;
   UserInterface *interface = user_data;
   const gchar *text = gtk_entry_get_text(interface->insert_angle);
@@ -68,14 +73,19 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data) {
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Step_by_step));
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(interface->Rotate)) ==
-      TRUE) {
+      TRUE)
+  {
     need_rotate = 1;
-    if (strcmp(def, text) != 0) {
-      if (!isInteger(text)) {
+    if (strcmp(def, text) != 0)
+    {
+      if (!isInteger(text))
+      {
         show_error("The angle must be an integer", interface->window);
         gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
         return;
-      } else {
+      }
+      else
+      {
         angle = atoi(text);
         is_automatic = 0;
       }
@@ -83,10 +93,12 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data) {
   }
 }
 
-gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data) {
+gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
+{
   UserInterface *interface = user_data;
 
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) == FALSE) {
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) == FALSE)
+  {
     gtk_entry_set_text(interface->insert_angle, "Default: Automatic");
   }
   gtk_widget_set_sensitive(
@@ -95,7 +107,8 @@ gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data) {
   return TRUE;
 }
 
-static void help_button_clicked(GtkWidget *widget, gpointer user_data) {
+static void help_button_clicked(GtkWidget *widget, gpointer user_data)
+{
   (void)widget;
   UserInterface *interface = user_data;
   GtkWindow *window = interface->window;
@@ -113,7 +126,8 @@ static void help_button_clicked(GtkWidget *widget, gpointer user_data) {
   gtk_dialog_run(GTK_DIALOG(dialog));
   gtk_widget_destroy(dialog);
 }
-gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
   (void)event;
   // TODO: resize images
 
@@ -129,12 +143,14 @@ gboolean on_configure(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
   return FALSE;
 }
 
-gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data) {
+gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data)
+{
   (void)event;
   UserInterface *interface = user_data;
 
   GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
-  if (pixbuf != NULL) {
+  if (pixbuf != NULL)
+  {
 
     gint wd_width, wd_height;
 
@@ -152,7 +168,8 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data) {
   }
 
   GdkPixbuf *pixbuf2 = gtk_image_get_pixbuf(interface->baseImage);
-  if (pixbuf2 != NULL) {
+  if (pixbuf2 != NULL)
+  {
     gint wd_width, wd_height;
 
     gtk_window_get_size(GTK_WINDOW(window), &wd_width, &wd_height);
@@ -171,11 +188,13 @@ gboolean set_image(GtkWidget *window, GdkEvent *event, gpointer user_data) {
   return FALSE;
 }
 
-void fix_size(gpointer user_data) {
+void fix_size(gpointer user_data)
+{
   UserInterface *interface = user_data;
 
   GdkPixbuf *pixbuf = gtk_image_get_pixbuf(interface->solvedImage);
-  if (pixbuf != NULL) {
+  if (pixbuf != NULL)
+  {
 
     int new_width = 300;
     int new_height = 300;
@@ -189,7 +208,8 @@ void fix_size(gpointer user_data) {
   }
 
   GdkPixbuf *pixbuf2 = gtk_image_get_pixbuf(interface->baseImage);
-  if (pixbuf2 != NULL) {
+  if (pixbuf2 != NULL)
+  {
 
     int new_width = 200;
     int new_height = 200;
@@ -202,7 +222,8 @@ void fix_size(gpointer user_data) {
     g_object_unref(scaled_pixbuf);
   }
 }
-static void upload_button_clicked(GtkWidget *widget, gpointer user_data) {
+static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
+{
   (void)widget;
   UserInterface *interface = user_data;
   GtkWidget *dialog = gtk_file_chooser_dialog_new(
@@ -218,15 +239,20 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data) {
   // Run the dialog and get the response
   gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
-  if (response == GTK_RESPONSE_ACCEPT) {
+  if (response == GTK_RESPONSE_ACCEPT)
+  {
     // Get the selected file
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-    // realloc(interface->filename, 999*sizeof(char));
+
     interface->filename = filename;
-    // realloc(interface->filename_solved, 999*sizeof(char));
-    strcpy(interface->filename_solved, filename);
+    // char *tmp = malloc((strlen(filename) + 1) * sizeof(char));
+    // strcpy(tmp, filename);
+    // interface->filename_solved = tmp;
+    // g_print("interface->solved = %s\n", interface->filename_solved);
+
     GtkWidget *image_widget = gtk_image_new_from_file(filename);
-    if (image_widget == NULL) {
+    if (image_widget == NULL)
+    {
       g_printerr("Error loading image: %s\n", filename);
       errx(1, "Could not get the image from file path");
     }
@@ -246,18 +272,20 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data) {
 }
 
 gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
-                             gpointer user_data) {
+                             gpointer user_data)
+{
   (void)event;
   // Récupérer l'objet GtkImage à partir des données utilisateur
   UserInterface *interface = user_data;
   GtkImage *image = interface->solvedImage;
 
   // Récupérer le GdkPixbuf associé à l'image
-  // GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
-  GdkPixbuf *pixbuf =
-      gdk_pixbuf_new_from_file(interface->filename_solved, NULL);
+  GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
+  // GdkPixbuf *pixbuf =
+  //     gdk_pixbuf_new_from_file(interface->filename_solved, NULL);
 
-  if (pixbuf != NULL) {
+  if (pixbuf != NULL)
+  {
     // Demander à l'utilisateur le nom du fichier de sauvegarde
     GtkWidget *dialog = gtk_file_chooser_dialog_new(
         "Save Image", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel",
@@ -272,7 +300,8 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
     // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
     gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
-    if (response == GTK_RESPONSE_ACCEPT) {
+    if (response == GTK_RESPONSE_ACCEPT)
+    {
       // Obtenir le chemin du fichier sélectionné
       char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
@@ -289,7 +318,8 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
   return TRUE;
 }
 
-int main() {
+int main()
+{
   // Initializes GTK.
   gtk_init(NULL, NULL);
 
@@ -297,7 +327,8 @@ int main() {
   // (Exits if an error occurs.)
   GtkBuilder *builder = gtk_builder_new();
   GError *error = NULL;
-  if (gtk_builder_add_from_file(builder, "interface.glade", &error) == 0) {
+  if (gtk_builder_add_from_file(builder, "interface.glade", &error) == 0)
+  {
     g_printerr("Error loading file: %s\n", error->message);
     g_clear_error(&error);
     return 1;
@@ -346,8 +377,7 @@ int main() {
       .baseImage = image_base,
       .baseContainer = box_solved,
       .solvedImage = image_solved,
-      .filename = malloc(999 * sizeof(char)),
-      .filename_solved = "Image-Defaults/Solved_Image.png",
+      .filename = NULL,
       .save_button = save_button,
   };
 
