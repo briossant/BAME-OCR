@@ -51,6 +51,8 @@ void InvertColor(SDL_Surface *image) {
     }
 }
 
+int keepAroundLen = 3;
+
 // parcours largeur des pixels blanc du chiffre
 void Balance(SDL_Surface *image) {
     // int min = 255;
@@ -97,13 +99,32 @@ void Balance(SDL_Surface *image) {
            whiting_factor);
     for (int x = 0; x < width * height; ++x) {
         SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+        if (a == 0)
+            continue;
         if (r <= mid_pix) {
-            pixtab[x] = SDL_MapRGBA(format, 0, 0, 0, 255);
+            pixtab[x] = SDL_MapRGBA(format, r, r, r, 255);
         } else {
+            for (int a = 0; a < keepAroundLen; a += 1) {
+                for (int b = 0; b < keepAroundLen; b += 1) {
+                    int xc = x % width + a;
+                    int yc = x / width + b;
+                    if (xc < 0 || yc < 0 || xc >= height || yc >= width)
+                        continue;
+                    pixtab[yc * width + xc] = SDL_MapRGBA(format, r, r, r, 0);
+                }
+            }
+        }
+    }
+
+    for (int x = 0; x < width * height; ++x) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+        if (a == 0) {
             r = (double)r * whiting_factor;
             if (r <= min_pix)
                 r = 255;
             pixtab[x] = SDL_MapRGBA(format, r, r, r, 255);
+        } else {
+            pixtab[x] = SDL_MapRGBA(format, 0, 0, 0, 255);
         }
     }
 }

@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
             // MatPrint(inputs);
             int prediction = Predict(network, inputs);
             if (prediction == 0) {
-                printf("predicted 0 which should not happen, replacing by 1\n");
-                prediction = 1;
+                printf("predicted 0 which should not happen, replacing by 0\n");
+                prediction = 0;
             }
             sdk_grid[y][x] = prediction;
         }
