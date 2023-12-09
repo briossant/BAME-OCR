@@ -102,6 +102,7 @@ void *BAME(void *data) {
         if (parameters->step_index < 8)
             parameters->raise_error(
                 "Unable to find a grid... maybe your image is trash ??\n");
+        return 0;
     }
 
     Uint32 color = SDL_MapRGBA(image_copy->format, 255, 0, 255, 255);
