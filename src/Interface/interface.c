@@ -61,9 +61,22 @@ void show_download()
     dialog =
         gtk_message_dialog_new(GTK_WINDOW(Interface->window), GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "Path: %s", Interface->filename);
-    gtk_window_set_title(GTK_WINDOW(dialog), "Where to find it");
+    gtk_window_set_title(GTK_WINDOW(dialog), "Image Saved");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
+}
+
+int validate_numbers(char *message)
+{
+
+    GtkWidget *dialog;
+    dialog =
+        gtk_message_dialog_new(GTK_WINDOW(Interface->window), GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, message);
+    gtk_window_set_title(GTK_WINDOW(dialog), "Verify numbers");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    return 1;
 }
 
 int isInteger(const char *text)
@@ -377,6 +390,7 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
     parameters->filename_resolved = "BAME-Solved.png";
     parameters->show_img = update_image;
     parameters->raise_error = show_warning;
+    parameters->validate_numbers= validate_numbers;
 
     g_print("filename: %s\n", parameters->filename);
 

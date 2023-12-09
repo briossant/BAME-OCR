@@ -167,11 +167,13 @@ void *BAME(void *data) {
     if (SSudo(sdk_grid, 0, 0) != 1) {
         printf("No solution found, please solve it yourself  "
                "(just fill empty square with the right number)\n");
-        if (parameters->step_index < 8)
-            parameters->raise_error(
-                "No solution found, please solve it yourself  "
-                "(just fill empty square with the right number)\n");
-        return 0;
+        if (parameters->step_index < 8) {
+            int changed = parameters->validate_numbers(
+                "No solution found please modifie the grid numbers in : "
+                "src/SudokuSolver/grid_01\n Do not close this window unless "
+                "you have already modified the grid or wish to ignore this "
+                "message\n");
+        }
     }
 
     for (int x = 0; x < 9; ++x)
