@@ -165,11 +165,11 @@ void *BAME(void *data) {
         for (int y = 0; y < 9; ++y)
             copy_grid[y][x] = sdk_grid[y][x];
 
-    while (SSudo(sdk_grid, 0, 0) != 1) {
-        printf("No solution found\n");
-        if (parameters->step_index > 8)
-            return 0;
+    if (SSudo(sdk_grid, 0, 0) != 1) {
         FILE *file = fopen("SudokuSolver/grid.txt", "w");
+        if (file == NULL)
+            err(0, "Missing the file SudokuSolver/grid.txt");
+
         for (int x = 0; x < 9; ++x) {
             for (int y = 0; y < 9; ++y) {
                 if (y == 3 || y == 6)
@@ -183,10 +183,17 @@ void *BAME(void *data) {
 
         fclose(file);
 
-        parameters->validate_numbers(
-            "No solution found please modifie the grid numbers in : "
-            "src/SudokuSolver/grid.txt\n");
-        solve_sudo("SudokuSolver/grid.txt", sdk_grid);
+        printf("No solution found please modifie the grid numbers in : "
+               "src/SudokuSolver/grid.txt\n");
+        if (parameters->step_index < 8)
+            parameters->validate_numbers(
+                "No solution found please modifie the grid numbers in : "
+                "src/SudokuSolver/grid.txt\n");
+        if (solve_sudo("SudokuSolver/grid.txt", sdk_grid) != 1) {
+            printf("You havn't modify the file, operation stopped\n");
+            parameters->raise_error(
+                "You havn't modify the file, operation stopped\n");
+        }
     }
 
     for (int x = 0; x < 9; ++x)
