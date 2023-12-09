@@ -48,7 +48,7 @@ ul{
 	
   &:before,
   &:after {
-    background: white;
+    background: #AAAAAA;
     padding: 50px 0;
     height: 0;
     transform: rotate(45deg);
