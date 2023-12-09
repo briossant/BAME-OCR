@@ -6,19 +6,53 @@ body, html
     font-family: "New Century Schoolbook", "TeX Gyre Schola", serif;
 }
 
-/* Style buttons */
-.btn {
-    background-color: #ff1e4b;
-    border: none;
-    color: white;
-    padding: 12px 30px;
-    cursor: pointer;
-    font-size: 20px;
+
+.divider {
+  display: flex;
+
+  &:before,
+  &:after {
+    content: "";
+    flex: 1;
+  }
 }
 
-/* Darker background on mouse-over */
-.btn:hover {
-    background-color: #7b1b1b;
+p {
+    font-size: 1.4em;
+}
+h1{
+    font-family: 'Doom 2016 Left', sans-serif;
+    font-size: 4em;
+    color: #f00;
+}
+h2 {
+    font-family: 'Doom 2016 Left', sans-serif;
+    font-size: 3em;
+}
+.fata {
+    font-family: 'Doom 2016 Left', sans-serif;
+    font-size: 3em;
+color: #00f;
+}
+ul{
+    font-size: 1.3em;
+}
+
+.dnc {
+  overflow: hidden;
+  align-items: center;
+  background: hsl(0, 100%, 50%);
+  color: black;
+  height: 2em;
+  line-height: 2em;
+	
+  &:before,
+  &:after {
+    background: white;
+    padding: 50px 0;
+    height: 0;
+    transform: rotate(45deg);
+  }
 }
 
 img{
