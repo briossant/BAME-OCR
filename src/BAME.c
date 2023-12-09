@@ -136,7 +136,7 @@ void *BAME(void *data) {
     if (SSudo(sdk_grid, 0, 0) != 1) {
         printf("No solution found\n");
         if (parameters->step_index < 8)
-            parameters->raise_error("No solution found\n");
+            parameters->raise_error("No solution found please modifie the grid numbers in : src/SudokuSolver/grid_01\n" );
         return 0;
     }
 
