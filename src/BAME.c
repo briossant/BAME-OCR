@@ -183,12 +183,15 @@ void *BAME(void *data) {
 
         fclose(file);
 
-        printf("No solution found please modifie the grid numbers in : "
-               "src/SudokuSolver/grid.txt\n");
         if (parameters->step_index < 8)
             parameters->validate_numbers(
                 "No solution found please modifie the grid numbers in : "
-                "src/SudokuSolver/grid.txt\n");
+                "src/SudokuSolver/grid.txt\n Do not close this window unless "
+                "you have already modified the grid or wish to ignore this "
+                "message\n");
+        else
+            printf("No solution found, you will have to do it yourself (just "
+                   "put the good number at the right place easy?)\n");
         if (solve_sudo("SudokuSolver/grid.txt", sdk_grid) != 1) {
             printf("You havn't modify the file, operation stopped\n");
             parameters->raise_error(
