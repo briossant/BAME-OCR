@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Usage: ./ocr <image path>\n");
+        printf("Usage: ./BAME <image path>\n");
         return 1;
     }
     ThreadParameters *parameters = malloc(sizeof(ThreadParameters));
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     parameters->auto_rotate = 1;
     parameters->step_index = 42;
     parameters->filename = argv[1];
-    parameters->filename_resolved = "BANE.png";
+    parameters->filename_resolved = "BAME.png";
     BAME(parameters);
     return 0;
 }
