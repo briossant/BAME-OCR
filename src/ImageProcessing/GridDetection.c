@@ -101,7 +101,8 @@ int *GridDetection(int *lines, int nbr_of_lines) {
         }
     }
 
-    printf("Number of lines: vert: %ld , hori: %ld \n////// Y /////\n", v_i, h_i);
+    printf("Number of lines: vert: %ld , hori: %ld \n////// Y /////\n", v_i,
+           h_i);
     double *y = GridDetectionAux(horizontal, h_i);
     printf("Grid Y coordinates:\ny1: %lf - y2: %lf\n/////// X //////\n", y[0],
            y[1]);

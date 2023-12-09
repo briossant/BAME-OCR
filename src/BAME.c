@@ -173,7 +173,8 @@ void *BAME(void *data) {
                 "src/SudokuSolver/grid_01\n Do not close this window unless "
                 "you have already modified the grid or wish to ignore this "
                 "message\n");
-        }
+        } else
+            return 0;
     }
 
     for (int x = 0; x < 9; ++x)
