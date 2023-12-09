@@ -37,7 +37,7 @@
             </child>
             <child>
               <object class="GtkCheckButton" id="rotation_check">
-                <property name="label" translatable="yes">Rotation</property>
+                <property name="label" translatable="yes">Manual Rotation</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
