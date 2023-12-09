@@ -189,9 +189,11 @@ void *BAME(void *data) {
                 "src/SudokuSolver/grid.txt\n Do not close this window unless "
                 "you have already modified the grid or wish to ignore this "
                 "message\n");
-        else
+        else{
             printf("No solution found, you will have to do it yourself (just "
                    "put the good number at the right place easy?)\n");
+            return 0;
+        }
         if (solve_sudo("SudokuSolver/grid.txt", sdk_grid) != 1) {
             printf("You havn't modify the file, operation stopped\n");
             parameters->raise_error(
