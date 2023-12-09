@@ -1,6 +1,9 @@
 #include "ImageProcess.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_surface.h>
 #include <complex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,7 +64,6 @@ void Balance(SDL_Surface *image) {
     const SDL_PixelFormat *format = image->format;
     Uint32 *pixtab = image->pixels;
     Uint8 r, g, b, a;
-    GreyScale(image);
 
     int count_white = 0;
 
@@ -92,8 +94,9 @@ void Balance(SDL_Surface *image) {
     if (max_pix == 0)
         return;
     double whiting_factor = 255. / max_pix;
-    printf("max %d - min %d - mid %d - factor %lf\n", max_pix, min_pix, mid_pix,
-           whiting_factor);
+    // printf("max %d - min %d - mid %d - factor %lf\n", max_pix, min_pix,
+    // mid_pix,
+    //      whiting_factor);
     for (int x = 0; x < width * height; ++x) {
         SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
         if (r <= mid_pix) {

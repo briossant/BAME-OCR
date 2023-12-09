@@ -3,8 +3,10 @@
 #include "SudokuSolver/Sudoku_Solver.h"
 #include "Interface/interface.h"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void *BAME(void *data) {
 
@@ -15,6 +17,8 @@ void *BAME(void *data) {
     Network network = LoadNetwork(DEFAULT_NN);
 
     SDL_Surface *image = SDL_Start(parameters->filename);
+    if (image == NULL)
+        err(0, "Image not found");
 
     int old_width = image->w;
     int old_height = image->h;
@@ -55,7 +59,34 @@ void *BAME(void *data) {
         printf("angle_rotated: %lf\n", angle_to_rotate);
     }
     image_copy = Rotate(image_copy, angle_to_rotate);
+    SDL_Surface *image_copy_test = SDL_ConvertSurface(image_copy, format, 0);
     canny_copy = Rotate(canny_copy, angle_to_rotate);
+
+    Uint32 *pixtab = image_copy_test->pixels;
+    int height = image_copy_test->h;
+    int width = image_copy_test->w;
+    Uint8 r, g, b, a;
+    Uint8 biais = ComputeSeuil(image_copy_test);
+    if (biais < 10) {
+        biais = 255;
+    }
+    for (int x = 0; x < width * height; x++) {
+        SDL_GetRGBA(pixtab[x], format, &r, &g, &b, &a);
+
+        if ((r + g + b) / 3 > biais) {
+            r = 255;
+            g = 255;
+            b = 255;
+        } else {
+            r = 0;
+            g = 0;
+            b = 0;
+        }
+
+        // Pixel Update
+        pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
+    }
+    IMG_SavePNG(image_copy_test, "test_otsu_bw.png");
 
     IMG_SavePNG(canny_copy, parameters->filename_resolved);
     if (parameters->step_index < 7)
@@ -92,8 +123,8 @@ void *BAME(void *data) {
             int image_y = grid_corner[1] + y * box_size_y;
             // remove offseting from Resize_crop and do it after void_square
             SDL_Surface *box_img =
-                Resize_crop(image_copy, image_x, image_y, image_x + box_size_x,
-                            image_y + box_size_y);
+                Resize_crop(image_copy_test, image_x, image_y,
+                            image_x + box_size_x, image_y + box_size_y);
             grid_coo[y][x] = image_y * image_copy->w +
                              image_x; // grid of coordinates of each box
 
@@ -116,8 +147,8 @@ void *BAME(void *data) {
             // MatPrint(inputs);
             int prediction = Predict(network, inputs);
             if (prediction == 0) {
-                printf("predicted 0 which should not happen, replacing by 1\n");
-                prediction = 1;
+                printf("predicted 0 which should not happen, replacing by 0\n");
+                prediction = 0;
             }
             sdk_grid[y][x] = prediction;
         }
