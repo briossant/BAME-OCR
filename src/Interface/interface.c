@@ -246,12 +246,8 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
     {
         // Get the selected file
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-
+        
         interface->filename = filename;
-        // char *tmp = malloc((strlen(filename) + 1) * sizeof(char));
-        // strcpy(tmp, filename);
-        // interface->filename_solved = tmp;
-        // g_print("interface->solved = %s\n", interface->filename_solved);
 
         GtkWidget *image_widget = gtk_image_new_from_file(filename);
         if (image_widget == NULL)
@@ -307,7 +303,7 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
             char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
             // Sauvegarder le pixbuf dans le fichier
-            GError *e;
+            // GError *e;
             gdk_pixbuf_save(pixbuf, filename, "png", NULL, NULL);
 
             // Libérer la mémoire du chemin du fichier
@@ -347,6 +343,11 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
                 angle = atoi(text);
                 is_automatic = 0;
             }
+        }
+        else
+        {
+            angle = 0;
+            is_automatic = 0;
         }
     }
 
