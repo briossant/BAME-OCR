@@ -12,7 +12,7 @@ void *BAME(void *data) {
 
     print_logo();
     ThreadParameters *parameters = data;
-    printf("filename = %s\n", parameters->filename);
+    printf("Solving your sudoku in %s\n", parameters->filename);
 
     Network network = LoadNetwork(DEFAULT_NN);
 
@@ -56,8 +56,8 @@ void *BAME(void *data) {
     if (parameters->auto_rotate) {
         angle_to_rotate =
             GetImageAngleAndRotateHoughMatrix(ho_mat, ho_mat_size);
-        printf("angle_rotated: %lf\n", angle_to_rotate);
     }
+    printf("Rotating the image %lf degrees\n", angle_to_rotate);
     image_copy = Rotate(image_copy, angle_to_rotate);
     SDL_Surface *image_copy_test = SDL_ConvertSurface(image_copy, format, 0);
     canny_copy = Rotate(canny_copy, angle_to_rotate);
@@ -86,7 +86,6 @@ void *BAME(void *data) {
         // Pixel Update
         pixtab[x] = SDL_MapRGBA(format, r, g, b, a);
     }
-    IMG_SavePNG(image_copy_test, "test_otsu_bw.png");
 
     IMG_SavePNG(canny_copy, parameters->filename_resolved);
     if (parameters->step_index < 7)
@@ -98,9 +97,11 @@ void *BAME(void *data) {
     int *grid_corner = GridDetection(ho_points, ho_mat_size);
 
     if (grid_corner[0] < 0 || grid_corner[1] < 0) {
-        printf("Unable to find a grid\n");
+        printf(
+            "Unable to find the sudoku grid... maybe your image is trash ??\n");
         if (parameters->step_index < 8)
-            parameters->raise_error("Unable to find a grid\n");
+            parameters->raise_error(
+                "Unable to find a grid... maybe your image is trash ??\n");
     }
 
     Uint32 color = SDL_MapRGBA(image_copy->format, 255, 0, 255, 255);
@@ -128,35 +129,34 @@ void *BAME(void *data) {
             grid_coo[y][x] = image_y * image_copy->w +
                              image_x; // grid of coordinates of each box
 
-            char *kokok;
-            Balance(box_img); // A retravailler -> marche pas bien pour les 9,
-                              // 6, 8, 4
+            // char *kokok;
+            Balance(box_img);
             if (!void_square(box_img)) {
-                asprintf(&kokok, "tmp/empty-%d-%d.png", x, y);
-                IMG_SavePNG(box_img, kokok);
+                /*asprintf(&kokok, "tmp/empty-%d-%d.png", x, y);
+                IMG_SavePNG(box_img, kokok);*/
                 sdk_grid[y][x] = 0;
                 continue;
             }
-            asprintf(&kokok, "tmp/full-before-%d-%d.png", x, y);
+            /*asprintf(&kokok, "tmp/full-before-%d-%d.png", x, y);
             IMG_SavePNG(box_img, kokok);
-            box_img = CenterNumber(box_img);
             asprintf(&kokok, "tmp/full-%d-%d.png", x, y);
-            IMG_SavePNG(box_img, kokok);
+            IMG_SavePNG(box_img, kokok);*/
 
+            box_img = CenterNumber(box_img);
             Matrix inputs = image_to_matrix(box_img);
             // MatPrint(inputs);
             int prediction = Predict(network, inputs);
-            if (prediction == 0) {
+            /*if (prediction == 0) {
                 printf("predicted 0 which should not happen, replacing by 0\n");
                 prediction = 0;
-            }
+            }*/
             sdk_grid[y][x] = prediction;
         }
     }
 
     // step 7
-    // TODO: hack the grid modif
 
+    printf("Detected grid:\n");
     printgrid(sdk_grid);
     int copy_grid[9][9];
 
@@ -165,14 +165,16 @@ void *BAME(void *data) {
             copy_grid[y][x] = sdk_grid[y][x];
 
     if (SSudo(sdk_grid, 0, 0) != 1) {
-        printf("No solution found\n");
-        if (parameters->step_index < 8)
-        {
-
-
-            int changed = parameters->validate_numbers("No solution found please modifie the grid numbers in : src/SudokuSolver/grid_01\n Do not close this window unless you have already modified the grid or wish to ignore this message\n" );
-
-        }
+        printf("No solution found, please solve it yourself  "
+               "(just fill empty square with the right number)\n");
+        if (parameters->step_index < 8) {
+            int changed = parameters->validate_numbers(
+                "No solution found please modifie the grid numbers in : "
+                "src/SudokuSolver/grid_01\n Do not close this window unless "
+                "you have already modified the grid or wish to ignore this "
+                "message\n");
+        } else
+            return 0;
     }
 
     for (int x = 0; x < 9; ++x)
@@ -187,7 +189,10 @@ void *BAME(void *data) {
     IMG_SavePNG(image_copy, parameters->filename_resolved);
     if (parameters->step_index < 8)
         parameters->show_img();
-    printf("Successful bb\n");
+    printf("\nSuccessful bb, BAME-OCR is sooo awsome!\n\n");
+    printf("Solved grid:\n");
     printgrid(sdk_grid);
+    printf("\nSolved image was saved as BAME.png\n");
+    printf("\nYou're welcome,\nGoodbye!\n");
     return 0;
 }

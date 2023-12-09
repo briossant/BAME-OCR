@@ -78,6 +78,7 @@ double *GridDetectionAux(double *points, size_t len) {
 
 // main function
 int *GridDetection(int *lines, int nbr_of_lines) {
+    printf("\nDATA FOR THE DEV TEAM, DO NOT LOOK PLEASE!\n");
     double *vertical = malloc(sizeof(double) * nbr_of_lines);
     double *horizontal = malloc(sizeof(double) * nbr_of_lines);
     size_t v_i = 0;
@@ -100,17 +101,20 @@ int *GridDetection(int *lines, int nbr_of_lines) {
         }
     }
 
-    printf("v: %ld , h: %ld \n////// Y /////\n", v_i, h_i);
+    printf("Number of lines: vert: %ld , hori: %ld \n////// Y /////\n", v_i,
+           h_i);
     double *y = GridDetectionAux(horizontal, h_i);
-    printf("\n\ny: %lf %lf\n/////// X //////\n", y[0], y[1]);
+    printf("Grid Y coordinates:\ny1: %lf - y2: %lf\n/////// X //////\n", y[0],
+           y[1]);
     double *x = GridDetectionAux(vertical, v_i);
 
-    printf("\n\nx: %lf %lf\n", x[0], x[1]);
+    printf("Grid X coordinates\nx1: %lf - x2: %lf\n", x[0], x[1]);
     int *matrix = malloc(sizeof(int) * 4);
     matrix[0] = x[0];
     matrix[1] = y[0];
     matrix[2] = x[1];
     matrix[3] = y[1];
+    printf("YOU CAN LOOK BACK NOW\n\n");
 
     return matrix;
 }
