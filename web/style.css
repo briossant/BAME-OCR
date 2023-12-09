@@ -1,0 +1,40 @@
+
+body, html
+{
+    background: #AAAAAA;
+    font-size: large;
+    font-family: "New Century Schoolbook", "TeX Gyre Schola", serif;
+}
+
+/* Style buttons */
+.btn {
+    background-color: #ff1e4b;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+    background-color: #7b1b1b;
+}
+
+img{
+    border-radius: 30px;
+}
+section {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+
+.carousel-caption{
+    color: #ffffff;
+    border-radius: 20px;
+    background-color: rgba(55,55,55,0.5);
+}
