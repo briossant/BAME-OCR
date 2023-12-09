@@ -22,7 +22,6 @@ typedef struct UserInterface
     guint window_size;
     char *filename;
     GtkButton *save_button;
-
 } UserInterface;
 
 UserInterface *Interface;
@@ -62,6 +61,57 @@ int isInteger(const char *text)
 
     // Check if conversion was successful and the entire string was consumed
     return (*text != '\0' && *endptr == '\0');
+}
+
+void open_button_clicked(GtkWidget *widget, gpointer user_data) {
+    // Récupérer l'objet GtkEntry à partir des données utilisateur
+    // GtkEntry *entry = GTK_ENTRY(user_data);
+
+    // Demander à l'utilisateur de sélectionner un fichier
+    GtkWidget *dialog = gtk_file_chooser_dialog_new("Open File",
+                                                    NULL,
+                                                    GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                    "Cancel", GTK_RESPONSE_CANCEL,
+                                                    "Open", GTK_RESPONSE_ACCEPT,
+                                                    NULL);
+
+    // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
+    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+
+    if (response == GTK_RESPONSE_ACCEPT) {
+        // Obtenir le chemin du fichier sélectionné
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+        // Ouvrir le fichier en mode lecture
+        FILE *file = fopen(filename, "r");
+        if (file != NULL) {
+            // Lire le contenu du fichier
+            fseek(file, 0, SEEK_END);
+            long file_size = ftell(file);
+            fseek(file, 0, SEEK_SET);
+
+            char *file_content = malloc(file_size + 1);
+            fread(file_content, 1, file_size, file);
+            file_content[file_size] = '\0';
+
+            // Définir le texte du GtkEntry avec le contenu du fichier
+            gtk_entry_set_text(Interface->entry, file_content);
+
+            // Libérer la mémoire allouée pour le contenu du fichier
+            free(file_content);
+
+            // Fermer le fichier
+            fclose(file);
+        } else {
+            g_printerr("Failed to open the file: %s\n", filename);
+        }
+
+        // Libérer la mémoire du chemin du fichier
+        g_free(filename);
+    }
+
+    // Détruire la boîte de dialogue
+    gtk_widget_destroy(dialog);
 }
 
 gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
@@ -246,7 +296,7 @@ static void upload_button_clicked(GtkWidget *widget, gpointer user_data)
     {
         // Get the selected file
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        
+
         interface->filename = filename;
 
         GtkWidget *image_widget = gtk_image_new_from_file(filename);

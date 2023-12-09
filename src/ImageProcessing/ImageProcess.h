@@ -44,6 +44,8 @@ typedef struct {
     int y;
 } pair;
 
+void print_logo();
+
 void SortList(double *list, size_t len);
 
 int mostBrightPixel(SDL_Surface *image);

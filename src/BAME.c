@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 void *BAME(void *data) {
+
+    print_logo();
     ThreadParameters *parameters = data;
     printf("filename = %s\n", parameters->filename);
 
