@@ -35,7 +35,7 @@
 #define FIRST_CROP_SIZE 58
 #define NN_IMAGE_SIZE 28 // mnist size
 #define TRESHOLD_NUMBER_DETECTION 24
-#define OFFSET_CENTER_NUMBER 2
+#define OFFSET_CENTER_NUMBER 4
 #define OFFSET_FIRST_CROP 28
 //////// DEFINES END //////
 
@@ -121,3 +121,8 @@ SDL_Surface *CenterNumber(SDL_Surface *image);
 
 void get_green_number(SDL_Surface *image, int number, int start, int end,
                       char *path);
+
+int Balance_test(SDL_Surface *image);
+
+int convolution_grayscale(SDL_Surface *image, int x, int y, int *kernel,
+                          int kernelWidth);

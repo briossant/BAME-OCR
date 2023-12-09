@@ -169,15 +169,16 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
     int d = S - N;
     int y = N;
 
-    printf("x_center = %i, y_center = %i\n", nb_center % width,
-           nb_center / width);
+    // printf("x_center = %i, y_center = %i\n", nb_center % width,
+    //        nb_center / width);
 
     if (d2 == 0)
         d2 = 1;
     int x = (nb_center % width) - (dW * d) / d2;
 
-    printf("N= %i, S= %i, E= %i, W= %i, d= %i, y= %i, x= %i\n", N, S, E, W, d,
-           y, x);
+    // printf("N= %i, S= %i, E= %i, W= %i, d= %i, y= %i, x= %i\n", N, S,
+    // E, W, d,
+    //         y, x);
 
     if (x < OFFSET_CENTER_NUMBER)
         x = OFFSET_CENTER_NUMBER;
@@ -199,6 +200,15 @@ SDL_Surface *CenterNumber(SDL_Surface *image) {
     int er = SDL_BlitScaled(image, &src, image_converted, NULL);
     if (er == -1)
         err(0, NULL);
+
+    Uint8 r, g, b, a;
+    Uint32 *pixtab2 = image_converted->pixels;
+    for (int x = 0; x < NN_IMAGE_SIZE * NN_IMAGE_SIZE; x++) {
+        SDL_GetRGBA(pixtab2[x], format, &r, &g, &b, &a);
+        if (a < 254) {
+            pixtab2[x] = SDL_MapRGBA(format, 0, 0, 0, 255);
+        }
+    }
 
     // printf("Is empty? = %i\n",void_square(image_converted));
     return image_converted;
