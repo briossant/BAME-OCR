@@ -195,9 +195,9 @@ void *BAME(void *data) {
             return 0;
         }
         if (solve_sudo("SudokuSolver/grid.txt", sdk_grid) != 1) {
-            printf("You havn't modify the file, operation stopped\n");
+            printf("You haven't modify the file, operation stopped\n");
             parameters->raise_error(
-                "You havn't modify the file, operation stopped\n");
+                "You haven't modify the file, operation stopped\n");
             return 0;
         }
     }
