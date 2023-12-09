@@ -163,16 +163,30 @@ void *BAME(void *data) {
     for (int x = 0; x < 9; ++x)
         for (int y = 0; y < 9; ++y)
             copy_grid[y][x] = sdk_grid[y][x];
-
-    if (SSudo(sdk_grid, 0, 0) != 1) {
+    if (SSudo(sdk_grid, 0, 0) != 1)
+    {
         printf("No solution found\n");
-        if (parameters->step_index < 8)
+    }
+
+    while (SSudo(sdk_grid, 0, 0) != 1) {
+        FILE* file = fopen("SudokuSolver/grid.txt", "w");
+        for (int x = 0; x < 9; ++x)
         {
-
-
-            int changed = parameters->validate_numbers("No solution found please modifie the grid numbers in : src/SudokuSolver/grid_01\n Do not close this window unless you have already modified the grid or wish to ignore this message\n" );
-
+            for (int y = 0; y < 9; ++y)
+            {
+                if (y == 3 || y == 6)
+                    fprintf(file, " ");    
+                fprintf(file, "%d",sdk_grid[x][y]);
+            }
+            if (x == 2 || x == 5)
+                fprintf(file, "\n"); 
+            fprintf(file, "\n");
         }
+        
+        fclose(file);
+
+        parameters->validate_numbers("No solution found please modifie the grid numbers in : src/SudokuSolver/grid.txt\n" );
+        solve_sudo("SudokuSolver/grid.txt", sdk_grid);
     }
 
     for (int x = 0; x < 9; ++x)

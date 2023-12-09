@@ -4,7 +4,7 @@ LDFLAGS= `pkg-config sdl2 --libs` -lSDL2_image -lm `pkg-config --libs gtk+-3.0`
 EXEC=BAME
 SRC_NN= $(wildcard NeuralNetwork/utilities/*.c) $(wildcard NeuralNetwork/matrices/*.c) $(wildcard NeuralNetwork/mnistHandler/*.c) $(wildcard NeuralNetwork/network/*.c) 
 SRC_IP= $(filter-out ImageProcessing/ImageProcess.c, $(wildcard ImageProcessing/*.c))
-SRC_SS= SudokuSolver/PrintGrid.c SudokuSolver/Sudoku_Solver.c
+SRC_SS= SudokuSolver/PrintGrid.c SudokuSolver/Sudoku_Solver.c SudokuSolver/solvesudo.c
 # SRC_IF= Interface/interface.c
 OBJ= $(SRC_NN:.c=.o) $(SRC_IP:.c=.o) $(SRC_SS:.c=.o) BAME.o
 
