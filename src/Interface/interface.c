@@ -22,6 +22,7 @@ typedef struct UserInterface
     guint window_size;
     char *filename;
     GtkButton *save_button;
+
 } UserInterface;
 
 UserInterface *Interface;
@@ -54,6 +55,17 @@ void show_error(char *message, gpointer window)
     gtk_widget_destroy(dialog);
 }
 
+void show_download()
+{
+    GtkWidget *dialog;
+    dialog =
+        gtk_message_dialog_new(GTK_WINDOW(Interface->window), GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "Path: %s", Interface->filename);
+    gtk_window_set_title(GTK_WINDOW(dialog), "Where to find it");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
 int isInteger(const char *text)
 {
     char *endptr;
@@ -61,57 +73,6 @@ int isInteger(const char *text)
 
     // Check if conversion was successful and the entire string was consumed
     return (*text != '\0' && *endptr == '\0');
-}
-
-void open_button_clicked(GtkWidget *widget, gpointer user_data) {
-    // Récupérer l'objet GtkEntry à partir des données utilisateur
-    // GtkEntry *entry = GTK_ENTRY(user_data);
-
-    // Demander à l'utilisateur de sélectionner un fichier
-    GtkWidget *dialog = gtk_file_chooser_dialog_new("Open File",
-                                                    NULL,
-                                                    GTK_FILE_CHOOSER_ACTION_OPEN,
-                                                    "Cancel", GTK_RESPONSE_CANCEL,
-                                                    "Open", GTK_RESPONSE_ACCEPT,
-                                                    NULL);
-
-    // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
-    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-
-    if (response == GTK_RESPONSE_ACCEPT) {
-        // Obtenir le chemin du fichier sélectionné
-        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-
-        // Ouvrir le fichier en mode lecture
-        FILE *file = fopen(filename, "r");
-        if (file != NULL) {
-            // Lire le contenu du fichier
-            fseek(file, 0, SEEK_END);
-            long file_size = ftell(file);
-            fseek(file, 0, SEEK_SET);
-
-            char *file_content = malloc(file_size + 1);
-            fread(file_content, 1, file_size, file);
-            file_content[file_size] = '\0';
-
-            // Définir le texte du GtkEntry avec le contenu du fichier
-            gtk_entry_set_text(Interface->entry, file_content);
-
-            // Libérer la mémoire allouée pour le contenu du fichier
-            free(file_content);
-
-            // Fermer le fichier
-            fclose(file);
-        } else {
-            g_printerr("Failed to open the file: %s\n", filename);
-        }
-
-        // Libérer la mémoire du chemin du fichier
-        g_free(filename);
-    }
-
-    // Détruire la boîte de dialogue
-    gtk_widget_destroy(dialog);
 }
 
 gboolean rotate_check_clicked(GtkWidget *widget, gpointer user_data)
@@ -322,47 +283,52 @@ gboolean save_button_clicked(GtkWidget *widget, GdkEvent *event,
 {
     (void)event;
     (void)widget;
-    // Récupérer l'objet GtkImage à partir des données utilisateur
-    UserInterface *interface = user_data;
-    GtkImage *image = interface->solvedImage;
+    (void)user_data;
 
-    // Récupérer le GdkPixbuf associé à l'image
-    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
-    // GdkPixbuf *pixbuf =
-    //     gdk_pixbuf_new_from_file(interface->filename_solved, NULL);
+    // GdkPixbuf *pixbuf = gtk_image_get_pixbuf(Interface->solvedImage);
+    // // GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("Interface/Image-Defaults/Solved_Image.png", NULL);
 
-    if (pixbuf != NULL)
-    {
-        // Demander à l'utilisateur le nom du fichier de sauvegarde
-        GtkWidget *dialog = gtk_file_chooser_dialog_new(
-            "Save Image", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel",
-            GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+    // if (pixbuf != NULL)
+    // {
+    //     // Demander à l'utilisateur le nom du fichier de sauvegarde
+    //     GtkWidget *dialog = gtk_file_chooser_dialog_new(
+    //         "Save Image", NULL, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel",
+    //         GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
 
-        // Ajouter un filtre d'extension pour les fichiers image
-        GtkFileFilter *filter = gtk_file_filter_new();
-        gtk_file_filter_set_name(filter, "Image Files");
-        gtk_file_filter_add_mime_type(filter, "image/*");
-        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+    //     // Ajouter un filtre d'extension pour les fichiers image
+    //     GtkFileFilter *filter = gtk_file_filter_new();
+    //     gtk_file_filter_set_name(filter, "Image Files");
+    //     gtk_file_filter_add_mime_type(filter, "image/*");
+    //     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
-        // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
-        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+    //     // Exécuter la boîte de dialogue et obtenir la réponse de l'utilisateur
+    //     gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
-        if (response == GTK_RESPONSE_ACCEPT)
-        {
-            // Obtenir le chemin du fichier sélectionné
-            char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    //     if (response == GTK_RESPONSE_ACCEPT)
+    //     {
+    //         // Obtenir le chemin du fichier sélectionné
+    //         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-            // Sauvegarder le pixbuf dans le fichier
-            // GError *e;
-            gdk_pixbuf_save(pixbuf, filename, "png", NULL, NULL);
+    //         // Sauvegarder le pixbuf dans le fichier
+    //         GError *error = NULL;
+    //         gdk_pixbuf_savev(GDK_PIXBUF(pixbuf), filename, "png", NULL, NULL, &error);
+    //         if (error == NULL)
+    //         {
+    //             g_printerr("Error loading file: %s\n", error->message);
+    //             g_clear_error(&error);
+    //             return 1;
+    //         }
 
-            // Libérer la mémoire du chemin du fichier
-            // g_free(filename);
-        }
+    //         // Libérer la mémoire du chemin du fichier
+    //         // g_free(filename);
+    //     }
 
-        // Détruire la boîte de dialogue
-        gtk_widget_destroy(dialog);
-    }
+    //     // Détruire la boîte de dialogue
+    //     gtk_widget_destroy(dialog);
+    // }
+
+    show_download();
+
     return TRUE;
 }
 
@@ -408,7 +374,7 @@ static void solve_button_clicked(GtkWidget *widget, gpointer user_data)
     strcpy(tmp, interface->filename);
     parameters->filename = tmp;
     parameters->step_index = step_by_step ? 0 : 7;
-    parameters->filename_resolved = "Nimp.png";
+    parameters->filename_resolved = "BAME-Solved.png";
     parameters->show_img = update_image;
     parameters->raise_error = show_warning;
 
@@ -486,10 +452,8 @@ int main()
     Interface->baseImage = image_base;
     Interface->baseContainer = box_solved;
     Interface->solvedImage = image_solved;
-    Interface->filename = NULL;
+    Interface->filename = "src/Interface/Image-Defaults/Solved_Image.png";
     Interface->save_button = save_button;
-
-    // Interface.filename_solved = "Image-Defaults/Solved_Image.png";
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(help_button, "clicked", G_CALLBACK(help_button_clicked),
