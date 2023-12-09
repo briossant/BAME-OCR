@@ -34,7 +34,7 @@ section {
 
 
 .carousel-caption{
-    color: #ffffff;
+    color: #ff0000;
     border-radius: 20px;
-    background-color: rgba(55,55,55,0.5);
+    background-color: rgba(170, 170, 170, 0.6);
 }
