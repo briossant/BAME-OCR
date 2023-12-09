@@ -9,6 +9,7 @@ typedef struct ThreadParameters {
     char *filename_resolved;
     void (*show_img)(void);
     void (*raise_error)(char *);
+    int (*validate_numbers)(char*);
 } ThreadParameters;
 
 void *BAME(void *data);
