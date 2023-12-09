@@ -9,6 +9,8 @@
 #include <stdlib.h>
 
 void *BAME(void *data) {
+
+    print_logo();
     ThreadParameters *parameters = data;
     printf("filename = %s\n", parameters->filename);
 
@@ -98,7 +100,7 @@ void *BAME(void *data) {
     if (grid_corner[0] < 0 || grid_corner[1] < 0) {
         printf("Unable to find a grid\n");
         if (parameters->step_index < 8)
-            parameters->raise_error("unabled to find a grid\n");
+            parameters->raise_error("Unable to find a grid\n");
     }
 
     Uint32 color = SDL_MapRGBA(image_copy->format, 255, 0, 255, 255);

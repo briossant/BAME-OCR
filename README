@@ -4,48 +4,43 @@ An optical character recogniser and sudoku solver app.
 
 ## Overview
 
-The current version includes a neural network restricted to the XOR problem with
-its CLI, an image processing unit with its CLI and a sudoku solver.
+BAME-OCR includes a main program which takes a photo of a sudoku and return an
+image with that grid solved. That main program has a CLI and a GUI version.
+BAME-OCR also includes a separate sudoku solver which takes grid in text format,
+and a neural network CLI which can train and test networks.
+
+On top of that, the project also include a static website in ```web/```.
 
 ## Installation & Requirements
 
 Just clone the master branch for setup.
 
-The program is written in c and requires the SDL2 and SDL2-image packages.
+The program is written in c and requires the SDL2 and SDL2-image packages as
+well as gtk3.
 
 The program is only tested on linux with the gcc compiler.
 
+If warnings occur during the use of the interface do not panic this is normal
+as gtk has some basic warnings that can not be suppressed.
+
 ## Usage
 
-Since the project isn't finished, only the sub-program can be used separatly.
-Each of them can be found under ```src/[sub-program name]/```.
+### Main program
 
-Details on those below.
+The neural network can be found under ```src/```
 
-### Image processing
-
-The image processing can be found under ```src/ImageProcessing/```
-
-Run ```make``` to compile and then ```./ImageProcess``` to enter the CLI.
-The program doesn't take any arguments.
+Run ```make``` to compile with the CLI. 
 
 CLI usage:
 
-* a, all: Apply all the filters for the OCR
-* i, input [filename]: Input file
-* o, output [filename]: Output file
-* h, help: Display this help message
-* v, version: Display version information
-* g, greyscale: Convert the image to grayscale
-* bw, blackwhite: Convert the image to black and white
-* c, contrast: Adjust the image contrast
-* gb, gaussianblur: Apply Gaussian blur to the image
-* b, bright: Adjust the image brightness
-* ag, arroundgaussianblur: Apply Gaussian blur to the image
-* r, rotate [angle]: Rotate the image
-* ca, canny: Apply Canny filters to the image
+〉./BAME <image path>
 
-### XOR Neural Network
+
+Otherwise, run ```make interface``` to compile with the GUI and then run
+```./interface``` to start it.
+
+
+### Neural Network
 
 The neural network can be found under ```src/NeuralNetwork/```
 
@@ -54,13 +49,14 @@ The program doesn't take any arguments.
 
 CLI usage:
 
-* 〉 help : show this message
-* 〉 new [hidden layer size] ... : create a new network
-* 〉 train [learning rate] [epochs] [inertia strength]: train the network
-* 〉 run [0 or 1] [0 or 1]: run the prediction on those inputs
-* 〉 save [filename]: save the network
-* 〉 load [filename]: load the network
-
+*〉help : show this message
+*〉quit : exit program
+*〉new [hidden layer size] ... : create a new network
+*〉train [learning rate] [epochs] [inertia strength] [batch size] [dataset] : train the network
+*〉test [dataset] : test network performance on the test database
+*〉save [filename] : save the network
+*〉load [filename] : load the network
+*〉img [filename] : predict the number on the image (28x28 pixels)
 
 ### Sudoku solver
 
